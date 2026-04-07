@@ -46,14 +46,27 @@ if (isset($_POST['action']) && $_POST['action'] == 'delete') {
     exit;
 }
 
-$data = $conn->query("SELECT * FROM tb_supervisi_ipcn ORDER BY id DESC");
+$dataRows = [];
+$data = safe_query($conn, "SELECT * FROM tb_supervisi_ipcn ORDER BY id DESC");
+if ($data) {
+    while ($row = $data->fetch_assoc()) {
+        $dataRows[] = $row;
+    }
+}
+
+$tahunListRows = [];
+$tahunList = safe_query($conn, "SELECT DISTINCT YEAR(tanggal) as tahun FROM tb_supervisi_ipcn ORDER BY tahun DESC");
+if ($tahunList) {
+    while ($row = $tahunList->fetch_assoc()) {
+        $tahunListRows[] = $row;
+    }
+}
 ?>
 
 
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "AUDIT DAN SUPERVISI";
-include '../layout.php';
 ?>
 <!--end-->
 
@@ -662,12 +675,9 @@ include '../layout.php';
                     <div class="filterTahun">
                         <select id="filterTahun" onchange="filterData()">
                             <option value="semua">Semua Tahun</option>
-                            <?php
-                            $tahunList = $conn->query("SELECT DISTINCT YEAR(tanggal) as tahun FROM tb_supervisi_ipcn ORDER BY tahun DESC");
-                            while ($t = $tahunList->fetch_assoc()) {
-                                echo "<option value='{$t['tahun']}'>{$t['tahun']}</option>";
-                            }
-                            ?>
+                            <?php foreach ($tahunListRows as $t): ?>
+                                <option value="<?= $t['tahun'] ?>"><?= $t['tahun'] ?></option>
+                            <?php endforeach; ?>
                         </select>
 
                         <input type="month" id="filterBulan" onchange="filterData()">
@@ -692,7 +702,7 @@ include '../layout.php';
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php while ($row = $data->fetch_assoc()): ?>
+                                <?php foreach ($dataRows as $row): ?>
                                     <tr>
                                         <td>
                                             <?= htmlspecialchars($row['tanggal']) ?>
@@ -729,7 +739,7 @@ include '../layout.php';
                                             </form>
                                         </td>
                                     </tr>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                     </div>

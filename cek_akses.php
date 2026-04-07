@@ -1,10 +1,12 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 include_once "koneksi.php";
 
 // 1️⃣ Cek login
 if (!isset($_SESSION['username'])) {
-    header("Location: /login.php");
+    header("Location: " . base_url('login.php'));
     exit;
 }
 

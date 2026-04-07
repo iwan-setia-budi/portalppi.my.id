@@ -3,11 +3,13 @@ const sidebar = document.getElementById('sb');
 const layout = document.querySelector('.layout');
 
 /* TOGGLE SIDEBAR */
-btn.addEventListener('click', () => {
-    layout.classList.toggle('collapse');
-    sidebar.classList.toggle('open');
-    btn.classList.toggle('active');
-});
+if (btn && sidebar && layout) {
+    btn.addEventListener('click', () => {
+        layout.classList.toggle('collapse');
+        sidebar.classList.toggle('open');
+        btn.classList.toggle('active');
+    });
+}
 
 /* CLOSE SIDEBAR SAAT KLIK DI LUAR (MOBILE ONLY) */
 document.addEventListener('click', function (e) {
@@ -15,6 +17,7 @@ document.addEventListener('click', function (e) {
     const isMobile = window.innerWidth <= 900;
 
     if (!isMobile) return;
+    if (!sidebar || !btn || !layout) return;
 
     const clickInsideSidebar = sidebar.contains(e.target);
     const clickHamburger = btn.contains(e.target);
@@ -38,7 +41,7 @@ if (userToggle) {
 }
 
 document.addEventListener("click", function (e) {
-  if (!e.target.closest(".user-menu")) {
+    if (userDropdown && !e.target.closest(".user-menu")) {
     userDropdown.style.display = "none";
   }
 });
@@ -85,3 +88,35 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 });
+
+/* THEME TOGGLE GLOBAL */
+(function () {
+    const storageKey = 'portalppi_theme';
+    const themeButton = document.getElementById('toggleThemeGlobal');
+    const themeText = themeButton ? themeButton.querySelector('.theme-text') : null;
+
+    function applyTheme(theme) {
+        const isDark = theme === 'dark';
+        document.body.classList.toggle('dark-mode', isDark);
+
+        if (themeText) {
+            themeText.innerHTML = isDark ? '☀️ Mode Terang' : '🌙 Mode Gelap';
+        }
+
+        if (themeButton) {
+            themeButton.setAttribute('aria-label', isDark ? 'Ubah ke mode terang' : 'Ubah ke mode gelap');
+        }
+    }
+
+    const savedTheme = localStorage.getItem(storageKey);
+    const defaultTheme = savedTheme ? savedTheme : 'light';
+    applyTheme(defaultTheme);
+
+    if (themeButton) {
+        themeButton.addEventListener('click', function () {
+            const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+            localStorage.setItem(storageKey, nextTheme);
+            applyTheme(nextTheme);
+        });
+    }
+})();

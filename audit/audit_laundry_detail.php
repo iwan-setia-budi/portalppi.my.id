@@ -108,7 +108,6 @@ $monitoring = [
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "LIHAT DATA AUDIT LAUNDRY";
-include '../layout.php';
 ?>
 <!--end-->
 

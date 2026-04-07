@@ -24,7 +24,6 @@ $fotos = mysqli_query($koneksi, "
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "LIHAT fFOTO AUDIT LAUNDRY";
-include '../layout.php';
 ?>
 <!--end-->
 

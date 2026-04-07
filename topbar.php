@@ -5,17 +5,21 @@
     <?= isset($pageTitle) ? $pageTitle : 'Dashboard'; ?>
   </div>
 
-  <!-- USER DROPDOWN -->
-  <div class="user-menu">
-    <div class="user-toggle" id="userToggle">
-      👤 <?= $_SESSION['username']; ?> ▼
-    </div>
+  <div class="topbar-right">
+    <button type="button" class="theme-switch" id="toggleThemeGlobal" aria-label="Ubah tema"><span class="theme-text">🌙 Mode Gelap</span></button>
 
-    <div class="user-dropdown" id="userDropdown">
-      <a href="/profile.php">Profile</a>
-      <a href="/ganti_password.php">Ganti Password</a>
-      <hr>
-      <a href="/logout.php" class="logout">Logout</a>
+    <!-- USER DROPDOWN -->
+    <div class="user-menu">
+      <div class="user-toggle" id="userToggle">
+        <span class="user-icon">👤</span><span class="user-text"><?= $_SESSION['username']; ?> ▼</span>
+      </div>
+
+      <div class="user-dropdown" id="userDropdown">
+        <a href="/profile.php">Profile</a>
+        <a href="/ganti_password.php">Ganti Password</a>
+        <hr>
+        <a href="/logout.php" class="logout">Logout</a>
+      </div>
     </div>
   </div>
 

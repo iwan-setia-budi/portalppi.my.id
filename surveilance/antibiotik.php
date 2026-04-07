@@ -45,7 +45,6 @@ if (isset($_GET['load'])) {
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "SURVEILANCE";
-include '../layout.php';
 ?>
 <!--end-->
 

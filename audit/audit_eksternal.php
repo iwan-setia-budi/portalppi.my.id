@@ -2,11 +2,11 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-include_once 'koneksi.php';
+include_once '../koneksi.php';
 
 // Proteksi halaman
 if (!isset($_SESSION['username'])) {
-    header("Location: /login.php");
+    header("Location: " . base_url('login.php'));
     exit();
 }
 ?>
@@ -14,7 +14,6 @@ if (!isset($_SESSION['username'])) {
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "Audit External";
-include '../layout.php';
 ?>
 <!--end-->
 

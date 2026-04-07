@@ -41,7 +41,6 @@ $purulen = $conn->query("SELECT * FROM tb_emerging WHERE jenis='Purulen' ORDER B
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "SURVEILANCE";
-include '../layout.php';
 ?>
 <!--end-->
 

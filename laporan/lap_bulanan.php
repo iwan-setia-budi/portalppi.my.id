@@ -7,7 +7,7 @@ include_once '../koneksi.php';
 
 // Proteksi halaman
 if (!isset($_SESSION['username'])) {
-  header("Location: /login.php");
+    header("Location: " . base_url('login.php'));
   exit();
 }
 ?>

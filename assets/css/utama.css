@@ -33,6 +33,16 @@ body{
   color:var(--text);
 }
 
+body.dark-mode {
+  --bg:#0b1220;
+  --card:#111827;
+  --text:#e2e8f0;
+  --muted:#94a3b8;
+  --blue-soft:#0f172a;
+  --shadow-sm:0 8px 20px rgba(0,0,0,.35);
+  --shadow-md:0 20px 46px rgba(0,0,0,.45);
+}
+
 html, body {
   width: 100%;
   overflow-x: hidden;
@@ -283,6 +293,30 @@ main{
   z-index:10;
 }
 
+.topbar-right{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+
+.theme-switch{
+  border:none;
+  background:linear-gradient(135deg, #1e40af, #1e88e5);
+  color:#ffffff;
+  padding:10px 16px;
+  border-radius:999px;
+  font-size:14px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .2s ease;
+  box-shadow:0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.theme-switch:hover{
+  transform:translateY(-2px);
+  box-shadow:0 6px 18px rgba(37, 99, 235, 0.4);
+}
+
 /* HAMBURGER */
 .hamb{
   font-size:22px;
@@ -409,6 +443,14 @@ main{
   font-weight: 500;
 }
 
+.user-icon {
+  display: inline;
+}
+
+.user-text {
+  display: inline;
+}
+
 .user-dropdown {
   position: absolute;
   right: 0;
@@ -445,6 +487,41 @@ main{
   margin: 4px 0;
 }
 
+body.dark-mode .topbar{
+  background:linear-gradient(90deg,#0f172a,#111827);
+  border-bottom-color:#1f2937;
+}
+
+body.dark-mode .hamb{
+  background:linear-gradient(135deg,#1d4ed8,#0369a1);
+}
+
+body.dark-mode .theme-switch{
+  background:linear-gradient(135deg, #0ea5e9, #3b82f6);
+  color:#ffffff;
+  border:none;
+  box-shadow:0 4px 12px rgba(14, 165, 233, 0.4);
+}
+
+body.dark-mode .user-toggle{
+  background:#111827;
+  color:#e5e7eb;
+  border-color:#334155;
+}
+
+body.dark-mode .user-dropdown{
+  background:#111827;
+  border-color:#334155;
+}
+
+body.dark-mode .user-dropdown a{
+  color:#e5e7eb;
+}
+
+body.dark-mode .user-dropdown a:hover{
+  background:#1f2937;
+}
+
 /*end - USER DROPDOWN*/
 
 /* Konten full */
@@ -466,6 +543,35 @@ main{
 details li a.active{
   background:rgba(255,255,255,.22);
   box-shadow:inset 3px 0 0 #38bdf8;
+}
+
+/* MOBILE - HIDE TEXT ELEMENTS */
+@media(max-width:900px){
+  .theme-text{
+    display:none !important;
+  }
+
+  .user-text{
+    display:none !important;
+    width:0 !important;
+    height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+  }
+
+  .user-icon{
+    display:inline !important;
+  }
+
+  .theme-switch{
+    padding:10px 12px;
+    font-size:16px;
+  }
+
+  .user-toggle{
+    padding:8px 10px;
+  }
 }
 
 

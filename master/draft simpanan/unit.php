@@ -49,7 +49,6 @@ if(isset($_POST['delete'])){
 $data = $conn->query("SELECT * FROM tb_unit ORDER BY nama_unit ASC");
 
 $pageTitle = "MASTER UNIT";
-include '../layout.php';
 ?>
 
 <!DOCTYPE html>

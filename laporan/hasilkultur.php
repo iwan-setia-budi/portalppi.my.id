@@ -6,7 +6,7 @@ include_once '../koneksi.php';
 include "../cek_akses.php";
 
 if (!isset($_SESSION['username'])) {
-  header("Location: /login.php");
+  header("Location: " . base_url('login.php'));
   exit();
 }
 ?>

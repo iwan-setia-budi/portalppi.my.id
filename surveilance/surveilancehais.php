@@ -7,7 +7,6 @@ include "../cek_akses.php";
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "SURVEILANCE";
-include '../layout.php';
 ?>
 <!--end-->
 

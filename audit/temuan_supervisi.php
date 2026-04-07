@@ -127,16 +127,49 @@ if (count($where) > 0) {
 
 $sql .= " ORDER BY tanggal DESC";
 
-$data = $conn->query($sql);
+$dataRows = [];
+$data = safe_query($conn, $sql);
+if ($data) {
+    while ($row = $data->fetch_assoc()) {
+        $dataRows[] = $row;
+    }
+}
 
-
-
-
-$tahunList = $conn->query("
+$tahunListRows = [];
+$tahunList = safe_query($conn, "
     SELECT DISTINCT YEAR(tanggal) as tahun 
     FROM tb_supervise 
     ORDER BY tahun DESC
 ");
+if ($tahunList) {
+    while ($row = $tahunList->fetch_assoc()) {
+        $tahunListRows[] = $row;
+    }
+}
+
+$tahunList2Rows = [];
+$tahunList2 = safe_query($conn, "
+    SELECT DISTINCT YEAR(tanggal) as tahun 
+    FROM tb_supervise 
+    ORDER BY tahun DESC
+");
+if ($tahunList2) {
+    while ($row = $tahunList2->fetch_assoc()) {
+        $tahunList2Rows[] = $row;
+    }
+}
+
+$unitListRows = [];
+$unitList = safe_query($conn, "
+    SELECT DISTINCT unit 
+    FROM tb_supervise 
+    ORDER BY unit ASC
+");
+if ($unitList) {
+    while ($row = $unitList->fetch_assoc()) {
+        $unitListRows[] = $row;
+    }
+}
 
 ?>
 
@@ -146,7 +179,6 @@ $tahunList = $conn->query("
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "AUDIT DAN SUPERVISI";
-include '../layout.php';
 ?>
 <!--end-->
 
@@ -196,6 +228,14 @@ include '../layout.php';
 
         .dashboard-btn:hover {
             transform: translateY(-2px);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         /* ===== FILTER HASIL DATA ===== */
@@ -363,6 +403,51 @@ include '../layout.php';
         .container-supervise {
             padding: 26px;
         }
+
+        body.dark-mode .container-supervise {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode #filterForm {
+            background: #1e293b;
+        }
+
+        body.dark-mode #filterForm label,
+        body.dark-mode .form-group label,
+        body.dark-mode .card h2,
+        body.dark-mode .card h3 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode #filterForm select,
+        body.dark-mode #formSupervise input,
+        body.dark-mode #formSupervise textarea,
+        body.dark-mode #formSupervise select {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: #334155;
+        }
+
+        body.dark-mode .card,
+        body.dark-mode table,
+        body.dark-mode tr {
+            background: #111827;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode tbody tr:nth-child(even) {
+            background: #1f2937;
+        }
+
+        body.dark-mode #modalLihat {
+            background: rgba(0, 0, 0, .65);
+        }
+
+        body.dark-mode #modalLihat .modal-card {
+            background: #111827;
+            color: #e2e8f0;
+        }
+
 
         .tab-btn {
             padding: 10px 20px;
@@ -603,7 +688,9 @@ include '../layout.php';
 
                 <header>
                     <div>💊 Temuan Supervisi | PPI PHBW</div>
-                    <button class="dashboard-btn" onclick="kembaliDashboard()">🏠 Kembali ke Dashboard</button>
+                    <div class="header-actions">
+                        <button class="dashboard-btn" onclick="kembaliDashboard()">🏠 Kembali ke Dashboard</button>
+                    </div>
                 </header>
 
                 <!-- TAB BUTTON -->
@@ -623,8 +710,10 @@ include '../layout.php';
 
                         if (isset($_GET['edit'])) {
                             $id = (int)$_GET['edit'];
-                            $result = $conn->query("SELECT * FROM tb_supervise WHERE id=$id");
-                            $editData = $result->fetch_assoc();
+                            $result = safe_query($conn, "SELECT * FROM tb_supervise WHERE id=$id");
+                            if ($result) {
+                                $editData = $result->fetch_assoc();
+                            }
                         }
                         ?>
 
@@ -723,17 +812,12 @@ include '../layout.php';
                                     <option value="">Semua</option>
                                     <?php
                                     $tahunSelected = $_GET['tahun'] ?? '';
-                                    $tahunList2 = $conn->query("
-                    SELECT DISTINCT YEAR(tanggal) as tahun 
-                    FROM tb_supervise 
-                    ORDER BY tahun DESC
-                ");
-                                    while ($t = $tahunList2->fetch_assoc()):
+                                    foreach ($tahunList2Rows as $t):
                                     ?>
                                         <option value="<?= $t['tahun'] ?>" <?= ($tahunSelected == $t['tahun']) ? 'selected' : '' ?>>
                                             <?= $t['tahun'] ?>
                                         </option>
-                                    <?php endwhile; ?>
+                                    <?php endforeach; ?>
                                 </select>
                             </div>
 
@@ -755,38 +839,6 @@ include '../layout.php';
                                 </select>
                             </div>
 
-                            <!-- Unit -->
-                            <div>
-                                <label>Unit</label>
-                                <select name="unit" onchange="document.getElementById('filterForm').submit()">
-                                    <option value="">Semua</option>
-                                    <?php
-                                    $unitSelected = $_GET['unit'] ?? '';
-                                    $unitList = $conn->query("
-                    SELECT DISTINCT unit 
-                    FROM tb_supervise 
-                    ORDER BY unit ASC
-                ");
-                                    while ($u = $unitList->fetch_assoc()):
-                                    ?>
-                                        <option value="<?= $u['unit'] ?>" <?= ($unitSelected == $u['unit']) ? 'selected' : '' ?>>
-                                            <?= $u['unit'] ?>
-                                        </option>
-                                    <?php endwhile; ?>
-                                </select>
-                            </div>
-                        </form>
-                    </div>
-
-                    <button class="action-btn view btn-pdf" onclick="exportPDFTemuan()">
-
-                        📄 Simpan PDF
-                    </button>
-
-
-                    <div class="table-box">
-                        <table>
-                            <thead>
                                 <tr>
                                     <th>Tanggal</th>
                                     <th>Unit</th>
@@ -799,7 +851,7 @@ include '../layout.php';
                             </thead>
 
                             <tbody>
-                                <?php while ($row = $data->fetch_assoc()): ?>
+                                <?php foreach ($dataRows as $row): ?>
                                     <tr>
                                         <td data-label="Tanggal">
                                             <?= $row['tanggal'] ?>
@@ -862,13 +914,13 @@ include '../layout.php';
                                             </form>
                                         </td>
                                     </tr>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </tbody>
                         </table>
                         <div id="modalLihat" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); 
      justify-content:center; align-items:center;">
 
-                            <div
+                            <div class="modal-card"
                                 style="background:white; padding:25px; width:90%; max-width:500px; border-radius:16px;">
                                 <h3>Detail Supervisi</h3>
                                 <div id="isiModal"></div>
@@ -890,11 +942,11 @@ include '../layout.php';
                         <div class="grafik-filter">
                             <select id="filterTahun">
                                 <option value="">Semua Tahun</option>
-                                <?php while ($t = $tahunList->fetch_assoc()): ?>
+                                <?php foreach ($tahunListRows as $t): ?>
                                     <option value="<?= $t['tahun']; ?>">
                                         <?= $t['tahun']; ?>
                                     </option>
-                                <?php endwhile; ?>
+                                <?php endforeach; ?>
                             </select>
 
                             <select id="filterBulan">
@@ -1293,6 +1345,34 @@ include '../layout.php';
 
             pdf.save("Laporan_Temuan_Supervisi.pdf");
         }
+    </script>
+
+    <script>
+        (function() {
+            const storageKey = 'temuan_supervisi_theme';
+            const toggleBtn = document.getElementById('toggleDarkMode');
+
+            function applyTheme(theme) {
+                const isDark = theme === 'dark';
+                document.body.classList.toggle('dark-mode', isDark);
+
+                if (toggleBtn) {
+                    toggleBtn.textContent = isDark ? '☀️ Mode Terang' : '🌙 Mode Gelap';
+                    toggleBtn.setAttribute('aria-label', isDark ? 'Ubah ke mode terang' : 'Ubah ke mode gelap');
+                }
+            }
+
+            const savedTheme = localStorage.getItem(storageKey);
+            applyTheme(savedTheme === 'dark' ? 'dark' : 'light');
+
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    const nextTheme = document.body.classList.contains('dark-mode') ? 'light' : 'dark';
+                    localStorage.setItem(storageKey, nextTheme);
+                    applyTheme(nextTheme);
+                });
+            }
+        })();
     </script>
 
 

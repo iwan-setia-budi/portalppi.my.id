@@ -266,7 +266,6 @@ if ($izinQuery) {
 $currentDisplayIzin = count($izinRows);
 
 $pageTitle = "MOU & IZIN";
-include '../layout.php';
 ?>
 
 <!DOCTYPE html>

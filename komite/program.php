@@ -51,7 +51,6 @@ $res = mysqli_query($conn, "SELECT * FROM tb_program_ppi ORDER BY id ASC");
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "KOMITE PPI";
-include '../layout.php';
 ?>
 <!--end-->
 

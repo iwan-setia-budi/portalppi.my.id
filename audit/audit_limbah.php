@@ -1,7 +1,6 @@
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "Audit External";
-include '../layout.php';
 ?>
 <!--end-->
 

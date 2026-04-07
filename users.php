@@ -128,7 +128,6 @@ if (isset($_GET['edit'])) {
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "Manajemen User";
-include 'layout.php';
 ?>
 <!--end-->
 

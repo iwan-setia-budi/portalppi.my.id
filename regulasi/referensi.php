@@ -173,19 +173,31 @@ if (isset($_POST['hapus'])) {
     exit;
 }
 
-$jenisReferensi = mysqli_query($conn, "
-    SELECT id, nama_referensi
-    FROM tb_jenis_referensi
-    WHERE status='aktif'
-    ORDER BY nama_referensi ASC
+$jenisReferensiRows = [];
+$jenisReferensi = safe_mysqli_query($conn, "
+  SELECT id, nama_referensi
+  FROM tb_jenis_referensi
+  WHERE status='aktif'
+  ORDER BY nama_referensi ASC
 ");
+if ($jenisReferensi) {
+  while ($row = mysqli_fetch_assoc($jenisReferensi)) {
+    $jenisReferensiRows[] = $row;
+  }
+}
 
-$sumberReferensi = mysqli_query($conn, "
-    SELECT id, nama_sumber
-    FROM tb_sumber_referensi
-    WHERE status='aktif'
-    ORDER BY nama_sumber ASC
+$sumberReferensiRows = [];
+$sumberReferensi = safe_mysqli_query($conn, "
+  SELECT id, nama_sumber
+  FROM tb_sumber_referensi
+  WHERE status='aktif'
+  ORDER BY nama_sumber ASC
 ");
+if ($sumberReferensi) {
+  while ($row = mysqli_fetch_assoc($sumberReferensi)) {
+    $sumberReferensiRows[] = $row;
+  }
+}
 
 // ===============================
 // PAGINATION
@@ -227,7 +239,6 @@ $currentDisplayCount = count($referensiRows);
 
 <?php
 $pageTitle = "REFERENSI";
-include '../layout.php';
 ?>
 
 <!DOCTYPE html>
@@ -1092,11 +1103,11 @@ include '../layout.php';
             <label>Jenis Referensi</label>
             <select name="jenis" required>
               <option value="">Pilih Jenis Referensi...</option>
-              <?php while ($j = mysqli_fetch_assoc($jenisReferensi)): ?>
+              <?php foreach ($jenisReferensiRows as $j): ?>
                 <option value="<?= $j['nama_referensi']; ?>">
                   <?= htmlspecialchars($j['nama_referensi']); ?>
                 </option>
-              <?php endwhile; ?>
+              <?php endforeach; ?>
             </select>
 
             <label>Tahun Terbit</label>
@@ -1105,11 +1116,11 @@ include '../layout.php';
             <label>Sumber / Penerbit</label>
             <select name="sumber" required>
               <option value="">Pilih Sumber Referensi...</option>
-              <?php while ($s = mysqli_fetch_assoc($sumberReferensi)): ?>
+              <?php foreach ($sumberReferensiRows as $s): ?>
                 <option value="<?= $s['nama_sumber']; ?>">
                   <?= htmlspecialchars($s['nama_sumber']); ?>
                 </option>
-              <?php endwhile; ?>
+              <?php endforeach; ?>
             </select>
 
             <label>Berkas (PDF) atau Link</label>
@@ -1133,7 +1144,7 @@ include '../layout.php';
         border-top:1px solid #e2e8f0;
         background:#f8fafc;
       ">
-        © <?= date('Y') ?> PPI RS Primaya Bhaktiwara Pangkalpinang  
+        ï¿½ <?= date('Y') ?> PPI RS Primaya Bhaktiwara Pangkalpinang  
         <br>
         Sistem Manajemen Dokumen & Regulasi
       </footer>

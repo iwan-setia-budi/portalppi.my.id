@@ -264,7 +264,6 @@ $elemenList = $elemenQuery->get_result();
 $elemenQuery->close();
 
 $pageTitle = "DOKUMEN DAN MEDIA";
-include '../layout.php';
 ?>
 
 <!DOCTYPE html>

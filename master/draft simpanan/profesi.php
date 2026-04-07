@@ -41,7 +41,6 @@ if(isset($_POST['delete'])){
 $data = $conn->query("SELECT * FROM tb_profesi ORDER BY nama_profesi ASC");
 
 $pageTitle = "MASTER PROFESI";
-include '../layout.php';
 ?>
 
 <!DOCTYPE html>

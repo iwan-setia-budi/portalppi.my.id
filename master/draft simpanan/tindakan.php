@@ -49,7 +49,6 @@ if(isset($_POST['delete'])){
 $data = $conn->query("SELECT * FROM tb_tindakan ORDER BY nama_tindakan ASC");
 
 $pageTitle = "MASTER TINDAKAN";
-include '../layout.php';
 ?>
 
 

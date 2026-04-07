@@ -78,7 +78,6 @@ $tahunList = $conn->query("
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "AUDIT DAN SUPERVISI";
-include '../layout.php';
 ?>
 <!--end-->
 

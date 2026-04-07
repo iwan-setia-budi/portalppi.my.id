@@ -35,7 +35,7 @@ $conn = $koneksi;
 // ======================================
 $kategori_list = [];
 
-$kat = $conn->query("
+$kat = safe_query($conn, "
     SELECT id, nama_kegiatan
     FROM tb_kegiatan
     WHERE status='aktif'
@@ -171,14 +171,14 @@ $calendarEvents = [];
 
 // Ambil semua progress
 $progressList = [];
-$resProgress = $conn->query("SELECT * FROM tb_kalender_progress");
+$resProgress = safe_query($conn, "SELECT * FROM tb_kalender_progress");
 if ($resProgress) {
     while ($row = $resProgress->fetch_assoc()) {
         $progressList[] = $row;
     }
 }
 
-$resCal = $conn->query("
+$resCal = safe_query($conn, "
     SELECT 
         tb_kalender.*, 
         tb_kegiatan.nama_kegiatan
@@ -205,7 +205,7 @@ $start = ($page - 1) * $limit;
 
 // ================== NON LIBUR NASIONAL ==================
 
-$totalRes = $conn->query("
+$totalRes = safe_query($conn, "
     SELECT COUNT(*) as total
     FROM tb_kalender
     JOIN tb_kegiatan 
@@ -213,12 +213,14 @@ $totalRes = $conn->query("
     WHERE tb_kegiatan.status='aktif'
     AND tb_kegiatan.nama_kegiatan != 'Libur Nasional'
 ");
+$totalData = 0;
+if ($totalRes) {
+    $totalRow = $totalRes->fetch_assoc();
+    $totalData = (int) ($totalRow['total'] ?? 0);
+}
+$totalPage = max(1, (int) ceil($totalData / $limit));
 
-$totalRow = $totalRes->fetch_assoc();
-$totalData = $totalRow['total'];
-$totalPage = ceil($totalData / $limit);
-
-$res = $conn->query("
+$res = safe_query($conn, "
     SELECT 
         tb_kalender.*, 
         tb_kegiatan.nama_kegiatan
@@ -249,7 +251,7 @@ if ($liburPage < 1) $liburPage = 1;
 $liburStart = ($liburPage - 1) * $liburLimit;
 
 // Hitung total libur
-$totalLiburRes = $conn->query("
+$totalLiburRes = safe_query($conn, "
     SELECT COUNT(*) as total
     FROM tb_kalender
     JOIN tb_kegiatan 
@@ -257,15 +259,17 @@ $totalLiburRes = $conn->query("
     WHERE tb_kegiatan.status='aktif'
     AND tb_kegiatan.nama_kegiatan = 'Libur Nasional'
 ");
-
-$totalLiburRow = $totalLiburRes->fetch_assoc();
-$totalLiburData = $totalLiburRow['total'];
-$totalLiburPage = ceil($totalLiburData / $liburLimit);
+$totalLiburData = 0;
+if ($totalLiburRes) {
+    $totalLiburRow = $totalLiburRes->fetch_assoc();
+    $totalLiburData = (int) ($totalLiburRow['total'] ?? 0);
+}
+$totalLiburPage = max(1, (int) ceil($totalLiburData / $liburLimit));
 
 // Ambil data libur sesuai halaman
 $liburData = [];
 
-$resLibur = $conn->query("
+$resLibur = safe_query($conn, "
     SELECT 
         tb_kalender.*, 
         tb_kegiatan.nama_kegiatan

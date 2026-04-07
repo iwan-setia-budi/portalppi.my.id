@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 include_once 'koneksi.php';
 
 if (!isset($_SESSION['username'])) {
-    header("Location: /login.php");
+    header("Location: " . base_url('login.php'));
     exit();
 }
 

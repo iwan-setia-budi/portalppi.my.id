@@ -383,7 +383,6 @@ function getStatusTanggal($tanggal) {
 }
 
 $pageTitle = "REGULASI";
-include '../layout.php';
 ?>
 
 <!DOCTYPE html>

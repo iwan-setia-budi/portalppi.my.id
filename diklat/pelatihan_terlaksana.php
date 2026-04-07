@@ -7,7 +7,7 @@ include "../cek_akses.php";
 $conn = $koneksi; // sinkronisasi agar tetap kompatibel
 
 if (!isset($_SESSION['username'])) {
-  header("Location: /login.php");
+  header("Location: " . base_url('login.php'));
   exit();
 }
 ?>

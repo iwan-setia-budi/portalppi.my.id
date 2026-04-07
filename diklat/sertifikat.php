@@ -7,7 +7,7 @@ include "../cek_akses.php";
 $conn = $koneksi;
 
 if (!isset($_SESSION['username'])) {
-  header("Location: /login.php");
+  header("Location: " . base_url('login.php'));
   exit();
 }
 
