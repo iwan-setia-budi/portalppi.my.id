@@ -33,17 +33,31 @@ document.addEventListener('click', function (e) {
 const userToggle = document.getElementById("userToggle");
 const userDropdown = document.getElementById("userDropdown");
 
+function setUserDropdownState(isOpen) {
+        if (!userToggle || !userDropdown) return;
+
+        userToggle.classList.toggle("is-open", isOpen);
+        userDropdown.classList.toggle("is-open", isOpen);
+        userToggle.setAttribute("aria-expanded", String(isOpen));
+}
+
 if (userToggle) {
   userToggle.addEventListener("click", function () {
-    userDropdown.style.display =
-      userDropdown.style.display === "block" ? "none" : "block";
+        const isOpen = userDropdown ? userDropdown.classList.contains("is-open") : false;
+        setUserDropdownState(!isOpen);
   });
 }
 
 document.addEventListener("click", function (e) {
     if (userDropdown && !e.target.closest(".user-menu")) {
-    userDropdown.style.display = "none";
+        setUserDropdownState(false);
   }
+});
+
+document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+                setUserDropdownState(false);
+        }
 });
 
 
