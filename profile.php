@@ -122,10 +122,51 @@ $pageTitle = "Profile";
             cursor: pointer;
             width: 100%;
         }
+
+        /* DARK MODE KHUSUS HALAMAN PROFILE */
+        body.dark-mode.profile-page .container {
+            background: transparent;
+        }
+
+        body.dark-mode.profile-page .profile-header h2 {
+            color: #f8fafc;
+        }
+
+        body.dark-mode.profile-page .role-badge {
+            background: rgba(56, 189, 248, 0.2);
+            color: #bae6fd;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        body.dark-mode.profile-page .card-profile {
+            background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
+            border: 1px solid rgba(51, 65, 85, 0.9);
+            box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+        }
+
+        body.dark-mode.profile-page .card-profile h3,
+        body.dark-mode.profile-page .card-profile span,
+        body.dark-mode.profile-page .card-profile strong {
+            color: #e2e8f0 !important;
+        }
+
+        body.dark-mode.profile-page .status-active {
+            color: #4ade80 !important;
+        }
+
+        body.dark-mode.profile-page .btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border: 1px solid rgba(147, 197, 253, 0.3);
+        }
+
+        body.dark-mode.profile-page .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: 1px solid rgba(254, 202, 202, 0.22);
+        }
     </style>
 </head>
 
-<body>
+<body class="profile-page">
     <div class="layout">
 
         <?php include_once 'sidebar.php'; ?>

@@ -1021,6 +1021,151 @@ $pageTitle = "KOMITE PPI";
             min-height: 80px;
         }
 
+        /* ================= DARK MODE KHUSUS HALAMAN KALENDER ================= */
+        body.dark-mode.kalender-page .container.kalender {
+            background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+            box-shadow: 0 16px 36px rgba(2, 6, 23, 0.5);
+            border: 1px solid #1e293b;
+        }
+
+        body.dark-mode.kalender-page .page-hero {
+            box-shadow: 0 20px 45px rgba(2, 6, 23, 0.45);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        body.dark-mode.kalender-page .hero-btn {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        body.dark-mode.kalender-page .tab-wrapper {
+            background: #111827;
+            border: 1px solid #334155;
+        }
+
+        body.dark-mode.kalender-page .tab-btn {
+            background: #f8fafc;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+        }
+
+        body.dark-mode.kalender-page .tab-btn.active {
+            background: #3b49df;
+            color: #ffffff;
+            border-color: #3b49df;
+        }
+
+        body.dark-mode.kalender-page .controls .month,
+        body.dark-mode.kalender-page h3 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.kalender-page .filter-input {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.kalender-page .filter-input::placeholder {
+            color: #94a3b8;
+        }
+
+        body.dark-mode.kalender-page .calendar {
+            border-color: #334155;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.35);
+        }
+
+        body.dark-mode.kalender-page .weekday {
+            border-color: #334155;
+        }
+
+        body.dark-mode.kalender-page .day {
+            background: #0f172a;
+            border-color: #1e293b;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.kalender-page .day .dateNum {
+            color: #dbeafe;
+        }
+
+        body.dark-mode.kalender-page .day.inactive {
+            opacity: .55;
+        }
+
+        body.dark-mode.kalender-page .day.today {
+            background: #1e3a8a !important;
+            border-color: #3b82f6;
+        }
+
+        body.dark-mode.kalender-page .day.today .dateNum {
+            background: #60a5fa;
+            color: #0f172a !important;
+        }
+
+        body.dark-mode.kalender-page .day.libur {
+            background: rgba(127, 29, 29, 0.35) !important;
+            border-color: #ef4444 !important;
+        }
+
+        body.dark-mode.kalender-page .calendar>.day:nth-child(7n+8) {
+            background: rgba(127, 29, 29, 0.22);
+            border-color: rgba(239, 68, 68, 0.45);
+        }
+
+        body.dark-mode.kalender-page .calendar>.day:nth-child(7n+8) .dateNum {
+            color: #fca5a5;
+        }
+
+        body.dark-mode.kalender-page .legend-item {
+            background: #1e293b;
+            color: #e2e8f0;
+            border: 1px solid #334155;
+            box-shadow: none;
+        }
+
+        body.dark-mode.kalender-page .table-wrapper {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.35);
+        }
+
+        body.dark-mode.kalender-page table {
+            background: transparent;
+        }
+
+        body.dark-mode.kalender-page th {
+            border-bottom-color: #1e293b;
+        }
+
+        body.dark-mode.kalender-page td {
+            background: #0f172a;
+            color: #dbeafe;
+            border-bottom-color: #1e293b;
+        }
+
+        body.dark-mode.kalender-page tr:hover {
+            background: #1e293b;
+        }
+
+        body.dark-mode.kalender-page .modal-content {
+            background: #1e293b;
+            border: 1px solid #334155;
+        }
+
+        body.dark-mode.kalender-page .modal h2,
+        body.dark-mode.kalender-page .modal-content label {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.kalender-page .modal-content input,
+        body.dark-mode.kalender-page .modal-content select,
+        body.dark-mode.kalender-page .modal-content textarea {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
         @media (max-width:768px) {
 
             .day {
@@ -1042,6 +1187,7 @@ $pageTitle = "KOMITE PPI";
                 overflow: hidden;
                 display: -webkit-box;
                 -webkit-line-clamp: 2;
+                line-clamp: 2;
                 /* maksimal 2 baris */
                 -webkit-box-orient: vertical;
             }
@@ -1131,6 +1277,7 @@ $pageTitle = "KOMITE PPI";
                 }
 
             }
+        }
     </style>
 
 
@@ -1138,7 +1285,7 @@ $pageTitle = "KOMITE PPI";
 </head>
 
 
-<body>
+<body class="kalender-page">
 
     <div class="layout">
 

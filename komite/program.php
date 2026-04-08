@@ -475,12 +475,12 @@ $pageTitle = "KOMITE PPI";
             }
 
             /* Dark mode - mobile card */
-            body.dark-mode .container tbody tr {
+            body.dark-mode.program-page .container tbody tr {
                 background: #1e293b;
                 border-color: #334155;
             }
 
-            body.dark-mode .container tbody tr:hover {
+            body.dark-mode.program-page .container tbody tr:hover {
                 background: #253348;
                 border-color: #3b82f6;
             }
@@ -489,71 +489,71 @@ $pageTitle = "KOMITE PPI";
         /* =====================================================
    DARK MODE
 ===================================================== */
-        body.dark-mode .container {
+        body.dark-mode.program-page .container {
             background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
         }
 
-        body.dark-mode .container header h1 {
+        body.dark-mode.program-page .container header h1 {
             color: #93c5fd;
         }
 
-        body.dark-mode .container .content {
+        body.dark-mode.program-page .container .content {
             background: rgba(17, 24, 39, 0.9);
             border-color: #1e3a5f;
             box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
         }
 
-        body.dark-mode .container tbody tr {
+        body.dark-mode.program-page .container tbody tr {
             background: #111827;
         }
 
-        body.dark-mode .container tbody tr:hover {
+        body.dark-mode.program-page .container tbody tr:hover {
             background: #1e293b;
         }
 
-        body.dark-mode .container tbody td {
+        body.dark-mode.program-page .container tbody td {
             color: #e2e8f0;
             border-color: #1e293b;
         }
 
-        body.dark-mode .container tbody td::before {
+        body.dark-mode.program-page .container tbody td::before {
             color: #93c5fd;
         }
 
-        body.dark-mode .popup-form {
+        body.dark-mode.program-page .popup-form {
             background: #1e293b;
             box-shadow: 0 35px 80px rgba(0, 0, 0, 0.6);
         }
 
-        body.dark-mode .popup-form h2 {
+        body.dark-mode.program-page .popup-form h2 {
             color: #93c5fd;
         }
 
-        body.dark-mode .popup-form label {
+        body.dark-mode.program-page .popup-form label {
             color: #cbd5e1;
         }
 
-        body.dark-mode .popup-form input,
-        body.dark-mode .popup-form textarea {
+        body.dark-mode.program-page .popup-form input,
+        body.dark-mode.program-page .popup-form textarea {
             background: #0f172a;
             border-color: #334155;
             color: #e2e8f0;
         }
 
-        body.dark-mode .popup-form input:focus,
-        body.dark-mode .popup-form textarea:focus {
+        body.dark-mode.program-page .popup-form input:focus,
+        body.dark-mode.program-page .popup-form textarea:focus {
             background: #1e293b;
             border-color: #3b82f6;
         }
 
-        body.dark-mode .container .content .btn-cancel {
+        body.dark-mode.program-page .container .content .btn-cancel {
             background: #334155;
         }
     </style>
 
 </head>
 
-<body>
+<body class="program-page">
 
     <div class="layout">
 

@@ -163,12 +163,65 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   user-select:none;
 }
 
+/* DARK MODE KHUSUS HALAMAN PASSWORD */
+body.dark-mode.password-page .container {
+    background: transparent;
+}
+
+body.dark-mode.password-page .page-header h2 {
+    color: #f8fafc;
+}
+
+body.dark-mode.password-page .card-form {
+    background: linear-gradient(160deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
+    border: 1px solid rgba(51, 65, 85, 0.9);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode.password-page .form-group label {
+    color: #cbd5e1 !important;
+}
+
+body.dark-mode.password-page .password-wrapper input,
+body.dark-mode.password-page .form-group input {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-mode.password-page .password-wrapper input:focus,
+body.dark-mode.password-page .form-group input:focus {
+    border-color: #3b82f6 !important;
+    box-shadow: 0 0 0 3px rgba(59,130,246,.25) !important;
+}
+
+body.dark-mode.password-page .toggle-pass {
+    color: #bfdbfe;
+}
+
+body.dark-mode.password-page .btn-primary {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    border: 1px solid rgba(147, 197, 253, 0.3);
+}
+
+body.dark-mode.password-page .alert-success {
+    background: rgba(22, 101, 52, 0.22);
+    color: #86efac;
+    border: 1px solid rgba(134, 239, 172, 0.3);
+}
+
+body.dark-mode.password-page .alert-error {
+    background: rgba(127, 29, 29, 0.24);
+    color: #fecaca;
+    border: 1px solid rgba(252, 165, 165, 0.3);
+}
+
 
 
 </style>
 </head>
 
-<body>
+<body class="password-page">
 <div class="layout">
 
 <?php include_once 'sidebar.php'; ?>

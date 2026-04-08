@@ -1133,6 +1133,123 @@ $pageTitle = "REGULASI";
       box-shadow: 0 10px 24px rgba(37, 99, 235, 0.24);
     }
 
+    /* DARK MODE KHUSUS HALAMAN REGULASI */
+    body.dark-mode.regulasi-page {
+      --ink: #e2e8f0;
+      --muted: #9fb3ca;
+      --line: #334155;
+      --line-strong: #475569;
+      background:
+        radial-gradient(circle at top right, rgba(30, 64, 175, 0.22), transparent 26%),
+        linear-gradient(180deg, #030d24 0%, #071632 100%);
+      color: var(--ink);
+    }
+
+    body.dark-mode.regulasi-page .container {
+      background: transparent;
+    }
+
+    body.dark-mode.regulasi-page .hero-header {
+      box-shadow: 0 24px 50px rgba(2, 6, 23, 0.45);
+      border: 1px solid rgba(59, 130, 246, 0.28);
+    }
+
+    body.dark-mode.regulasi-page .search-wrap {
+      background: rgba(15, 23, 42, 0.9);
+      border-color: rgba(71, 85, 105, 0.9);
+      box-shadow: 0 12px 24px rgba(2, 6, 23, 0.38);
+    }
+
+    body.dark-mode.regulasi-page .search-wrap input {
+      color: #e2e8f0;
+    }
+
+    body.dark-mode.regulasi-page .search-wrap input::placeholder {
+      color: #94a3b8;
+    }
+
+    body.dark-mode.regulasi-page .table-card {
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.94), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(51, 65, 85, 0.95);
+      box-shadow: 0 18px 40px rgba(2, 6, 23, 0.44);
+    }
+
+    body.dark-mode.regulasi-page .table-card-title {
+      color: #e2e8f0;
+    }
+
+    body.dark-mode.regulasi-page .table-card-note {
+      color: #9fb3ca;
+    }
+
+    body.dark-mode.regulasi-page thead th {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: #f8fafc;
+    }
+
+    body.dark-mode.regulasi-page tbody td {
+      background: #0f172a;
+      border-top: 1px solid #1e293b;
+      border-bottom: 1px solid #1e293b;
+      color: #dbeafe !important;
+    }
+
+    body.dark-mode.regulasi-page tbody tr:nth-child(even) td {
+      background: #172033;
+    }
+
+    body.dark-mode.regulasi-page tbody tr:hover td {
+      background: #1e293b;
+    }
+
+    body.dark-mode.regulasi-page tbody td:first-child {
+      border-left: 1px solid #1e293b;
+      color: #93c5fd !important;
+    }
+
+    body.dark-mode.regulasi-page tbody td:last-child {
+      border-right: 1px solid #1e293b;
+    }
+
+    body.dark-mode.regulasi-page .title-cell {
+      color: #f1f5f9 !important;
+    }
+
+    body.dark-mode.regulasi-page .meta-pill {
+      background: rgba(37, 99, 235, 0.22);
+      color: #bfdbfe;
+      border: 1px solid rgba(96, 165, 250, 0.35);
+    }
+
+    body.dark-mode.regulasi-page .empty-state {
+      background: #0f172a;
+      border-color: #334155;
+      color: #cbd5e1;
+    }
+
+    body.dark-mode.regulasi-page .form-box {
+      background: #0f172a;
+      border: 1px solid #334155;
+    }
+
+    body.dark-mode.regulasi-page .form-box h3,
+    body.dark-mode.regulasi-page .form-box label {
+      color: #e2e8f0;
+    }
+
+    body.dark-mode.regulasi-page .form-box input,
+    body.dark-mode.regulasi-page .form-box select {
+      background: #1e293b;
+      border-color: #334155;
+      color: #e2e8f0;
+    }
+
+    body.dark-mode.regulasi-page footer {
+      color: #94a3b8 !important;
+      border-top-color: #1e293b !important;
+      background: #0b1220 !important;
+    }
+
     @media (max-width: 992px) {
       .container {
         padding: 22px 18px 34px;
@@ -1274,7 +1391,7 @@ $pageTitle = "REGULASI";
   </style>
 </head>
 
-<body>
+<body class="regulasi-page">
   <div class="layout">
     <?php include_once '../sidebar.php'; ?>
 

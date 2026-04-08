@@ -419,6 +419,90 @@ $pageTitle = "AUDIT DAN SUPERVISI";
             color: white;
         }
 
+        /* DARK MODE KHUSUS HALAMAN SUPERVISI IPCN */
+        body.dark-mode.supervisi-ipcn-page .supervisi {
+            background: transparent;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi h2,
+        body.dark-mode.supervisi-ipcn-page .supervisi label,
+        body.dark-mode.supervisi-ipcn-page .supervisi .label-utama {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi nav button {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi nav button.active {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.35);
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi input,
+        body.dark-mode.supervisi-ipcn-page .supervisi select {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi input:focus,
+        body.dark-mode.supervisi-ipcn-page .supervisi select:focus {
+            background: #253348;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, .22);
+        }
+
+        body.dark-mode.supervisi-ipcn-page header {
+            box-shadow: 0 20px 40px rgba(2, 6, 23, 0.45);
+            border: 1px solid rgba(59, 130, 246, 0.35);
+        }
+
+        body.dark-mode.supervisi-ipcn-page #tableSupervisi {
+            background: #0f172a;
+            box-shadow: 0 8px 24px rgba(2, 6, 23, 0.42);
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi thead {
+            background: #1e3a8a;
+            color: #f8fafc;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi th,
+        body.dark-mode.supervisi-ipcn-page .supervisi td {
+            border-bottom-color: #1e293b;
+            color: #dbeafe;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi tbody tr:hover {
+            background: #1e293b;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi .check-item {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .supervisi .check-item:hover {
+            background: #253348;
+            border-color: #3b82f6;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .pagination button {
+            background: #1e293b;
+            border-color: #334155;
+            color: #cbd5e1;
+        }
+
+        body.dark-mode.supervisi-ipcn-page .pagination button:hover {
+            background: #2563eb;
+            color: #fff;
+        }
+
 
         @media (max-width: 768px) {
 
@@ -491,7 +575,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
 
 </head>
 
-<body>
+<body class="supervisi-ipcn-page">
 
     <div class="layout">
 
