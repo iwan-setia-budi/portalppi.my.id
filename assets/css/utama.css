@@ -2,6 +2,9 @@
 
 /* ================= ROOT ================= */
 :root{
+  --sidebar-width:280px;
+  --topbar-height:68px;
+
   --blue-1:#0b3c5d;
   --blue-2:#0f5fa6;
   --blue-3:#1e88e5;
@@ -53,7 +56,7 @@ html, body {
 /* ================= LAYOUT ================= */
 .layout{
   display:grid;
-  grid-template-columns:280px 1fr;
+  grid-template-columns:var(--sidebar-width) 1fr;
   min-height:100vh;
 }
 
@@ -277,11 +280,12 @@ details[open] .chev{
 main{
   display:flex;
   flex-direction:column;
+  padding-top:var(--topbar-height);
 }
 
 /* ================= TOPBAR ================= */
 .topbar{
-  height:68px;
+  height:var(--topbar-height);
   background:linear-gradient(130deg,rgba(255,255,255,.98),rgba(240,247,255,.94));
   border-bottom:1px solid rgba(148,163,184,.2);
   display:flex;
@@ -289,10 +293,13 @@ main{
   justify-content:space-between;
   padding:0 22px;
   box-shadow:var(--shadow-sm);
-  position:sticky;
+  position:fixed;
   top:0;
-  z-index:10;
+  left:var(--sidebar-width);
+  right:0;
+  z-index:1000;
   backdrop-filter:blur(14px);
+  transition:left .35s ease;
 }
 
 .topbar-right{
@@ -351,13 +358,23 @@ main{
     grid-template-columns:1fr;
   }
 
+  main{
+    padding-top:var(--topbar-height);
+  }
+
+  .topbar{
+    left:0;
+    right:0;
+    z-index:1050;
+  }
+
   .sidebar{
     position:fixed;
     inset:0 auto 0 0;
     width:260px;
     transform:translateX(-100%);
     transition:.35s ease;
-    z-index:99;
+    z-index:1100;
   }
 
   .sidebar.open{
@@ -429,6 +446,10 @@ main{
 @media(min-width:901px){
   .layout.collapse .sidebar{
     transform:translateX(-100%);
+  }
+
+  .layout.collapse .topbar{
+    left:0;
   }
 
   .layout.collapse{
