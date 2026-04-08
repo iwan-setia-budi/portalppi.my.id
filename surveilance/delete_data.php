@@ -1,11 +1,18 @@
 <?php
-include '../koneksi.php';
-$id = $_POST['id'];
+session_start();
+if (!isset($_SESSION['username'])) { http_response_code(403); exit; }
 
-$sql = "DELETE FROM surveilans_data WHERE id = $id";
-if (mysqli_query($conn, $sql)) {
-  echo "deleted";
+include '../koneksi.php';
+$id = intval($_POST['id'] ?? 0);
+
+if ($id <= 0) { echo 'error'; exit; }
+
+$stmt = mysqli_prepare($conn, "DELETE FROM surveilans_data WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "i", $id);
+if (mysqli_stmt_execute($stmt)) {
+    echo "deleted";
 } else {
-  echo "error";
+    echo "error";
 }
+mysqli_stmt_close($stmt);
 ?>

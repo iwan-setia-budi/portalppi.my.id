@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -27,7 +28,7 @@ $pageTitle = "Audit External";
     <title>Audit External</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         /* ================================
@@ -218,7 +219,7 @@ $pageTitle = "Audit External";
 
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 </body>
 

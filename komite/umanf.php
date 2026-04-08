@@ -1,49 +1,95 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 $conn = $koneksi;
+$csrfToken = csrf_token();
+$targetDir = __DIR__ . '/../uploads/umanf';
+$allowedUploadMap = [
+    'pdf' => ['application/pdf', 'application/x-pdf'],
+    'jpg' => ['image/jpeg'],
+    'jpeg' => ['image/jpeg'],
+    'png' => ['image/png'],
+];
 
 // ============ SIMPAN DATA ============
 if (isset($_POST['simpan'])) {
-    $jenis = mysqli_real_escape_string($conn, $_POST['jenis_rapat']);
-    $targetDir = "../uploads/umanf/";
-    if (!file_exists($targetDir)) mkdir($targetDir, 0775, true);
-    $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf();
+    }
+
+    $jenis = trim($_POST['jenis_rapat'] ?? '');
 
     $fields = ['undangan', 'materi', 'absensi', 'notulen'];
     $uploaded = [];
+    $createdFiles = [];
     foreach ($fields as $f) {
-        $name = $_FILES["file_$f"]['name'] ?? '';
-        if ($name != '') {
-            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-            if (in_array($ext, $allowed)) {
-                $newName = time() . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $name);
-                move_uploaded_file($_FILES["file_$f"]['tmp_name'], $targetDir . $newName);
-                $uploaded[$f] = $targetDir . $newName;
+        $uploaded[$f] = '';
+        if (!empty($_FILES["file_$f"]['name'])) {
+            $uploadError = '';
+            $stored = ppi_store_uploaded_file($_FILES["file_$f"], $targetDir, $allowedUploadMap, $uploadError);
+            if ($stored === false) {
+                foreach ($createdFiles as $createdFile) {
+                    ppi_unlink_upload($createdFile, $targetDir);
+                }
+                echo "<script>alert('❌ " . htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') . "');window.location='umanf.php';</script>";
+                exit;
             }
-        } else $uploaded[$f] = '';
+            $uploaded[$f] = $stored;
+            $createdFiles[] = $stored;
+        }
     }
 
     $fotoArr = [];
     if (!empty($_FILES['file_foto']['name'][0])) {
         foreach ($_FILES['file_foto']['name'] as $i => $fn) {
-            $ext = strtolower(pathinfo($fn, PATHINFO_EXTENSION));
-            if (in_array($ext, $allowed)) {
-                $newName = time() . rand(100,999) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $fn);
-                move_uploaded_file($_FILES['file_foto']['tmp_name'][$i], $targetDir . $newName);
-                $fotoArr[] = $targetDir . $newName;
+            if ($fn !== '') {
+                $file = [
+                    'name' => $_FILES['file_foto']['name'][$i] ?? '',
+                    'type' => $_FILES['file_foto']['type'][$i] ?? '',
+                    'tmp_name' => $_FILES['file_foto']['tmp_name'][$i] ?? '',
+                    'error' => $_FILES['file_foto']['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+                    'size' => $_FILES['file_foto']['size'][$i] ?? 0,
+                ];
+                $uploadError = '';
+                $stored = ppi_store_uploaded_file($file, $targetDir, $allowedUploadMap, $uploadError);
+                if ($stored === false) {
+                    foreach ($createdFiles as $createdFile) {
+                        ppi_unlink_upload($createdFile, $targetDir);
+                    }
+                    echo "<script>alert('❌ " . htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') . "');window.location='umanf.php';</script>";
+                    exit;
+                }
+                $fotoArr[] = $stored;
+                $createdFiles[] = $stored;
             }
         }
     }
     $fotoJson = json_encode($fotoArr);
 
-    $insert = mysqli_query($conn, "INSERT INTO tb_umanf 
+    $insertStmt = mysqli_prepare($conn, "INSERT INTO tb_umanf 
     (jenis_rapat,file_undangan,file_materi,file_absensi,file_notulen,file_foto)
-    VALUES('$jenis','{$uploaded['undangan']}','{$uploaded['materi']}','{$uploaded['absensi']}','{$uploaded['notulen']}','$fotoJson')");
+    VALUES(?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param(
+        $insertStmt,
+        "ssssss",
+        $jenis,
+        $uploaded['undangan'],
+        $uploaded['materi'],
+        $uploaded['absensi'],
+        $uploaded['notulen'],
+        $fotoJson
+    );
+    $insert = mysqli_stmt_execute($insertStmt);
+    mysqli_stmt_close($insertStmt);
 
     if ($insert) {
         header("Location: umanf.php?success=1");
         exit;
+    }
+
+    foreach ($createdFiles as $createdFile) {
+        ppi_unlink_upload($createdFile, $targetDir);
     }
 
     header("Location: umanf.php?error=1");
@@ -52,14 +98,19 @@ if (isset($_POST['simpan'])) {
 
 // ============ UPDATE DATA (LENGKAPI BERTAHAP) ============
 if (isset($_POST['update'])) {
-    $id = intval($_POST['id'] ?? 0);
-    $jenis = mysqli_real_escape_string($conn, $_POST['jenis_rapat'] ?? '');
-    $targetDir = "../uploads/umanf/";
-    if (!file_exists($targetDir)) mkdir($targetDir, 0775, true);
-    $allowed = ['pdf', 'jpg', 'jpeg', 'png'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf();
+    }
 
-    $oldQ = mysqli_query($conn, "SELECT * FROM tb_umanf WHERE id='$id'");
+    $id = intval($_POST['id'] ?? 0);
+    $jenis = trim($_POST['jenis_rapat'] ?? '');
+
+    $oldStmt = mysqli_prepare($conn, "SELECT * FROM tb_umanf WHERE id = ? LIMIT 1");
+    mysqli_stmt_bind_param($oldStmt, "i", $id);
+    mysqli_stmt_execute($oldStmt);
+    $oldQ = mysqli_stmt_get_result($oldStmt);
     $old = mysqli_fetch_assoc($oldQ);
+    mysqli_stmt_close($oldStmt);
 
     if (!$old) {
         header("Location: umanf.php?error=1");
@@ -74,25 +125,26 @@ if (isset($_POST['update'])) {
     ];
 
     $updated = [];
+    $createdFiles = [];
     foreach ($fieldsMap as $short => $dbField) {
-        // Default pakai file lama jika tidak ada upload baru.
         $updated[$dbField] = $old[$dbField] ?? '';
 
         if (!empty($_FILES["file_$short"]['name'])) {
-            $name = $_FILES["file_$short"]['name'];
-            $ext = strtolower(pathinfo($name, PATHINFO_EXTENSION));
-
-            if (in_array($ext, $allowed)) {
-                $newName = time() . rand(100, 999) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $name);
-                $newPath = $targetDir . $newName;
-
-                if (move_uploaded_file($_FILES["file_$short"]['tmp_name'], $newPath)) {
-                    if (!empty($old[$dbField]) && file_exists($old[$dbField])) {
-                        unlink($old[$dbField]);
-                    }
-                    $updated[$dbField] = $newPath;
+            $uploadError = '';
+            $stored = ppi_store_uploaded_file($_FILES["file_$short"], $targetDir, $allowedUploadMap, $uploadError);
+            if ($stored === false) {
+                foreach ($createdFiles as $createdFile) {
+                    ppi_unlink_upload($createdFile, $targetDir);
                 }
+                echo "<script>alert('❌ " . htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') . "');window.location='umanf.php';</script>";
+                exit;
             }
+
+            if (!empty($old[$dbField])) {
+                ppi_unlink_upload($old[$dbField], $targetDir);
+            }
+            $updated[$dbField] = $stored;
+            $createdFiles[] = $stored;
         }
     }
 
@@ -102,31 +154,58 @@ if (isset($_POST['update'])) {
 
     if (!empty($_FILES['file_foto']['name'][0])) {
         foreach ($_FILES['file_foto']['name'] as $i => $fn) {
-            $ext = strtolower(pathinfo($fn, PATHINFO_EXTENSION));
-            if (in_array($ext, $allowed)) {
-                $newName = time() . rand(100, 999) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $fn);
-                $newPath = $targetDir . $newName;
-                if (move_uploaded_file($_FILES['file_foto']['tmp_name'][$i], $newPath)) {
-                    $oldFoto[] = $newPath;
+            if ($fn !== '') {
+                $file = [
+                    'name' => $_FILES['file_foto']['name'][$i] ?? '',
+                    'type' => $_FILES['file_foto']['type'][$i] ?? '',
+                    'tmp_name' => $_FILES['file_foto']['tmp_name'][$i] ?? '',
+                    'error' => $_FILES['file_foto']['error'][$i] ?? UPLOAD_ERR_NO_FILE,
+                    'size' => $_FILES['file_foto']['size'][$i] ?? 0,
+                ];
+                $uploadError = '';
+                $stored = ppi_store_uploaded_file($file, $targetDir, $allowedUploadMap, $uploadError);
+                if ($stored === false) {
+                    foreach ($createdFiles as $createdFile) {
+                        ppi_unlink_upload($createdFile, $targetDir);
+                    }
+                    echo "<script>alert('❌ " . htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') . "');window.location='umanf.php';</script>";
+                    exit;
                 }
+                $oldFoto[] = $stored;
+                $createdFiles[] = $stored;
             }
         }
     }
     $fotoJson = json_encode($oldFoto);
 
-    $sql = "UPDATE tb_umanf SET
-            jenis_rapat   = '$jenis',
-            file_undangan = '{$updated['file_undangan']}',
-            file_materi   = '{$updated['file_materi']}',
-            file_absensi  = '{$updated['file_absensi']}',
-            file_notulen  = '{$updated['file_notulen']}',
-            file_foto     = '$fotoJson'
-        WHERE id='$id'";
-
-    $update = mysqli_query($conn, $sql);
+    $updateStmt = mysqli_prepare($conn, "UPDATE tb_umanf SET
+            jenis_rapat   = ?,
+            file_undangan = ?,
+            file_materi   = ?,
+            file_absensi  = ?,
+            file_notulen  = ?,
+            file_foto     = ?
+        WHERE id = ?");
+    mysqli_stmt_bind_param(
+        $updateStmt,
+        "ssssssi",
+        $jenis,
+        $updated['file_undangan'],
+        $updated['file_materi'],
+        $updated['file_absensi'],
+        $updated['file_notulen'],
+        $fotoJson,
+        $id
+    );
+    $update = mysqli_stmt_execute($updateStmt);
+    mysqli_stmt_close($updateStmt);
     if ($update) {
         header("Location: umanf.php?updated=1");
         exit;
+    }
+
+    foreach ($createdFiles as $createdFile) {
+        ppi_unlink_upload($createdFile, $targetDir);
     }
 
     header("Location: umanf.php?error=1");
@@ -135,22 +214,33 @@ if (isset($_POST['update'])) {
 
 // ============ HAPUS DATA ============
 if (isset($_GET['hapus'])) {
+    if (!csrf_validate($_GET['csrf'] ?? '')) {
+        ppi_abort_csrf();
+    }
+
     $id = intval($_GET['hapus']);
-    $q = mysqli_query($conn, "SELECT * FROM tb_umanf WHERE id='$id'");
+    $selectStmt = mysqli_prepare($conn, "SELECT * FROM tb_umanf WHERE id = ? LIMIT 1");
+    mysqli_stmt_bind_param($selectStmt, "i", $id);
+    mysqli_stmt_execute($selectStmt);
+    $q = mysqli_stmt_get_result($selectStmt);
     $d = mysqli_fetch_assoc($q);
+    mysqli_stmt_close($selectStmt);
     foreach (['file_undangan', 'file_materi', 'file_absensi', 'file_notulen'] as $f)
-        if (!empty($d[$f]) && file_exists($d[$f])) unlink($d[$f]);
+        if (!empty($d[$f])) ppi_unlink_upload($d[$f], $targetDir);
     if (!empty($d['file_foto'])) {
         $ff = json_decode($d['file_foto'], true);
-        foreach ($ff as $f) if (file_exists($f)) unlink($f);
+        foreach ($ff as $f) ppi_unlink_upload($f, $targetDir);
     }
-    mysqli_query($conn, "DELETE FROM tb_umanf WHERE id='$id'");
+    $deleteStmt = mysqli_prepare($conn, "DELETE FROM tb_umanf WHERE id = ?");
+    mysqli_stmt_bind_param($deleteStmt, "i", $id);
+    mysqli_stmt_execute($deleteStmt);
+    mysqli_stmt_close($deleteStmt);
     header("Location: umanf.php");
     exit;
 }
 
 // ============ AMBIL DATA ============
-$data     = mysqli_query($conn, "SELECT * FROM tb_umanf ORDER BY id DESC");
+$data     = mysqli_query($conn, "SELECT id, jenis_rapat, file_undangan, file_materi, file_absensi, file_notulen, file_foto FROM tb_umanf ORDER BY id DESC");
 $allRows  = mysqli_fetch_all($data, MYSQLI_ASSOC);
 $total    = count($allRows);
 
@@ -169,7 +259,7 @@ foreach ($allRows as $r) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UmanF – Dokumen Rapat | PPI PHBW</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         /* ===== WRAPPER ===== */
@@ -593,7 +683,7 @@ foreach ($allRows as $r) {
                             data-jenis="<?= htmlspecialchars($r['jenis_rapat'], ENT_QUOTES) ?>">
                             ✏️ Edit
                         </button>
-                        <a href="?hapus=<?= $r['id'] ?>" onclick="return confirm('Hapus data rapat ini beserta semua file?')"
+                                <a href="?hapus=<?= (int) $r['id'] ?>&csrf=<?= urlencode($csrfToken) ?>" onclick="return confirm('Hapus data rapat ini beserta semua file?')"
                            class="btn btn-danger btn-sm btn-icon" title="Hapus">🗑️</a>
                     </div>
                 </div>
@@ -611,6 +701,7 @@ foreach ($allRows as $r) {
                     <button class="btn-close" id="btnBatal" aria-label="Tutup">✕</button>
                 </div>
                 <form method="POST" enctype="multipart/form-data">
+                    <?= csrf_input() ?>
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Jenis Rapat <span class="req">*</span></label>
@@ -674,6 +765,7 @@ foreach ($allRows as $r) {
                 </div>
 
                 <form method="POST" enctype="multipart/form-data">
+                    <?= csrf_input() ?>
                     <input type="hidden" name="id" id="edit_id">
 
                     <div class="modal-body">
@@ -724,7 +816,7 @@ foreach ($allRows as $r) {
     </main>
 </div>
 
-<script src="/assets/js/utama.js"></script>
+<script src="<?= asset('assets/js/utama.js') ?>"></script>
 <script>
     // Modal
     const overlay  = document.getElementById('formOverlay');

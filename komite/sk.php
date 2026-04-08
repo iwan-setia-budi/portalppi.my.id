@@ -1,54 +1,77 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 $conn = $koneksi;
+$csrfToken = csrf_token();
 
 // === TAMBAH DATA ===
 if (isset($_POST['simpan'])) {
-    $nomor = mysqli_real_escape_string($conn, $_POST['nomor_sk']);
-    $judul = mysqli_real_escape_string($conn, $_POST['judul_sk']);
-    $tanggal = $_POST['tanggal'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf();
+    }
 
-    $file = $_FILES['file_sk'];
-    $namaFile = basename($file['name']);
-    $targetDir = "../uploads/sk/";
-    $namaUnik = time() . "_" . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $namaFile);
-    $targetFile = $targetDir . $namaUnik;
-    $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    $nomor = trim($_POST['nomor_sk'] ?? '');
+    $judul = trim($_POST['judul_sk'] ?? '');
+    $tanggal = trim($_POST['tanggal'] ?? '');
 
-    // Validasi tipe file
-    if ($fileType != "pdf") {
-        echo "<script>alert('❌ Hanya file PDF yang diizinkan!');window.location='sk.php';</script>";
+    $uploadError = '';
+    $targetFile = ppi_store_uploaded_pdf($_FILES['file_sk'] ?? null, __DIR__ . '/../uploads/sk', $uploadError);
+    if ($targetFile === false) {
+        echo "<script>alert('❌ " . htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') . "');window.location='sk.php';</script>";
         exit;
     }
 
-    // Upload file
-    if (move_uploaded_file($file["tmp_name"], $targetFile)) {
-        // Simpan ke database (gunakan kolom link_file)
-        mysqli_query($conn, "INSERT INTO tb_sk (nomor_sk, judul_sk, tanggal, link_file)
-                         VALUES ('$nomor', '$judul', '$tanggal', '$targetFile')");
+    $insertStmt = mysqli_prepare($conn, "INSERT INTO tb_sk (nomor_sk, judul_sk, tanggal, link_file)
+                         VALUES (?, ?, ?, ?)");
+    mysqli_stmt_bind_param($insertStmt, "ssss", $nomor, $judul, $tanggal, $targetFile);
+    if (mysqli_stmt_execute($insertStmt)) {
         echo "<script>alert('✅ Data SK berhasil disimpan!');window.location='sk.php';</script>";
         exit;
     } else {
+        ppi_unlink_upload($targetFile, __DIR__ . '/../uploads/sk');
         echo "<script>alert('⚠️ Gagal mengunggah file! Pastikan folder uploads/sk dapat ditulis.');window.location='sk.php';</script>";
     }
+    mysqli_stmt_close($insertStmt);
 }
 
 // === HAPUS DATA ===
 if (isset($_GET['hapus'])) {
-    $id = $_GET['hapus'];
-    $q = mysqli_query($conn, "SELECT link_file FROM tb_sk WHERE id='$id'");
+    $id = intval($_GET['hapus']);
+    if (!csrf_validate($_GET['csrf'] ?? '') || $id <= 0) {
+        ppi_abort_csrf();
+    }
+
+    $selectStmt = mysqli_prepare($conn, "SELECT link_file FROM tb_sk WHERE id = ?");
+    mysqli_stmt_bind_param($selectStmt, "i", $id);
+    mysqli_stmt_execute($selectStmt);
+    $q = mysqli_stmt_get_result($selectStmt);
     $data = mysqli_fetch_assoc($q);
-    if ($data && file_exists($data['link_file'])) unlink($data['link_file']);
-    mysqli_query($conn, "DELETE FROM tb_sk WHERE id='$id'");
+    mysqli_stmt_close($selectStmt);
+    if ($data) {
+        ppi_unlink_upload($data['link_file'], __DIR__ . '/../uploads/sk');
+    }
+
+    $deleteStmt = mysqli_prepare($conn, "DELETE FROM tb_sk WHERE id = ?");
+    mysqli_stmt_bind_param($deleteStmt, "i", $id);
+    mysqli_stmt_execute($deleteStmt);
+    mysqli_stmt_close($deleteStmt);
     echo "<script>alert('🗑️ Data berhasil dihapus!');window.location='sk.php';</script>";
     exit;
 }
 
 // === PENCARIAN ===
 $cari = $_GET['cari'] ?? '';
-$where = $cari ? "WHERE nomor_sk LIKE '%$cari%' OR judul_sk LIKE '%$cari%'" : '';
-$res = mysqli_query($conn, "SELECT * FROM tb_sk $where ORDER BY tanggal DESC");
+if ($cari !== '') {
+    $likeCari = '%' . $cari . '%';
+    $searchStmt = mysqli_prepare($conn, "SELECT id, nomor_sk, judul_sk, tanggal, link_file FROM tb_sk WHERE nomor_sk LIKE ? OR judul_sk LIKE ? ORDER BY tanggal DESC");
+    mysqli_stmt_bind_param($searchStmt, "ss", $likeCari, $likeCari);
+    mysqli_stmt_execute($searchStmt);
+    $res = mysqli_stmt_get_result($searchStmt);
+} else {
+    $searchStmt = null;
+    $res = mysqli_query($conn, "SELECT id, nomor_sk, judul_sk, tanggal, link_file FROM tb_sk ORDER BY tanggal DESC");
+}
 ?>
 
 
@@ -69,7 +92,7 @@ $pageTitle = "KOMITE PPI";
     <title>Daftar SK | PPI PHBW</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
 
     <style>
@@ -554,13 +577,16 @@ $pageTitle = "KOMITE PPI";
                                 while ($r = mysqli_fetch_assoc($res)) {
                                     $tgl = date('d F Y', strtotime($r['tanggal']));
                                     $file = str_replace("../", "", $r['link_file']);
+                                                                        $nomor = htmlspecialchars($r['nomor_sk'], ENT_QUOTES, 'UTF-8');
+                                                                        $judul = htmlspecialchars($r['judul_sk'], ENT_QUOTES, 'UTF-8');
+                                                                        $deleteUrl = '?hapus=' . (int) $r['id'] . '&csrf=' . urlencode($csrfToken);
                                     echo "<tr>
                               <td>$no</td>
-                              <td>{$r['nomor_sk']}</td>
-                              <td>{$r['judul_sk']}</td>
+                                                            <td>{$nomor}</td>
+                                                            <td>{$judul}</td>
                               <td>$tgl</td>
-                              <td><a href='/$file' target='_blank' class='btn-view'>Lihat</a></td>
-                              <td class='actions'><a href='?hapus={$r['id']}' onclick=\"return confirm('Yakin hapus data ini?')\" class='btn-del'>Hapus</a></td>
+                                                            <td><a href='/$file' target='_blank' rel='noopener noreferrer' class='btn-view'>Lihat</a></td>
+                                                            <td class='actions'><a href='{$deleteUrl}' onclick=\"return confirm('Yakin hapus data ini?')\" class='btn-del'>Hapus</a></td>
                             </tr>";
                                     $no++;
                                 }
@@ -579,6 +605,7 @@ $pageTitle = "KOMITE PPI";
                     <div class="popup-form">
                         <h2>Tambah Data SK</h2>
                         <form method="POST" enctype="multipart/form-data">
+                            <?= csrf_input() ?>
                             <label>Nomor SK</label>
                             <input type="text" name="nomor_sk" required placeholder="Contoh: SK/003/PPI/2025">
                             <label>Judul SK</label>
@@ -593,6 +620,8 @@ $pageTitle = "KOMITE PPI";
                     </div>
                 </div>
 
+                <?php if ($searchStmt instanceof mysqli_stmt) mysqli_stmt_close($searchStmt); ?>
+
             </div>
 
         </main>
@@ -600,7 +629,7 @@ $pageTitle = "KOMITE PPI";
     </div>
 
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
     <script>
         const overlay = document.getElementById('formOverlay');

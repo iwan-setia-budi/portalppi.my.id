@@ -1,7 +1,8 @@
-<?php include_once '../header.php'; ?>
+<?php
+require_once __DIR__ . '/../config/assets.php'; include_once '../header.php'; ?>
 <?php include_once '../sidebar.php'; ?>
 
-<link rel="stylesheet" href="../assets/css/dashboard.css">
+<link rel="stylesheet" href="<?= asset('assets/css/dashboard.css') ?>">
 
 
 <main>

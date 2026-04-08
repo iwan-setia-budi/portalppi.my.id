@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 session_start();
 include_once '../koneksi.php';
 include "../cek_akses.php";
@@ -274,7 +275,7 @@ $pageTitle = "MOU & IZIN";
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>MOU & Izin Resmi | PPI PHBW</title>
-  <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+  <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
   <style>
     :root {
@@ -1271,7 +1272,7 @@ $pageTitle = "MOU & IZIN";
     </div>
   </div>
 
-  <script src="/assets/js/utama.js?v=5"></script>
+  <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
   <script>
     const modal = document.getElementById('formModal');

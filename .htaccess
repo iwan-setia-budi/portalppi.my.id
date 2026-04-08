@@ -1,0 +1,93 @@
+# =====================================================
+# PORTALPPI — .htaccess
+# Security + Performance
+# =====================================================
+
+Options -Indexes
+
+# =====================================================
+# GZIP COMPRESSION
+# =====================================================
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css
+    AddOutputFilterByType DEFLATE text/javascript application/javascript application/x-javascript
+    AddOutputFilterByType DEFLATE application/json application/xml
+    AddOutputFilterByType DEFLATE image/svg+xml
+</IfModule>
+
+# =====================================================
+# BROWSER CACHE (assets static)
+# =====================================================
+<IfModule mod_expires.c>
+    ExpiresActive On
+
+    # CSS & JS — 1 bulan (versioning via ?v= sudah dihandle di PHP)
+    ExpiresByType text/css              "access plus 1 month"
+    ExpiresByType application/javascript "access plus 1 month"
+
+    # Gambar
+    ExpiresByType image/png             "access plus 3 months"
+    ExpiresByType image/jpeg            "access plus 3 months"
+    ExpiresByType image/gif             "access plus 3 months"
+    ExpiresByType image/webp            "access plus 3 months"
+    ExpiresByType image/svg+xml        "access plus 3 months"
+
+    # Font
+    ExpiresByType font/woff             "access plus 1 year"
+    ExpiresByType font/woff2            "access plus 1 year"
+
+    # HTML — jangan di-cache lama
+    ExpiresByType text/html             "access plus 0 seconds"
+</IfModule>
+
+# =====================================================
+# KEAMANAN HEADER HTTP
+# =====================================================
+<IfModule mod_headers.c>
+    # Cegah browser tebak MIME type
+    Header set X-Content-Type-Options "nosniff"
+
+    # Cegah halaman di-load dalam iframe (Clickjacking)
+    Header set X-Frame-Options "SAMEORIGIN"
+
+    # XSS Protection (browser lama)
+    Header set X-XSS-Protection "1; mode=block"
+
+    # Paksa HTTPS jika sudah live
+    # Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+
+    # Hapus header yang membocorkan info server
+    Header unset X-Powered-By
+    Header unset Server
+</IfModule>
+
+# =====================================================
+# BLOKIR AKSES LANGSUNG KE FILE SENSITIF
+# =====================================================
+
+# Blokir akses ke file konfigurasi
+<FilesMatch "^(koneksi|cek_akses|config|php\.ini|error_log)\.php?$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Blokir akses ke error_log
+<FilesMatch "^error_log$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# Blokir akses ke file backup / draft
+<FilesMatch "\.(bak|sql|sh|log)$">
+    Order Allow,Deny
+    Deny from all
+</FilesMatch>
+
+# =====================================================
+# PROTECT FOLDER CONFIG
+# (backup — juga ada .htaccess di dalam folder config/)
+# =====================================================
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^config/ - [F,L]
+</IfModule>

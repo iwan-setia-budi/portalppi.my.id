@@ -1,3 +1,6 @@
+<?php
+require_once __DIR__ . '/../config/assets.php';
+?>
 <!--Tulisan di topbar otomatis-->
 <?php
 $pageTitle = "Audit External";
@@ -14,7 +17,7 @@ $pageTitle = "Audit External";
     <title>Halaman Dalam Pengembangan</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <!-- FONT AWESOME -->
     <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">-->
@@ -175,7 +178,7 @@ $pageTitle = "Audit External";
 
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 </body>
 

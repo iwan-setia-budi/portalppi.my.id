@@ -1,0 +1,3 @@
+# Blokir semua akses langsung ke folder config/
+Order Allow,Deny
+Deny from all

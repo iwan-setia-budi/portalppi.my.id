@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 
@@ -154,7 +155,7 @@ $data = $conn->query("
 <head>
     <title>Master Bundle Mapping</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
     
     <style>
         /* ================= MASTER MAPPING ================= */
@@ -565,7 +566,7 @@ document.getElementById("searchMapping").addEventListener("keyup", function () {
 </main>
 </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 </body>
 </html>

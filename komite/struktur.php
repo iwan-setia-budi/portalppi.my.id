@@ -1,7 +1,9 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 $conn = $koneksi;
+$csrfToken = csrf_token();
 
 // Ambil data dari database
 $q = mysqli_query($conn, "SELECT * FROM tb_struktur_ppi ORDER BY id DESC LIMIT 1");
@@ -37,7 +39,7 @@ $pageTitle = "KOMITE PPI";
     <title>Struktur Komite PPI | PPI PHBW</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         /* === HEADER STRUKTUR SESUAI BRAND === */
@@ -212,6 +214,35 @@ $pageTitle = "KOMITE PPI";
                 width: 90%;
             }
         }
+
+        /* === DARK MODE FIX: IPCLN & Penanggung Jawab === */
+        body.dark-mode .member {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .group {
+            background: #111827;
+            border: 1px solid #1e3a5f;
+        }
+
+        body.dark-mode .group h4 {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .box {
+            background: #111827;
+        }
+
+        body.dark-mode .box h3 {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .box p,
+        body.dark-mode .box .name {
+            color: #e2e8f0;
+        }
     </style>
 </head>
 
@@ -289,10 +320,11 @@ $pageTitle = "KOMITE PPI";
 
 
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
     <script>
         const struktur = <?= json_encode($data) ?>;
+        const csrfToken = <?= json_encode($csrfToken) ?>;
         const ipclnGroup = document.getElementById('ipclnGroup');
         const pjGroup = document.getElementById('pjGroup');
 
@@ -346,7 +378,10 @@ $pageTitle = "KOMITE PPI";
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({
+                    ...data,
+                    csrf_token: csrfToken
+                })
             });
         }
 

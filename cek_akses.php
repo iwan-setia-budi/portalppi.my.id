@@ -26,9 +26,11 @@ if ($role === 'admin') {
     return;
 }
 
-// 5️⃣ Cek izin user
-$query = "SELECT * FROM user_access WHERE user_id='$user_id' AND halaman='$current_folder' AND diizinkan=1";
-$result = mysqli_query($koneksi, $query);
+// 5️⃣ Cek izin user — prepared statement mencegah SQL Injection
+$stmt = mysqli_prepare($koneksi, "SELECT id FROM user_access WHERE user_id=? AND halaman=? AND diizinkan=1 LIMIT 1");
+mysqli_stmt_bind_param($stmt, "is", $user_id, $current_folder);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
 // 6️⃣ Jika tidak punya izin
 if (!$result || mysqli_num_rows($result) == 0) {

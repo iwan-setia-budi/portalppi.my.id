@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config/assets.php';
 session_start();
 include "koneksi.php";
 
@@ -7,6 +8,8 @@ if (!isset($_SESSION['username'])) {
   header("Location: login.php");
   exit;
 }
+
+$csrfToken = csrf_token();
 
 $available_pages = [
   'dashboard' => ['icon' => '🏠', 'label' => 'Dashboard'],
@@ -25,9 +28,31 @@ $available_pages = [
 // ======================
 if (isset($_GET['hapus'])) {
   $id = intval($_GET['hapus']);
-  // Hapus dari tabel users dan user_access
-  mysqli_query($koneksi, "DELETE FROM users WHERE id='$id'");
-  mysqli_query($koneksi, "DELETE FROM user_access WHERE user_id='$id'");
+  if (!csrf_validate($_GET['csrf'] ?? '') || $id <= 0) {
+    ppi_abort_csrf();
+  }
+
+  if ($id === (int) $_SESSION['user_id']) {
+    echo "<script>alert('⚠️ Anda tidak bisa menghapus akun yang sedang dipakai.'); window.location='users.php';</script>";
+    exit;
+  }
+
+  mysqli_begin_transaction($koneksi);
+  $deleteAccess = mysqli_prepare($koneksi, "DELETE FROM user_access WHERE user_id = ?");
+  $deleteUser = mysqli_prepare($koneksi, "DELETE FROM users WHERE id = ?");
+  mysqli_stmt_bind_param($deleteAccess, "i", $id);
+  mysqli_stmt_bind_param($deleteUser, "i", $id);
+
+  $ok = mysqli_stmt_execute($deleteAccess) && mysqli_stmt_execute($deleteUser);
+  if ($ok) {
+    mysqli_commit($koneksi);
+  } else {
+    mysqli_rollback($koneksi);
+  }
+
+  mysqli_stmt_close($deleteAccess);
+  mysqli_stmt_close($deleteUser);
+
   echo "<script>alert('🗑️ User berhasil dihapus.'); window.location='users.php';</script>";
   exit;
 }
@@ -36,36 +61,64 @@ if (isset($_GET['hapus'])) {
 // UPDATE USER
 // ======================
 if (isset($_POST['update'])) {
+  if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+    ppi_abort_csrf();
+  }
+
   $id = intval($_POST['user_id']);
   $username_input = trim($_POST['username']);
   $password_input = trim($_POST['password']);
   $role_input = trim($_POST['role']);
 
-  $username = mysqli_real_escape_string($koneksi, $username_input);
-  $role = mysqli_real_escape_string($koneksi, $role_input);
-
-  $cek = mysqli_query($koneksi, "SELECT id FROM users WHERE username='$username' AND id != '$id' LIMIT 1");
-  if (mysqli_num_rows($cek) > 0) {
+  $duplicateStmt = mysqli_prepare($koneksi, "SELECT id FROM users WHERE username = ? AND id != ? LIMIT 1");
+  mysqli_stmt_bind_param($duplicateStmt, "si", $username_input, $id);
+  mysqli_stmt_execute($duplicateStmt);
+  $cek = mysqli_stmt_get_result($duplicateStmt);
+  if ($cek && mysqli_num_rows($cek) > 0) {
+    mysqli_stmt_close($duplicateStmt);
     echo "<script>alert('⚠️ Username sudah digunakan!'); window.location='users.php?edit=$id';</script>";
     exit;
   }
+  mysqli_stmt_close($duplicateStmt);
 
-  if ($password_input !== '') {
-    $password = password_hash($password_input, PASSWORD_DEFAULT);
-    $password = mysqli_real_escape_string($koneksi, $password);
-    mysqli_query($koneksi, "UPDATE users SET username='$username', password='$password', role='$role' WHERE id='$id'");
-  } else {
-    mysqli_query($koneksi, "UPDATE users SET username='$username', role='$role' WHERE id='$id'");
+  if ($password_input !== '' && strlen($password_input) < 6) {
+    echo "<script>alert('⚠️ Password minimal 6 karakter.'); window.location='users.php?edit=$id';</script>";
+    exit;
   }
 
-  mysqli_query($koneksi, "DELETE FROM user_access WHERE user_id='$id'");
+  mysqli_begin_transaction($koneksi);
+  if ($password_input !== '') {
+    $password = password_hash($password_input, PASSWORD_DEFAULT);
+    $updateStmt = mysqli_prepare($koneksi, "UPDATE users SET username = ?, password = ?, role = ? WHERE id = ?");
+    mysqli_stmt_bind_param($updateStmt, "sssi", $username_input, $password, $role_input, $id);
+  } else {
+    $updateStmt = mysqli_prepare($koneksi, "UPDATE users SET username = ?, role = ? WHERE id = ?");
+    mysqli_stmt_bind_param($updateStmt, "ssi", $username_input, $role_input, $id);
+  }
+  $ok = mysqli_stmt_execute($updateStmt);
+  mysqli_stmt_close($updateStmt);
+
+  $deleteAccessStmt = mysqli_prepare($koneksi, "DELETE FROM user_access WHERE user_id = ?");
+  mysqli_stmt_bind_param($deleteAccessStmt, "i", $id);
+  $ok = $ok && mysqli_stmt_execute($deleteAccessStmt);
+  mysqli_stmt_close($deleteAccessStmt);
+
+  $insertAccessStmt = mysqli_prepare($koneksi, "INSERT INTO user_access (user_id, halaman, diizinkan) VALUES (?, ?, 1)");
   if (!empty($_POST['akses'])) {
     foreach ($_POST['akses'] as $halaman) {
       $halaman = basename(trim(strtolower($halaman)));
       if (isset($available_pages[$halaman])) {
-        mysqli_query($koneksi, "INSERT INTO user_access (user_id, halaman, diizinkan) VALUES ('$id', '$halaman', 1)");
+        mysqli_stmt_bind_param($insertAccessStmt, "is", $id, $halaman);
+        $ok = $ok && mysqli_stmt_execute($insertAccessStmt);
       }
     }
+  }
+  mysqli_stmt_close($insertAccessStmt);
+
+  if ($ok) {
+    mysqli_commit($koneksi);
+  } else {
+    mysqli_rollback($koneksi);
   }
 
   echo "<script>alert('✏️ Data user berhasil diperbarui.'); window.location='users.php?tab=daftar';</script>";
@@ -76,30 +129,56 @@ if (isset($_POST['update'])) {
 // TAMBAH USER BARU
 // ======================
 if (isset($_POST['tambah'])) {
-  $username_input = trim($_POST['username']);
-  $username = mysqli_real_escape_string($koneksi, $username_input);
-  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-  $role = mysqli_real_escape_string($koneksi, $_POST['role']);
+  if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+    ppi_abort_csrf();
+  }
 
-  // 🚫 Cegah username duplikat
-  $cek = mysqli_query($koneksi, "SELECT * FROM users WHERE username='$username'");
-  if (mysqli_num_rows($cek) > 0) {
-    echo "<script>alert('⚠️ Username sudah digunakan!'); window.location='users.php';</script>";
+  $username_input = trim($_POST['username']);
+  $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+  $role = trim($_POST['role']);
+
+  if (strlen($_POST['password']) < 6) {
+    echo "<script>alert('⚠️ Password minimal 6 karakter.'); window.location='users.php';</script>";
     exit;
   }
 
+  // 🚫 Cegah username duplikat
+  $cekStmt = mysqli_prepare($koneksi, "SELECT id FROM users WHERE username = ? LIMIT 1");
+  mysqli_stmt_bind_param($cekStmt, "s", $username_input);
+  mysqli_stmt_execute($cekStmt);
+  $cek = mysqli_stmt_get_result($cekStmt);
+  if (mysqli_num_rows($cek) > 0) {
+    mysqli_stmt_close($cekStmt);
+    echo "<script>alert('⚠️ Username sudah digunakan!'); window.location='users.php';</script>";
+    exit;
+  }
+  mysqli_stmt_close($cekStmt);
+
   // Simpan user baru
-  mysqli_query($koneksi, "INSERT INTO users (username, password, role) VALUES ('$username', '$password', '$role')");
+  mysqli_begin_transaction($koneksi);
+  $insertUserStmt = mysqli_prepare($koneksi, "INSERT INTO users (username, password, role) VALUES (?, ?, ?)");
+  mysqli_stmt_bind_param($insertUserStmt, "sss", $username_input, $password, $role);
+  $ok = mysqli_stmt_execute($insertUserStmt);
+  mysqli_stmt_close($insertUserStmt);
   $user_id = mysqli_insert_id($koneksi); // Ambil ID user baru
 
   // Simpan hak akses
+  $insertAccessStmt = mysqli_prepare($koneksi, "INSERT INTO user_access (user_id, halaman, diizinkan) VALUES (?, ?, 1)");
   if (!empty($_POST['akses'])) {
     foreach ($_POST['akses'] as $halaman) {
       $halaman = basename(trim(strtolower($halaman))); // Bersihkan dari ../ atau .php
       if (isset($available_pages[$halaman])) {
-        mysqli_query($koneksi, "INSERT INTO user_access (user_id, halaman, diizinkan) VALUES ('$user_id', '$halaman', 1)");
+        mysqli_stmt_bind_param($insertAccessStmt, "is", $user_id, $halaman);
+        $ok = $ok && mysqli_stmt_execute($insertAccessStmt);
       }
     }
+  }
+  mysqli_stmt_close($insertAccessStmt);
+
+  if ($ok) {
+    mysqli_commit($koneksi);
+  } else {
+    mysqli_rollback($koneksi);
   }
 
   echo "<script>alert('✅ User baru berhasil ditambahkan!'); window.location='users.php';</script>";
@@ -112,16 +191,40 @@ $edit_access = [];
 
 if (isset($_GET['edit'])) {
   $edit_id = intval($_GET['edit']);
-  $edit_q = mysqli_query($koneksi, "SELECT * FROM users WHERE id='$edit_id' LIMIT 1");
+  $editStmt = mysqli_prepare($koneksi, "SELECT id, username, role, protected FROM users WHERE id = ? LIMIT 1");
+  mysqli_stmt_bind_param($editStmt, "i", $edit_id);
+  mysqli_stmt_execute($editStmt);
+  $edit_q = mysqli_stmt_get_result($editStmt);
   if ($edit_q && mysqli_num_rows($edit_q) > 0) {
     $is_edit_mode = true;
     $edit_user = mysqli_fetch_assoc($edit_q);
 
-    $akses_edit_q = mysqli_query($koneksi, "SELECT halaman FROM user_access WHERE user_id='$edit_id' AND diizinkan=1");
+    $aksesEditStmt = mysqli_prepare($koneksi, "SELECT halaman FROM user_access WHERE user_id = ? AND diizinkan = 1");
+    mysqli_stmt_bind_param($aksesEditStmt, "i", $edit_id);
+    mysqli_stmt_execute($aksesEditStmt);
+    $akses_edit_q = mysqli_stmt_get_result($aksesEditStmt);
     while ($a = mysqli_fetch_assoc($akses_edit_q)) {
       $edit_access[] = $a['halaman'];
     }
+    mysqli_stmt_close($aksesEditStmt);
   }
+  mysqli_stmt_close($editStmt);
+}
+
+$countResult = mysqli_query($koneksi, "SELECT COUNT(*) AS total FROM users");
+$countRow = $countResult ? mysqli_fetch_assoc($countResult) : ['total' => 0];
+$userCount = (int) ($countRow['total'] ?? 0);
+
+$usersResult = mysqli_query($koneksi, "SELECT id, username, role, protected FROM users ORDER BY id DESC");
+$usersList = [];
+while ($usersResult && ($row = mysqli_fetch_assoc($usersResult))) {
+  $usersList[] = $row;
+}
+
+$accessMap = [];
+$allAccessResult = mysqli_query($koneksi, "SELECT user_id, halaman FROM user_access WHERE diizinkan = 1 ORDER BY halaman ASC");
+while ($allAccessResult && ($row = mysqli_fetch_assoc($allAccessResult))) {
+  $accessMap[(int) $row['user_id']][] = ucfirst($row['halaman']);
 }
 ?>
 
@@ -139,7 +242,7 @@ $pageTitle = "Manajemen User";
 <title>Manajemen User | MyPPI</title>
 
   <!-- === Link CSS eksternal === -->
-  <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+  <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
 <style>
@@ -902,6 +1005,7 @@ $pageTitle = "Manajemen User";
       </div>
       <div class="um-card-body" style="padding-top:20px;">
         <form method="POST">
+          <?= csrf_input() ?>
           <div class="um-form-grid">
 
             <div class="um-form-group">
@@ -971,8 +1075,7 @@ $pageTitle = "Manajemen User";
       <div class="um-card-icon"><i class="bi bi-card-list"></i></div>
       <h2>Daftar Pengguna</h2>
       <?php
-        $count = mysqli_num_rows(mysqli_query($koneksi, "SELECT id FROM users"));
-        echo "<span class='um-badge-count'>{$count} User</span>";
+        echo "<span class='um-badge-count'>{$userCount} User</span>";
       ?>
     </div>
     <div class="um-card-body">
@@ -991,15 +1094,9 @@ $pageTitle = "Manajemen User";
           </thead>
           <tbody>
             <?php
-            $users = mysqli_query($koneksi, "SELECT * FROM users ORDER BY id DESC");
-            if (mysqli_num_rows($users) > 0):
-              while ($row = mysqli_fetch_assoc($users)):
-                // Ambil daftar izin
-                $akses_q = mysqli_query($koneksi, "SELECT halaman FROM user_access WHERE user_id='".$row['id']."' AND diizinkan=1");
-                $halaman = [];
-                while ($a = mysqli_fetch_assoc($akses_q)) {
-                  $halaman[] = ucfirst($a['halaman']);
-                }
+            if (!empty($usersList)):
+              foreach ($usersList as $row):
+                $halaman = $accessMap[(int) $row['id']] ?? [];
                 $initials = strtoupper(substr($row['username'], 0, 2));
                 $role_class = ($row['role'] === 'admin') ? 'admin' : 'petugas';
                 $role_icon  = ($row['role'] === 'admin') ? '🛡️' : '👤';
@@ -1034,7 +1131,7 @@ $pageTitle = "Manajemen User";
                   <?php if (isset($row['protected']) && $row['protected'] == 1): ?>
                     <span class="um-protected">🔒 Terlindungi</span>
                   <?php else: ?>
-                    <a href="users.php?hapus=<?= $row['id'] ?>" class="um-btn-del"
+                      <a href="users.php?hapus=<?= $row['id'] ?>&csrf=<?= urlencode($csrfToken) ?>" class="um-btn-del"
                        onclick="return confirm('Yakin ingin menghapus user ini?')">
                       <i class="bi bi-trash-fill"></i> Hapus
                     </a>
@@ -1042,7 +1139,7 @@ $pageTitle = "Manajemen User";
                 </div>
               </td>
             </tr>
-            <?php endwhile; else: ?>
+            <?php endforeach; else: ?>
             <tr>
               <td colspan="5">
                 <div class="um-empty">
@@ -1059,12 +1156,9 @@ $pageTitle = "Manajemen User";
       <!-- Mobile Card List -->
       <div class="um-mobile-list">
         <?php
-        $users2 = mysqli_query($koneksi, "SELECT * FROM users ORDER BY id DESC");
-        if (mysqli_num_rows($users2) > 0):
-          while ($row = mysqli_fetch_assoc($users2)):
-            $akses_q2 = mysqli_query($koneksi, "SELECT halaman FROM user_access WHERE user_id='".$row['id']."' AND diizinkan=1");
-            $halaman2 = [];
-            while ($a = mysqli_fetch_assoc($akses_q2)) { $halaman2[] = ucfirst($a['halaman']); }
+        if (!empty($usersList)):
+          foreach ($usersList as $row):
+            $halaman2 = $accessMap[(int) $row['id']] ?? [];
             $initials2 = strtoupper(substr($row['username'], 0, 2));
             $role_class2 = ($row['role'] === 'admin') ? 'admin' : 'petugas';
         ?>
@@ -1095,14 +1189,14 @@ $pageTitle = "Manajemen User";
                 <?php if (isset($row['protected']) && $row['protected'] == 1): ?>
                   <span class="um-protected">🔒 Terlindungi</span>
                 <?php else: ?>
-                  <a href="users.php?hapus=<?= $row['id'] ?>" class="um-btn-del"
+                  <a href="users.php?hapus=<?= $row['id'] ?>&csrf=<?= urlencode($csrfToken) ?>" class="um-btn-del"
                      onclick="return confirm('Yakin ingin menghapus user ini?')"><i class="bi bi-trash-fill"></i> Hapus</a>
                 <?php endif; ?>
               </div>
             </div>
           </div>
         </div>
-        <?php endwhile; else: ?>
+        <?php endforeach; else: ?>
           <div class="um-empty"><div class="um-empty-icon">🙅</div><p>Belum ada pengguna.</p></div>
         <?php endif; ?>
       </div>
@@ -1117,7 +1211,7 @@ $pageTitle = "Manajemen User";
     </main>
 
 </div>
-    <script src="/assets/js/utama.js?v=6"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
     <script>
       (function () {
         var tabButtons = document.querySelectorAll('.um-tab-btn');

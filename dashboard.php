@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config/assets.php';
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
@@ -27,8 +28,8 @@ $pageTitle = "Dashboard";
 <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicon.png">
 
   <!-- === Link CSS eksternal === -->
-  <link rel="stylesheet" href="/assets/css/utama.css?v=18">
-    <link rel="stylesheet" href="/assets/css/dashboard.css?v=12">
+  <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
+    <link rel="stylesheet" href="<?= asset('assets/css/dashboard.css') ?>">
 
 
 </head>
@@ -122,7 +123,7 @@ $pageTitle = "Dashboard";
     </main>
 
 </div>
-    <script src="/assets/js/utama.js?v=6"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 </body>
 

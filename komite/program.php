@@ -1,50 +1,71 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 $conn = $koneksi;
+$csrfToken = csrf_token();
 
 // === TAMBAH DATA ===
 if (isset($_POST['simpan'])) {
-    $nama = mysqli_real_escape_string($conn, $_POST['nama_program']);
-    $desk = mysqli_real_escape_string($conn, $_POST['deskripsi']);
-    $pj = mysqli_real_escape_string($conn, $_POST['penanggung_jawab']);
-    $mulai = $_POST['tanggal_mulai'];
-    $selesai = $_POST['tanggal_selesai'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf();
+    }
 
-    $file = $_FILES['file_program'];
-    $namaFile = basename($file['name']);
-    $targetDir = "../uploads/program/";
-    $namaUnik = time() . "_" . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $namaFile);
-    $targetFile = $targetDir . $namaUnik;
-    $fileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
+    $nama = trim($_POST['nama_program'] ?? '');
+    $desk = trim($_POST['deskripsi'] ?? '');
+    $pj = trim($_POST['penanggung_jawab'] ?? '');
+    $mulai = trim($_POST['tanggal_mulai'] ?? '');
+    $selesai = trim($_POST['tanggal_selesai'] ?? '');
 
-    if ($fileType != "pdf") {
-        echo "<script>alert('❌ Hanya file PDF yang diizinkan!');window.location='program.php';</script>";
+    $uploadError = '';
+    $targetFile = ppi_store_uploaded_pdf($_FILES['file_program'] ?? null, __DIR__ . '/../uploads/program', $uploadError);
+
+    if ($targetFile === false) {
+        echo "<script>alert('❌ " . htmlspecialchars($uploadError, ENT_QUOTES, 'UTF-8') . "');window.location='program.php';</script>";
         exit;
     }
 
-    if (move_uploaded_file($file["tmp_name"], $targetFile)) {
-        mysqli_query($conn, "INSERT INTO tb_program_ppi (nama_program, deskripsi, penanggung_jawab, tanggal_mulai, tanggal_selesai, file_path)
-                         VALUES ('$nama', '$desk', '$pj', '$mulai', '$selesai', '$targetFile')");
+    $stmt = mysqli_prepare($conn, "INSERT INTO tb_program_ppi (nama_program, deskripsi, penanggung_jawab, tanggal_mulai, tanggal_selesai, file_path)
+                         VALUES (?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, "ssssss", $nama, $desk, $pj, $mulai, $selesai, $targetFile);
+
+    if (mysqli_stmt_execute($stmt)) {
         echo "<script>alert('✅ Program berhasil disimpan!');window.location='program.php';</script>";
     } else {
+        ppi_unlink_upload($targetFile, __DIR__ . '/../uploads/program');
         echo "<script>alert('⚠️ Gagal mengunggah file! Pastikan folder uploads/program dapat ditulis.');window.location='program.php';</script>";
     }
+    mysqli_stmt_close($stmt);
 }
 
 // === HAPUS DATA ===
 if (isset($_GET['hapus'])) {
     $id = intval($_GET['hapus']);
-    $q = mysqli_query($conn, "SELECT file_path FROM tb_program_ppi WHERE id='$id'");
+    if (!csrf_validate($_GET['csrf'] ?? '') || $id <= 0) {
+        ppi_abort_csrf();
+    }
+
+    $selectStmt = mysqli_prepare($conn, "SELECT file_path FROM tb_program_ppi WHERE id = ?");
+    mysqli_stmt_bind_param($selectStmt, "i", $id);
+    mysqli_stmt_execute($selectStmt);
+    $q = mysqli_stmt_get_result($selectStmt);
     $data = mysqli_fetch_assoc($q);
-    if ($data && file_exists($data['file_path'])) unlink($data['file_path']);
-    mysqli_query($conn, "DELETE FROM tb_program_ppi WHERE id='$id'");
+    mysqli_stmt_close($selectStmt);
+
+    if ($data) {
+        ppi_unlink_upload($data['file_path'], __DIR__ . '/../uploads/program');
+    }
+
+    $deleteStmt = mysqli_prepare($conn, "DELETE FROM tb_program_ppi WHERE id = ?");
+    mysqli_stmt_bind_param($deleteStmt, "i", $id);
+    mysqli_stmt_execute($deleteStmt);
+    mysqli_stmt_close($deleteStmt);
     echo "<script>alert('🗑️ Data program dihapus.');window.location='program.php';</script>";
     exit;
 }
 
 // === AMBIL DATA ===
-$res = mysqli_query($conn, "SELECT * FROM tb_program_ppi ORDER BY id ASC");
+$res = mysqli_query($conn, "SELECT id, nama_program, deskripsi, penanggung_jawab, tanggal_mulai, tanggal_selesai, file_path FROM tb_program_ppi ORDER BY id ASC");
 ?>
 
 
@@ -64,7 +85,7 @@ $pageTitle = "KOMITE PPI";
     <title>Daftar Program PPI | PHBW</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         /* =====================================================
@@ -453,6 +474,80 @@ $pageTitle = "KOMITE PPI";
                 /* lebih halus */
             }
 
+            /* Dark mode - mobile card */
+            body.dark-mode .container tbody tr {
+                background: #1e293b;
+                border-color: #334155;
+            }
+
+            body.dark-mode .container tbody tr:hover {
+                background: #253348;
+                border-color: #3b82f6;
+            }
+        }
+
+        /* =====================================================
+   DARK MODE
+===================================================== */
+        body.dark-mode .container {
+            background: linear-gradient(180deg, #0b1220 0%, #0f172a 100%);
+        }
+
+        body.dark-mode .container header h1 {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .container .content {
+            background: rgba(17, 24, 39, 0.9);
+            border-color: #1e3a5f;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+        }
+
+        body.dark-mode .container tbody tr {
+            background: #111827;
+        }
+
+        body.dark-mode .container tbody tr:hover {
+            background: #1e293b;
+        }
+
+        body.dark-mode .container tbody td {
+            color: #e2e8f0;
+            border-color: #1e293b;
+        }
+
+        body.dark-mode .container tbody td::before {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .popup-form {
+            background: #1e293b;
+            box-shadow: 0 35px 80px rgba(0, 0, 0, 0.6);
+        }
+
+        body.dark-mode .popup-form h2 {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .popup-form label {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .popup-form input,
+        body.dark-mode .popup-form textarea {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .popup-form input:focus,
+        body.dark-mode .popup-form textarea:focus {
+            background: #1e293b;
+            border-color: #3b82f6;
+        }
+
+        body.dark-mode .container .content .btn-cancel {
+            background: #334155;
         }
     </style>
 
@@ -499,17 +594,21 @@ $pageTitle = "KOMITE PPI";
                                     while ($r = mysqli_fetch_assoc($res)) {
                                         $periode = date('M Y', strtotime($r['tanggal_mulai'])) . ' - ' . date('M Y', strtotime($r['tanggal_selesai']));
                                         $file = str_replace("../", "", $r['file_path']);
+                                                                                $namaProgram = htmlspecialchars($r['nama_program'], ENT_QUOTES, 'UTF-8');
+                                                                                $deskripsi = htmlspecialchars($r['deskripsi'], ENT_QUOTES, 'UTF-8');
+                                                                                $penanggungJawab = htmlspecialchars($r['penanggung_jawab'], ENT_QUOTES, 'UTF-8');
+                                                                                $deleteUrl = '?hapus=' . (int) $r['id'] . '&csrf=' . urlencode($csrfToken);
                                         echo "<tr>
                           <td data-label='No'>$no</td>
-                          <td data-label='Nama Program'>{$r['nama_program']}</td>
-                          <td data-label='Deskripsi'>{$r['deskripsi']}</td>
-                          <td data-label='Penanggung Jawab'>{$r['penanggung_jawab']}</td>
-                          <td data-label='Periode'>$periode</td>
+                                                    <td data-label='Nama Program'>{$namaProgram}</td>
+                                                    <td data-label='Deskripsi'>{$deskripsi}</td>
+                                                    <td data-label='Penanggung Jawab'>{$penanggungJawab}</td>
+                                                    <td data-label='Periode'>{$periode}</td>
                           <td data-label='File'>
-                            <a href='/$file' target='_blank' class='btn btn-dashboard'>Lihat</a>
+                                                        <a href='/$file' target='_blank' rel='noopener noreferrer' class='btn btn-dashboard'>Lihat</a>
                           </td>
                           <td data-label='Aksi' class='actions'>
-                            <a href='?hapus={$r['id']}' 
+                                                        <a href='{$deleteUrl}' 
                                onclick=\"return confirm('Yakin ingin menghapus data ini?')\" 
                                class='btn btn-hapus'>🗑️ Hapus</a>
                           </td>
@@ -530,6 +629,7 @@ $pageTitle = "KOMITE PPI";
                     <div class="popup-form">
                         <h2>Tambah Program PPI</h2>
                         <form method="POST" enctype="multipart/form-data">
+                            <?= csrf_input() ?>
                             <label>Nama Program</label>
                             <input type="text" name="nama_program" required placeholder="Contoh: Program Hand Hygiene">
                             <label>Deskripsi Singkat</label>
@@ -556,7 +656,7 @@ $pageTitle = "KOMITE PPI";
 
 
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
     <script>
         const overlay = document.getElementById('formOverlay');

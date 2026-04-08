@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 session_start();
 include_once '../koneksi.php';
 include "../cek_akses.php";
@@ -273,7 +274,7 @@ $pageTitle = "DOKUMEN DAN MEDIA";
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><?php echo $pageTitle; ?> | PPI PHBW</title>
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
     
     <style>
         :root {
@@ -858,7 +859,7 @@ $pageTitle = "DOKUMEN DAN MEDIA";
         </div>
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
     <script>
         const uploadModal = document.getElementById('uploadModal');
         

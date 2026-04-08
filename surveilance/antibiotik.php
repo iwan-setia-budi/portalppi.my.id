@@ -1,41 +1,59 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
+$csrfToken = csrf_token();
 
 // === SIMPAN DATA ===
 if (isset($_POST['action']) && $_POST['action'] == 'save') {
-    $tahun = $_POST['tahun'];
-    $bulan = $_POST['bulan'];
-    $jenis = $_POST['jenis'];
-    $unit = $_POST['unit'];
-    $numerator = $_POST['numerator'];
-    $denominator = $_POST['denominator'];
-    $hasil = $_POST['hasil'];
-    $satuan = $_POST['satuan'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf('text');
+    }
 
-    $sql = "INSERT INTO tb_surveillance_antibiotik_mdro 
+    $tahun = intval($_POST['tahun'] ?? 0);
+    $bulan = trim($_POST['bulan'] ?? '');
+    $jenis = trim($_POST['jenis'] ?? '');
+    $unit = trim($_POST['unit'] ?? '');
+    $numerator = (float) ($_POST['numerator'] ?? 0);
+    $denominator = (float) ($_POST['denominator'] ?? 0);
+    $hasil = (float) ($_POST['hasil'] ?? 0);
+    $satuan = trim($_POST['satuan'] ?? '');
+
+    $stmt = mysqli_prepare($conn, "INSERT INTO tb_surveillance_antibiotik_mdro 
           (tahun, bulan, jenis, unit, numerator, denominator, hasil, satuan)
-          VALUES ('$tahun', '$bulan', '$jenis', '$unit', '$numerator', '$denominator', '$hasil', '$satuan')";
-    mysqli_query($conn, $sql);
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    mysqli_stmt_bind_param($stmt, "isssddds", $tahun, $bulan, $jenis, $unit, $numerator, $denominator, $hasil, $satuan);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
     exit("success");
 }
 
 // === HAPUS DATA ===
 if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-    $id = $_POST['id'];
-    mysqli_query($conn, "DELETE FROM tb_surveillance_antibiotik_mdro WHERE id='$id'");
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf('text');
+    }
+
+    $id = intval($_POST['id'] ?? 0);
+    $stmt = mysqli_prepare($conn, "DELETE FROM tb_surveillance_antibiotik_mdro WHERE id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $id);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
     exit("deleted");
 }
 
 // === AMBIL DATA ===
 if (isset($_GET['load'])) {
-    $jenis = $_GET['jenis'];
-    $sql = "SELECT * FROM tb_surveillance_antibiotik_mdro WHERE jenis='$jenis' ORDER BY id DESC";
-    $res = mysqli_query($conn, $sql);
+    $jenis = trim($_GET['jenis'] ?? '');
+    $stmt = mysqli_prepare($conn, "SELECT id, tahun, bulan, unit, numerator, denominator, hasil, satuan FROM tb_surveillance_antibiotik_mdro WHERE jenis = ? ORDER BY id DESC");
+    mysqli_stmt_bind_param($stmt, "s", $jenis);
+    mysqli_stmt_execute($stmt);
+    $res = mysqli_stmt_get_result($stmt);
     $data = [];
     while ($row = mysqli_fetch_assoc($res)) {
         $data[] = $row;
     }
+    mysqli_stmt_close($stmt);
     header('Content-Type: application/json');
     echo json_encode($data);
     exit;
@@ -59,7 +77,7 @@ $pageTitle = "SURVEILANCE";
 
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
 
     <style>
@@ -390,6 +408,79 @@ $pageTitle = "SURVEILANCE";
             }
 
         }
+
+        /* =====================================================
+   DARK MODE
+===================================================== */
+        body.dark-mode .surveilans #input {
+            background: #111827;
+        }
+
+        body.dark-mode .tab h2 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .form-group label {
+            color: #94a3b8;
+        }
+
+        body.dark-mode .form-group input,
+        body.dark-mode .form-group select {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .form-group input:focus,
+        body.dark-mode .form-group select:focus {
+            background: #253348;
+            border-color: #3b82f6;
+        }
+
+        body.dark-mode .result {
+            background: #0f2744;
+            border-color: #1e3a5f;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .surveilans nav button {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        body.dark-mode .surveilans nav button.active {
+            background: var(--blue-3);
+            color: white;
+        }
+
+        body.dark-mode .dashboard-btn {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+
+        body.dark-mode table {
+            background: #111827;
+        }
+
+        body.dark-mode tbody td {
+            color: #e2e8f0;
+            border-color: #1e293b;
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: #1e293b;
+        }
+
+        body.dark-mode table tr {
+            background: #111827;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode table td::before {
+            color: #93c5fd;
+        }
+
     </style>
 
 </head>
@@ -580,13 +671,15 @@ $pageTitle = "SURVEILANCE";
 
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
+        const csrfToken = <?= json_encode($csrfToken) ?>;
+
         function showTab(tabId) {
             document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -648,6 +741,7 @@ $pageTitle = "SURVEILANCE";
             fd.append("denominator", denum);
             fd.append("hasil", hasil);
             fd.append("satuan", satuan);
+            fd.append("csrf_token", csrfToken);
             fetch("", {
                 method: "POST",
                 body: fd
@@ -693,6 +787,7 @@ $pageTitle = "SURVEILANCE";
             const fd = new FormData();
             fd.append("action", "delete");
             fd.append("id", id);
+            fd.append("csrf_token", csrfToken);
             fetch("", {
                 method: "POST",
                 body: fd

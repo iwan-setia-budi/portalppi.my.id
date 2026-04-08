@@ -1,32 +1,49 @@
 <?php
+ini_set('session.use_only_cookies', '1');
+ini_set('session.use_strict_mode', '1');
+
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+session_set_cookie_params([
+  'httponly' => true,
+  'samesite' => 'Lax',
+  'secure' => $isHttps,
+]);
+
 session_start();
 include "koneksi.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+    ppi_abort_csrf();
+  }
+
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    $query = "SELECT * FROM users WHERE username='$username'";
-    $result = mysqli_query($koneksi, $query);
+    // Prepared statement — mencegah SQL Injection
+    $stmt = mysqli_prepare($koneksi, "SELECT id, username, password, role FROM users WHERE username = ? LIMIT 1");
+    mysqli_stmt_bind_param($stmt, "s", $username);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
 
     if ($result && mysqli_num_rows($result) > 0) {
         $user = mysqli_fetch_assoc($result);
 
-        // ✅ Gunakan password_verify untuk cek hash
-            if (password_verify($password, $user['password'])) {
-
+        if (password_verify($password, $user['password'])) {
+            session_regenerate_id(true); // Cegah session fixation
             $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role']     = $user['role'];
+            $_SESSION['user_id']  = $user['id'];
 
             header("Location: dashboard.php");
             exit;
         } else {
-            $error = "⚠️ Password salah!";
+            $error = "⚠️ Username atau password salah!";
         }
     } else {
-        $error = "⚠️ Username tidak ditemukan!";
+          $error = "⚠️ Username atau password salah!";
     }
+    mysqli_stmt_close($stmt);
 }
 ?>
 
@@ -116,6 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <?php if (!empty($error)) echo "<div class='error'>$error</div>"; ?>
 
     <form method="POST" action="">
+      <?= csrf_input() ?>
       <div class="form-group">
         <label for="username">Username</label>
         <div class="input-wrapper">

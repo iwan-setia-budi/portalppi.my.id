@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 
@@ -91,9 +92,9 @@ $pageTitle = "AUDIT DAN SUPERVISI";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supervisi PPI</title>
-    <link rel="stylesheet" href="/assets/css/utama.css">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
-    <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <!-- === Link CSS eksternal === -->
 
@@ -699,7 +700,7 @@ textarea {
 
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

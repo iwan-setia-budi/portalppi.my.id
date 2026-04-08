@@ -1,19 +1,40 @@
 <?php
-include_once '../koneksi.php';
+session_start();
+require_once __DIR__ . '/../koneksi.php';
+include "../cek_akses.php";
 $conn = $koneksi;
+
+header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-if ($data) {
-  $p = mysqli_real_escape_string($conn, $data['pimpinan']);
-  $k = mysqli_real_escape_string($conn, $data['ketua']);
-  $s = mysqli_real_escape_string($conn, $data['sekretaris']);
-  $d = mysqli_real_escape_string($conn, $data['ipcd']);
-  $n = mysqli_real_escape_string($conn, $data['ipcn']);
-  $ipcln = mysqli_real_escape_string($conn, $data['ipcln']);
-  $pj = mysqli_real_escape_string($conn, $data['pj']);
-
-  mysqli_query($conn, "UPDATE tb_struktur_ppi 
-                       SET pimpinan='$p', ketua='$k', sekretaris='$s', ipcd='$d', ipcn='$n', ipcln='$ipcln', pj='$pj'
-                       ORDER BY id DESC LIMIT 1");
+if (!is_array($data) || !csrf_validate($data['csrf_token'] ?? '')) {
+  http_response_code(419);
+  echo json_encode(['status' => 'csrf']);
+  exit;
 }
+
+$p = trim($data['pimpinan'] ?? '');
+$k = trim($data['ketua'] ?? '');
+$s = trim($data['sekretaris'] ?? '');
+$d = trim($data['ipcd'] ?? '');
+$n = trim($data['ipcn'] ?? '');
+$ipcln = trim($data['ipcln'] ?? '[]');
+$pj = trim($data['pj'] ?? '[]');
+
+$latestResult = mysqli_query($conn, "SELECT id FROM tb_struktur_ppi ORDER BY id DESC LIMIT 1");
+$latestRow = $latestResult ? mysqli_fetch_assoc($latestResult) : null;
+$latestId = (int) ($latestRow['id'] ?? 0);
+
+if ($latestId <= 0) {
+  http_response_code(404);
+  echo json_encode(['status' => 'not-found']);
+  exit;
+}
+
+$stmt = mysqli_prepare($conn, "UPDATE tb_struktur_ppi SET pimpinan = ?, ketua = ?, sekretaris = ?, ipcd = ?, ipcn = ?, ipcln = ?, pj = ? WHERE id = ?");
+mysqli_stmt_bind_param($stmt, "sssssssi", $p, $k, $s, $d, $n, $ipcln, $pj, $latestId);
+$ok = mysqli_stmt_execute($stmt);
+mysqli_stmt_close($stmt);
+
+echo json_encode(['status' => $ok ? 'ok' : 'error']);

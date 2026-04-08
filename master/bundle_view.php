@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 
@@ -50,7 +51,7 @@ while($row = $data->fetch_assoc()){
 <head>
     <title>View Bundle <?= $kode; ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
     <style>
 
 /* CONTAINER */
@@ -312,7 +313,7 @@ while($row = $data->fetch_assoc()){
 
 </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 </body>
 </html>

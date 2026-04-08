@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/config/assets.php';
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
@@ -21,7 +22,7 @@ $pageTitle = "Profile";
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3.0" />
     <title>Profile PPI PHBW</title>
 
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         .container {
@@ -197,7 +198,7 @@ $pageTitle = "Profile";
         </main>
     </div>
 
-    <script src="/assets/js/utama.js?v=6"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 </body>
 

@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 
@@ -189,9 +190,9 @@ $pageTitle = "AUDIT DAN SUPERVISI";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Supervisi PPI</title>
-    <link rel="stylesheet" href="/assets/css/utama.css">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
-    <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <!-- === Link CSS eksternal === -->
 
@@ -404,9 +405,9 @@ $pageTitle = "AUDIT DAN SUPERVISI";
             padding: 26px;
         }
 
-        body.dark-mode .container-supervise {
+        /* body.dark-mode .container-supervise {
             color: #e2e8f0;
-        }
+        } */
 
         body.dark-mode #filterForm {
             background: #1e293b;
@@ -978,7 +979,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
 
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -1347,7 +1348,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
         }
     </script>
 
-    <script>
+    <!-- <script>
         (function() {
             const storageKey = 'temuan_supervisi_theme';
             const toggleBtn = document.getElementById('toggleDarkMode');
@@ -1373,7 +1374,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                 });
             }
         })();
-    </script>
+    </script> -->
 
 
 </body>

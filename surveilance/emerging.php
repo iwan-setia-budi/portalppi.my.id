@@ -1,41 +1,62 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
+$csrfToken = csrf_token();
 
 // ====== SIMPAN DATA ======
 if (isset($_POST['action']) && $_POST['action'] == 'save') {
-    $tahun = $_POST['tahun'];
-    $bulan = $_POST['bulan'];
-    $jenis = $_POST['jenis'];
-    $unit = $_POST['unit'];
-    $numerator = $_POST['numerator'];
-    $denominator = $_POST['denominator'];
-    $hasil = $_POST['hasil'];
-    $satuan = $_POST['satuan'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf();
+    }
+
+    $tahun = intval($_POST['tahun'] ?? 0);
+    $bulan = trim($_POST['bulan'] ?? '');
+    $jenis = trim($_POST['jenis'] ?? '');
+    $unit = trim($_POST['unit'] ?? '');
+    $numerator = (float) ($_POST['numerator'] ?? 0);
+    $denominator = (float) ($_POST['denominator'] ?? 0);
+    $hasil = (float) ($_POST['hasil'] ?? 0);
+    $satuan = trim($_POST['satuan'] ?? '');
 
     $sql = "INSERT INTO tb_emerging (tahun, bulan, jenis, unit, numerator, denominator, hasil, satuan)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isssidds", $tahun, $bulan, $jenis, $unit, $numerator, $denominator, $hasil, $satuan);
+    $stmt->bind_param("isssddds", $tahun, $bulan, $jenis, $unit, $numerator, $denominator, $hasil, $satuan);
     $stmt->execute();
+    $stmt->close();
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 
 // ====== HAPUS DATA ======
 if (isset($_POST['action']) && $_POST['action'] == 'delete') {
-    $id = $_POST['id'];
+    if (!csrf_validate($_POST['csrf_token'] ?? '')) {
+        ppi_abort_csrf();
+    }
+
+    $id = intval($_POST['id'] ?? 0);
     $stmt = $conn->prepare("DELETE FROM tb_emerging WHERE id = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
+    $stmt->close();
     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 
 
 // ====== TAMPILKAN DATA ======
-$emerging = $conn->query("SELECT * FROM tb_emerging WHERE jenis='Emerging' ORDER BY id DESC");
-$purulen = $conn->query("SELECT * FROM tb_emerging WHERE jenis='Purulen' ORDER BY id DESC");
+$emergingStmt = $conn->prepare("SELECT id, tahun, bulan, unit, numerator, denominator, hasil, satuan FROM tb_emerging WHERE jenis = ? ORDER BY id DESC");
+$emergingJenis = 'Emerging';
+$emergingStmt->bind_param("s", $emergingJenis);
+$emergingStmt->execute();
+$emerging = $emergingStmt->get_result();
+
+$purulenStmt = $conn->prepare("SELECT id, tahun, bulan, unit, numerator, denominator, hasil, satuan FROM tb_emerging WHERE jenis = ? ORDER BY id DESC");
+$purulenJenis = 'Purulen';
+$purulenStmt->bind_param("s", $purulenJenis);
+$purulenStmt->execute();
+$purulen = $purulenStmt->get_result();
 ?>
 
 <!--Tulisan di topbar otomatis-->
@@ -54,7 +75,7 @@ $pageTitle = "SURVEILANCE";
     <title>Surveilans Infeksi Emerging & Purulen | PPI PHBW</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         /* ================= WRAPPER ================= */
@@ -362,6 +383,79 @@ $pageTitle = "SURVEILANCE";
             }
 
         }
+
+        /* =====================================================
+   DARK MODE
+===================================================== */
+        body.dark-mode .emerging #input {
+            background: #111827;
+        }
+
+        body.dark-mode .emerging h2 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode #input label {
+            color: #94a3b8;
+        }
+
+        body.dark-mode #input input,
+        body.dark-mode #input select {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode #input input:focus,
+        body.dark-mode #input select:focus {
+            background: #253348;
+            border-color: #3b82f6;
+        }
+
+        body.dark-mode .emerging nav button {
+            background: #1e293b;
+            border-color: #334155;
+            color: #94a3b8;
+        }
+
+        body.dark-mode .emerging nav button.active {
+            background: var(--blue-3);
+            color: white;
+        }
+
+        body.dark-mode .dashboard-btn {
+            background: #1e293b;
+            color: #93c5fd;
+        }
+
+        body.dark-mode .filterTahun select {
+            background: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode table {
+            background: #111827;
+        }
+
+        body.dark-mode tbody td {
+            color: #e2e8f0;
+            border-color: #1e293b;
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: #1e293b;
+        }
+
+        body.dark-mode table tr {
+            background: #111827;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        body.dark-mode table td::before {
+            color: #93c5fd;
+        }
+
     </style>
 
 
@@ -401,6 +495,7 @@ $pageTitle = "SURVEILANCE";
                     <h2>🧾 Form Input Surveilans Infeksi</h2>
 
                     <form method="post" id="formEmerging">
+                        <?= csrf_input() ?>
                         <input type="hidden" name="action" value="save">
 
                         <div class="form-group">
@@ -485,7 +580,8 @@ $pageTitle = "SURVEILANCE";
                             <?php
                             $tahunList = $conn->query("SELECT DISTINCT tahun FROM tb_emerging WHERE jenis='Emerging' ORDER BY tahun DESC");
                             while ($t = $tahunList->fetch_assoc()) {
-                                echo "<option value='{$t['tahun']}'>{$t['tahun']}</option>";
+                                $tahunValue = (int) ($t['tahun'] ?? 0);
+                                echo "<option value='{$tahunValue}'>{$tahunValue}</option>";
                             }
                             ?>
                         </select>
@@ -514,30 +610,31 @@ $pageTitle = "SURVEILANCE";
 
                                     <tr>
                                         <td data-label="Tahun">
-                                            <?= $row['tahun'] ?>
+                                            <?= (int) $row['tahun'] ?>
                                         </td>
                                         <td data-label="Bulan">
-                                            <?= $row['bulan'] ?>
+                                            <?= htmlspecialchars($row['bulan'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Unit">
-                                            <?= $row['unit'] ?>
+                                            <?= htmlspecialchars($row['unit'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Numerator">
-                                            <?= $row['numerator'] ?>
+                                            <?= htmlspecialchars((string) $row['numerator'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Denominator">
-                                            <?= $row['denominator'] ?>
+                                            <?= htmlspecialchars((string) $row['denominator'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Hasil">
-                                            <?= $row['hasil'] ?>
+                                            <?= htmlspecialchars((string) $row['hasil'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Satuan">
-                                            <?= $row['satuan'] ?>
+                                            <?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Aksi">
                                             <form method="post">
+                                                <?= csrf_input() ?>
                                                 <input type="hidden" name="action" value="delete">
-                                                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                                <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
                                                 <button type="submit" class="delete-btn"
                                                     onclick="return confirm('Yakin hapus data ini?')">🗑️</button>
                                             </form>
@@ -564,7 +661,8 @@ $pageTitle = "SURVEILANCE";
                             <?php
                             $tahunListPurulen = $conn->query("SELECT DISTINCT tahun FROM tb_emerging WHERE jenis='Purulen' ORDER BY tahun DESC");
                             while ($tp = $tahunListPurulen->fetch_assoc()) {
-                                echo "<option value='{$tp['tahun']}'>{$tp['tahun']}</option>";
+                                $tahunValue = (int) ($tp['tahun'] ?? 0);
+                                echo "<option value='{$tahunValue}'>{$tahunValue}</option>";
                             }
                             ?>
                         </select>
@@ -593,30 +691,31 @@ $pageTitle = "SURVEILANCE";
 
                                     <tr>
                                         <td data-label="Tahun">
-                                            <?= $row['tahun'] ?>
+                                            <?= (int) $row['tahun'] ?>
                                         </td>
                                         <td data-label="Bulan">
-                                            <?= $row['bulan'] ?>
+                                            <?= htmlspecialchars($row['bulan'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Unit">
-                                            <?= $row['unit'] ?>
+                                            <?= htmlspecialchars($row['unit'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Numerator">
-                                            <?= $row['numerator'] ?>
+                                            <?= htmlspecialchars((string) $row['numerator'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Denominator">
-                                            <?= $row['denominator'] ?>
+                                            <?= htmlspecialchars((string) $row['denominator'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Hasil">
-                                            <?= $row['hasil'] ?>
+                                            <?= htmlspecialchars((string) $row['hasil'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Satuan">
-                                            <?= $row['satuan'] ?>
+                                            <?= htmlspecialchars($row['satuan'], ENT_QUOTES, 'UTF-8') ?>
                                         </td>
                                         <td data-label="Aksi">
                                             <form method="post">
+                                                <?= csrf_input() ?>
                                                 <input type="hidden" name="action" value="delete">
-                                                <input type="hidden" name="id" value="<?= $row['id'] ?>">
+                                                <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
                                                 <button type="submit" class="delete-btn"
                                                     onclick="return confirm('Yakin hapus data ini?')">🗑️</button>
                                             </form>
@@ -637,7 +736,7 @@ $pageTitle = "SURVEILANCE";
 
 
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -736,3 +835,8 @@ $pageTitle = "SURVEILANCE";
 </body>
 
 </html>
+
+<?php
+$emergingStmt->close();
+$purulenStmt->close();
+?>

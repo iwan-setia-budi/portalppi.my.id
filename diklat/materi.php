@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
@@ -230,7 +231,7 @@ if (isset($_GET['hapus'])) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Penyimpanan Sertifikat Pelatihan | PPI PHBW</title>
-  <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+  <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
     :root {
       --navy: #1a237e;
@@ -964,6 +965,6 @@ document.getElementById('nextPageBtn').addEventListener('click', function() {
 updateRekapCount();
 filterRekap();
 </script>
-<script src="/assets/js/utama.js?v=5"></script>
+<script src="<?= asset('assets/js/utama.js') ?>"></script>
 </body>
 </html>

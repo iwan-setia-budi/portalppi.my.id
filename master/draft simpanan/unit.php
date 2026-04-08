@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 
@@ -60,7 +61,7 @@ $pageTitle = "MASTER UNIT";
     <title>Master Profesi | PPI PHBW</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
 
     <style>
@@ -320,7 +321,7 @@ $pageTitle = "MASTER UNIT";
     </div>
 
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
     <script>
         document.getElementById("searchUnit").addEventListener("keyup", function () {

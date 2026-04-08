@@ -1,5 +1,5 @@
-
 <?php
+require_once __DIR__ . '/../config/assets.php';
 if (session_status() === PHP_SESSION_NONE) {
   session_start();
 }
@@ -24,7 +24,7 @@ if (!isset($_SESSION['username'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Laporan</title>
-    <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <!-- === Link CSS eksternal === -->
     <style>
@@ -477,7 +477,7 @@ if (!isset($_SESSION['username'])) {
         function kembaliDashboard() { window.location.href = "/dashboard.php"; }
     </script>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 
 </body>

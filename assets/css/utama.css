@@ -575,4 +575,135 @@ details li a.active{
 }
 
 
+/* =====================================================
+   GLOBAL DARK MODE — berlaku di semua halaman
+   Menimpa hard-coded warna terang (white, #f8fafc, dll)
+===================================================== */
+
+/* === INPUT, SELECT, TEXTAREA === */
+body.dark-mode input:not([type="submit"]):not([type="button"]):not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+body.dark-mode select,
+body.dark-mode textarea {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+body.dark-mode textarea:focus {
+  background: #253348 !important;
+  border-color: #3b82f6 !important;
+  outline: none;
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* === LABEL === */
+body.dark-mode label {
+  color: #94a3b8;
+}
+
+/* === TABLE === */
+body.dark-mode table {
+  background: #111827 !important;
+  color: #e2e8f0;
+}
+
+body.dark-mode thead {
+  background: #1e3a8a !important;
+}
+
+body.dark-mode tbody tr {
+  background: #111827 !important;
+}
+
+body.dark-mode tbody tr:hover {
+  background: #1e293b !important;
+}
+
+body.dark-mode tbody td,
+body.dark-mode tbody th {
+  color: #e2e8f0 !important;
+  border-color: #1e293b !important;
+}
+
+body.dark-mode tbody td::before {
+  color: #93c5fd !important;
+}
+
+/* === CARD / CONTENT AREA === */
+body.dark-mode .content {
+  background: rgba(17, 24, 39, 0.92) !important;
+  border-color: #1e3a5f !important;
+}
+
+/* === POPUP / MODAL / FORM === */
+body.dark-mode .popup-form,
+body.dark-mode .popup,
+body.dark-mode .modal-body,
+body.dark-mode .modal-content {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+}
+
+body.dark-mode .popup-form h2,
+body.dark-mode .popup-form h3,
+body.dark-mode .popup h2,
+body.dark-mode .popup h3 {
+  color: #93c5fd !important;
+}
+
+body.dark-mode .popup-form label,
+body.dark-mode .popup label {
+  color: #cbd5e1 !important;
+}
+
+/* === TOMBOL KEMBALI / DASHBOARD (background putih) === */
+body.dark-mode .dashboard-btn,
+body.dark-mode .btn-back,
+body.dark-mode .back-btn {
+  background: #1e293b !important;
+  color: #93c5fd !important;
+}
+
+/* === TOMBOL BATAL / CANCEL === */
+body.dark-mode .btn-cancel,
+body.dark-mode button[onclick*="tutup"],
+body.dark-mode button[onclick*="close"],
+body.dark-mode button[onclick*="Close"] {
+  background: #334155 !important;
+  color: #e2e8f0 !important;
+}
+
+/* === TAB NAVIGASI === */
+body.dark-mode nav button:not(.active) {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+/* === RESULT / PREVIEW BOX === */
+body.dark-mode .result,
+body.dark-mode .preview-box,
+body.dark-mode .hasil-box {
+  background: #0f2744 !important;
+  border-color: #1e3a5f !important;
+  color: #e2e8f0 !important;
+}
+
+/* === HEADING DI HALAMAN === */
+body.dark-mode main h1,
+body.dark-mode main h2 {
+  color: #e2e8f0;
+}
+
+/* === MOBILE CARD TABLE === */
+body.dark-mode table tr {
+  background: #111827 !important;
+}
+
 

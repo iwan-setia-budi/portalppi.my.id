@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 session_start();
 include_once '../koneksi.php';
 include_once '../cek_akses.php';
@@ -21,7 +22,7 @@ $pageTitle = "MASTER DATA";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Audit Internal</title>
-    <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <!-- === Link CSS eksternal === -->
     <style>
@@ -521,7 +522,7 @@ $pageTitle = "MASTER DATA";
         function kembaliDashboard() { window.location.href = "/dashboard.php"; }
     </script>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
 
 
 </body>

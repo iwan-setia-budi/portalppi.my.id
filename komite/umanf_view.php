@@ -1,11 +1,16 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 $conn = $koneksi;
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$q  = mysqli_query($conn, "SELECT * FROM tb_umanf WHERE id='$id'");
+$stmt = mysqli_prepare($conn, "SELECT * FROM tb_umanf WHERE id = ? LIMIT 1");
+mysqli_stmt_bind_param($stmt, "i", $id);
+mysqli_stmt_execute($stmt);
+$q = mysqli_stmt_get_result($stmt);
 $data = mysqli_fetch_assoc($q);
+mysqli_stmt_close($stmt);
 
 if (!$data) {
     echo "<script>alert('Data tidak ditemukan');location.href='umanf.php';<\/script>";
@@ -59,7 +64,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detail Rapat – <?= htmlspecialchars($data['jenis_rapat']) ?> | PPI PHBW</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
         *,
@@ -510,7 +515,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
     </main>
 </div>
 
-<script src="/assets/js/utama.js"></script>
+<script src="<?= asset('assets/js/utama.js') ?>"></script>
 <script>
     // Tabs
     document.querySelectorAll('.tab-btn').forEach(btn => {

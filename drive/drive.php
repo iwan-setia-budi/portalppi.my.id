@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include '../cek_akses.php';
 
@@ -905,7 +906,7 @@ $pageTitle = 'PENYIMPANAN DATA';
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Drive PPI</title>
-    <link rel="stylesheet" href="/assets/css/utama.css?v=15">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
     <style>
         .drive-wrapper {
             padding: 22px;
@@ -2612,7 +2613,7 @@ $pageTitle = 'PENYIMPANAN DATA';
 
     <div class="toast-zone" id="toastZone" aria-live="polite" aria-atomic="false"></div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
     <script>
         (function () {
             const csrfToken = <?= json_encode($csrfToken); ?>;

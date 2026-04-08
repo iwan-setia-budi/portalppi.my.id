@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
 
@@ -394,7 +395,7 @@ $pageTitle = "MASTER JENIS " . strtoupper($judul);
     <title>Master Jenis <?= $judul ?> | PPI PHBW</title>
 
     <!-- === Link CSS eksternal === -->
-    <link rel="stylesheet" href="/assets/css/utama.css?v=10">
+    <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
 
     <style>
@@ -661,7 +662,7 @@ $pageTitle = "MASTER JENIS " . strtoupper($judul);
         </main>
     </div>
 
-    <script src="/assets/js/utama.js?v=5"></script>
+    <script src="<?= asset('assets/js/utama.js') ?>"></script>
     <script>
         document.getElementById("search").addEventListener("keyup", function () {
             let value = this.value.toLowerCase();
