@@ -416,7 +416,7 @@ function hapusSemua(){
 }
 document.getElementById("search").addEventListener("input",()=>render());
 (async function init(){ await openDB(); render(); })();
-function goDashboard(){ window.location.href="/dashboard.php"; }
+function goDashboard(){ window.location.href="<?= base_url('dashboard.php') ?>"; }
 document.getElementById('modalOverlay').addEventListener('click',function(e){ if(e.target===this) tutupModal(); });
 </script>
 <script src="<?= asset('assets/js/utama.js') ?>"></script>

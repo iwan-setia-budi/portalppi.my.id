@@ -263,7 +263,7 @@ $pageTitle = "KOMITE PPI";
 
                 <header>
                     <h1>🏥 Struktur Komite PPI Rumah Sakit</h1>
-                    <a href="/dashboard.php" class="btn-dashboard">🏠 Kembali ke Dashboard</a>
+                    <a href="<?= base_url('dashboard.php') ?>" class="btn-dashboard">🏠 Kembali ke Dashboard</a>
                 </header>
 
 

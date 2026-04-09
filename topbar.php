@@ -46,10 +46,10 @@
           </div>
         </div>
         <div class="user-dropdown-divider"></div>
-        <a href="/profile.php">Profile</a>
-        <a href="/ganti_password.php">Ganti Password</a>
+        <a href="<?= base_url('profile.php') ?>">Profile</a>
+        <a href="<?= base_url('ganti_password.php') ?>">Ganti Password</a>
         <div class="user-dropdown-divider"></div>
-        <a href="/logout.php" class="logout">Logout</a>
+        <a href="<?= base_url('logout.php') ?>" class="logout">Logout</a>
       </div>
     </div>
   </div>

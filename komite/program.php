@@ -569,7 +569,7 @@ $pageTitle = "KOMITE PPI";
 
                 <header>
                     <h1>🗂️ Daftar Program PPI - PHBW</h1>
-                    <a href="/dashboard.php" class="btn btn-dashboard">🏠 Kembali ke Dashboard</a>
+                    <a href="<?= base_url('dashboard.php') ?>" class="btn btn-dashboard">🏠 Kembali ke Dashboard</a>
                 </header>
 
                 <div class="content">

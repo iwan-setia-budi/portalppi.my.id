@@ -546,7 +546,7 @@ $pageTitle = "KOMITE PPI";
                         <h1>📜 Daftar Surat Keputusan (SK)</h1>
                         <small>Pengelolaan SK Komite PPI</small>
                     </div>
-                    <a href="/dashboard.php" class="btn-white">🏠 Dashboard</a>
+                    <a href="<?= base_url('dashboard.php') ?>" class="btn-white">🏠 Dashboard</a>
                 </div>
 
                 <!--========= ISI ==========-->

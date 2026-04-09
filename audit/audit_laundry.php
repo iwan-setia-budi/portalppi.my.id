@@ -768,7 +768,7 @@ $pageTitle = "Audit External";
                 <div class="wrapper audit-wrapper" id="printableArea">
 
                     <div class="header-row">
-                        <img id="logo" alt="logo (ganti src nanti)" src="/assets/images/logo phbw123.png" />
+                        <img id="logo" alt="logo (ganti src nanti)" src="<?= base_url('assets/images/logo phbw123.png') ?>" />
                         <div class="title-wrap">
                             <h1>Monitoring Audit PPI di Laundry</h1>
                             <div class="meta">Form monitoring sesuai format</div>

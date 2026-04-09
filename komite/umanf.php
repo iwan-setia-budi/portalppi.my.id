@@ -587,7 +587,7 @@ foreach ($allRows as $r) {
                     </div>
                 </div>
                 <div class="hero-right">
-                    <a href="/dashboard.php" class="btn btn-back">🏠 Dashboard</a>
+                    <a href="<?= base_url('dashboard.php') ?>" class="btn btn-back">🏠 Dashboard</a>
                 </div>
             </div>
 

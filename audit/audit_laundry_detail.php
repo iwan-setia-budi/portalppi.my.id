@@ -403,7 +403,7 @@ $pageTitle = "LIHAT DATA AUDIT LAUNDRY";
                 <div class="container">
 
                     <div class="print-header">
-                        <img src="/assets/images/logo phbw123.png" alt="Logo PHBW" class="print-logo">
+                        <img src="<?= base_url('assets/images/logo phbw123.png') ?>" alt="Logo PHBW" class="print-logo">
                         <div class="print-title">
                             <strong>Primaya Hospital Bhakti Wara</strong><br>
                             <span>Monitoring Audit PPI</span>

@@ -12,7 +12,7 @@
         e.preventDefault();
         if(confirm("Yakin ingin logout dari Dashboard PPI PHBW?")){
           localStorage.removeItem('ppi_logged_in');
-          window.location.href="/login.php";
+          window.location.href="<?= base_url('login.php') ?>";
         }
       });
     }

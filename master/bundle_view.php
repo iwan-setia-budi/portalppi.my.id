@@ -260,7 +260,7 @@ while($row = $data->fetch_assoc()){
         </div>
     
         <div class="bundle-hero-right">
-            <a href="/master/master-data.php" class="btn-back-bundle">
+            <a href="<?= base_url('master/master-data.php') ?>" class="btn-back-bundle">
                 🏠 Kembali
             </a>
         </div>

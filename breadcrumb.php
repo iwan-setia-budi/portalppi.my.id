@@ -94,7 +94,7 @@ function cleanName($text) {
         <div class="home" title="Home">🏠</div>
 
         <div class="crumbs">
-            <a href="/dashboard.php">Home</a>
+            <a href="<?= base_url('dashboard.php') ?>">Home</a>
 
             <?php
             $pathAcc = "";

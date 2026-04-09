@@ -612,7 +612,7 @@ document.getElementById("searchTahunan").addEventListener("input",()=>render("Ta
   render("Semester");
   render("Tahunan");
 })();
-function goDashboard(){ window.location.href="/dashboard.php"; }
+function goDashboard(){ window.location.href="<?= base_url('dashboard.php') ?>"; }
 document.getElementById('modalOverlay').addEventListener('click',function(e){ if(e.target===this) tutupModal(); });
 </script>
 <script src="<?= asset('assets/js/utama.js') ?>"></script>

@@ -368,31 +368,31 @@ $pageTitle = "Master Aplikasi";
                             <div class="internal-grid">
 
                                 <!-- REGULASI => REFERENSI (Jenis Referensi)-->
-                                <a href="/master/master.php?type=referensi" class="internal-card">
+                                <a href="<?= base_url('master/master.php?type=referensi') ?>" class="internal-card">
                                     <div class="internal-icon">📖</div>
                                     <h4>Jenis Referensi</h4>
                                 </a>
 
                                 <!-- REGULASI => REFERENSI (Sumber Referensi)-->
-                                <a href="/master/master.php?type=sumber_referensi" class="internal-card">
+                                <a href="<?= base_url('master/master.php?type=sumber_referensi') ?>" class="internal-card">
                                     <div class="internal-icon">🔗</div>
                                     <h4>Sumber Referensi</h4>
                                 </a>
 
                                 <!-- REGULASI => SPO (Jenis Dokumen)-->
-                                <a href="/master/master.php?type=dokumen" class="internal-card">
+                                <a href="<?= base_url('master/master.php?type=dokumen') ?>" class="internal-card">
                                     <div class="internal-icon">📁</div>
                                     <h4>Jenis Dokumen</h4>
                                 </a>
 
                                 <!-- REGULASI => SPO (Klasifikasi)-->
-                                <a href="/master/master.php?type=jenis_regulasi" class="internal-card">
+                                <a href="<?= base_url('master/master.php?type=jenis_regulasi') ?>" class="internal-card">
                                     <div class="internal-icon">📜</div>
                                     <h4>Klasifikasi Regulasi</h4>
                                 </a>
 
                                 <!-- KOMITE => KALENDER (Kategori Kegiatan)-->
-                                <a href="/master/master.php?type=kegiatan" class="internal-card">
+                                <a href="<?= base_url('master/master.php?type=kegiatan') ?>" class="internal-card">
                                     <div class="internal-icon">🎯</div>
                                     <h4>Kategori Kegiatan</h4>
                                 </a>
@@ -411,50 +411,50 @@ $pageTitle = "Master Aplikasi";
                         <div class="internal-grid">
 
                             <!-- UNIT -->
-                            <a href="/master/master.php?type=unit" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=unit') ?>" class="internal-card">
                                 <div class="internal-icon">🏢</div>
                                 <h4>Daftar Unit</h4>
                             </a>
 
                             <!-- PROFESI -->
-                            <a href="/master/master.php?type=profesi" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=profesi') ?>" class="internal-card">
                                 <div class="internal-icon">👩‍⚕️</div>
                                 <h4>Daftar Profesi</h4>
                             </a>
 
                             <!-- TINDAKAN -->
-                            <a href="/master/master.php?type=tindakan" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=tindakan') ?>" class="internal-card">
                                 <div class="internal-icon">📋</div>
                                 <h4>Jenis Tindakan</h4>
                             </a>
 
                             <!-- LAPORAN -->
-                            <a href="/master/master.php?type=laporan" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=laporan') ?>" class="internal-card">
                                 <div class="internal-icon">📊</div>
                                 <h4>Jenis Laporan</h4>
                             </a>
 
                             <!-- MATERI -->
-                            <a href="/master/master.php?type=materi" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=materi') ?>" class="internal-card">
                                 <div class="internal-icon">📚</div>
                                 <h4>Jenis Materi</h4>
                             </a>
 
                             <!-- PELATIHAN -->
-                            <a href="/master/master.php?type=pelatihan" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=pelatihan') ?>" class="internal-card">
                                 <div class="internal-icon">🎓</div>
                                 <h4>Jenis Pelatihan</h4>
                             </a>
 
                             <!-- ELEMEN -->
-                            <a href="/master/master.php?type=elemen" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=elemen') ?>" class="internal-card">
                                 <div class="internal-icon">📌</div>
                                 <h4>Jenis Elemen</h4>
                             </a>
 
 
                             <!-- RAPAT -->
-                            <a href="/master/master.php?type=rapat" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=rapat') ?>" class="internal-card">
                                 <div class="internal-icon">🗓️</div>
                                 <h4>Jenis Rapat</h4>
                             </a>
@@ -462,7 +462,7 @@ $pageTitle = "Master Aplikasi";
 
 
                             <!-- FORM & BROSUR -->
-                            <a href="/master/master.php?type=form_brosur" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=form_brosur') ?>" class="internal-card">
                                 <div class="internal-icon">📝</div>
                                 <h4>Kategori Form & Brosur</h4>
                             </a>
@@ -470,7 +470,7 @@ $pageTitle = "Master Aplikasi";
 
 
                             <!-- PETUGAS -->
-                            <a href="/master/master.php?type=petugas" class="internal-card">
+                            <a href="<?= base_url('master/master.php?type=petugas') ?>" class="internal-card">
                                 <div class="internal-icon">👤</div>
                                 <h4>Nama Petugas</h4>
                             </a>
@@ -486,7 +486,7 @@ $pageTitle = "Master Aplikasi";
                         <div class="internal-grid">
 
                             <!-- AUDIT BUNDLE HAIs -->
-                            <a href="/master/master_bundle_item.php" class="internal-card">
+                            <a href="<?= base_url('master/master_bundle_item.php') ?>" class="internal-card">
                                 <div class="internal-icon">📋</div>
                                 <h4>Master Bundle Item</h4>
                             </a>
@@ -497,22 +497,22 @@ $pageTitle = "Master Aplikasi";
                             </a>
 
 
-                            <a href="/master/bundle_view.php?jenis=vap" class="internal-card">
+                            <a href="<?= base_url('master/bundle_view.php?jenis=vap') ?>" class="internal-card">
                                 <div class="internal-icon">🫁</div>
                                 <h4>View Bundle VAP</h4>
                             </a>
 
-                            <a href="/master/bundle_view.php?jenis=iadp" class="internal-card">
+                            <a href="<?= base_url('master/bundle_view.php?jenis=iadp') ?>" class="internal-card">
                                 <div class="internal-icon">🩸</div>
                                 <h4>View Bundle IADP</h4>
                             </a>
 
-                            <a href="/master/bundle_view.php?jenis=isk" class="internal-card">
+                            <a href="<?= base_url('master/bundle_view.php?jenis=isk') ?>" class="internal-card">
                                 <div class="internal-icon">🚻</div>
                                 <h4>View Bundle ISK</h4>
                             </a>
 
-                            <a href="/master/bundle_view.php?jenis=ido" class="internal-card">
+                            <a href="<?= base_url('master/bundle_view.php?jenis=ido') ?>" class="internal-card">
                                 <div class="internal-icon">🦠</div>
                                 <h4>View Bundle IDO</h4>
                             </a>
