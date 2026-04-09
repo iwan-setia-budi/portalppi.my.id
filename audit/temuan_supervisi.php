@@ -293,8 +293,29 @@ $pageTitle = "AUDIT DAN SUPERVISI";
         }
 
         .btn-pdf {
-            margin-bottom: 20px;
-            margin-top: 10px;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            box-shadow: 0 10px 20px rgba(185, 28, 28, .24);
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .btn-pdf:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 24px rgba(185, 28, 28, .3);
+        }
+
+        .hasil-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
         }
 
 
@@ -459,6 +480,16 @@ $pageTitle = "AUDIT DAN SUPERVISI";
         body.dark-mode .dashboard-btn:hover {
             background: linear-gradient(180deg, #ffffff, #eff6ff) !important;
             color: #0f172a !important;
+        }
+
+        body.dark-mode .btn-pdf {
+            color: #ffffff;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, .24);
+        }
+
+        body.dark-mode .btn-pdf:hover {
+            box-shadow: 0 14px 24px rgba(239, 68, 68, .32);
         }
 
 
@@ -678,6 +709,15 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                 content: attr(data-label);
                 font-weight: 600;
             }
+
+            .hasil-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn-pdf {
+                width: 100%;
+            }
         }
     </style>
 
@@ -809,9 +849,12 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                 <div id="hasil" class="tab">
 
                     <div class="card" style="margin-bottom:20px;">
-                        <h2 style="margin-bottom:0px; font-size:20px; font-weight:700;">
-                            Data Hasil Supervisi
-                        </h2>
+                        <div class="hasil-header">
+                            <h2 style="margin-bottom:0px; font-size:20px; font-weight:700;">
+                                Data Hasil Supervisi
+                            </h2>
+                            <button type="button" class="btn-pdf" onclick="exportPDFTemuan()">⬇ Download PDF</button>
+                        </div>
 
                         <form method="get" id="filterForm"
                             style="display:flex; gap:15px; flex-wrap:wrap; align-items:end;">
@@ -851,6 +894,12 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                     <?php endfor; ?>
                                 </select>
                             </div>
+
+                        </form>
+
+                        <div class="table-container">
+                            <table id="tableSupervisi">
+                                <thead>
 
                                 <tr>
                                     <th>Tanggal</th>
@@ -930,6 +979,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        </div>
                         <div id="modalLihat" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); 
      justify-content:center; align-items:center;">
 
@@ -1227,136 +1277,184 @@ $pageTitle = "AUDIT DAN SUPERVISI";
     <script>
         window.exportPDFTemuan = async function() {
 
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                alert('Library PDF belum termuat. Coba refresh halaman.');
+                return;
+            }
+
             const {
                 jsPDF
             } = window.jspdf;
-            const pdf = new jsPDF("l", "pt", "a4");
 
-            const rows = document.querySelectorAll("#hasil table tbody tr");
+            const rowElements = Array.from(document.querySelectorAll("#tableSupervisi tbody tr"));
+            const visibleRows = rowElements.filter(row => row.offsetParent !== null);
 
-            let bodyData = [];
+            if (!visibleRows.length) {
+                alert('Tidak ada data untuk diunduh.');
+                return;
+            }
 
-            rows.forEach(row => {
+            const toDataUrl = (imgElement) => {
+                return new Promise((resolve) => {
+                    if (!imgElement || !imgElement.src) {
+                        resolve(null);
+                        return;
+                    }
 
-                if (row.style.display === "none") return;
+                    const convert = () => {
+                        try {
+                            const canvas = document.createElement('canvas');
+                            canvas.width = imgElement.naturalWidth || imgElement.width || 1;
+                            canvas.height = imgElement.naturalHeight || imgElement.height || 1;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(imgElement, 0, 0, canvas.width, canvas.height);
+                            resolve(canvas.toDataURL('image/jpeg', 0.86));
+                        } catch (err) {
+                            resolve(null);
+                        }
+                    };
 
-                const btn = row.querySelector(".view");
+                    if (imgElement.complete && imgElement.naturalWidth > 0) {
+                        convert();
+                    } else {
+                        imgElement.onload = convert;
+                        imgElement.onerror = () => resolve(null);
+                    }
+                });
+            };
 
-                bodyData.push([
-                    btn.dataset.tanggal,
-                    btn.dataset.unit,
-                    btn.dataset.temuan,
-                    btn.dataset.tindak,
-                    btn.dataset.rekom,
-                    ""
-                ]);
+            const exportRows = [];
+            let rowNo = 1;
+
+            for (const row of visibleRows) {
+                const btn = row.querySelector('.view');
+                if (!btn) {
+                    continue;
+                }
+
+                const imgElement = row.querySelector('img');
+                const imageData = await toDataUrl(imgElement);
+
+                exportRows.push({
+                    no: rowNo,
+                    tanggal: btn.dataset.tanggal || '-',
+                    unit: btn.dataset.unit || '-',
+                    temuan: btn.dataset.temuan || '-',
+                    tindak: btn.dataset.tindak || '-',
+                    rekom: btn.dataset.rekom || '-',
+                    imageData: imageData
+                });
+
+                rowNo += 1;
+            }
+
+            const pdf = new jsPDF('l', 'pt', 'a4');
+            const pageWidth = pdf.internal.pageSize.getWidth();
+
+            const tahunSelect = document.querySelector('#filterForm select[name="tahun"]');
+            const bulanSelect = document.querySelector('#filterForm select[name="bulan"]');
+            const tahunText = tahunSelect && tahunSelect.value ? tahunSelect.options[tahunSelect.selectedIndex].text : 'Semua';
+            const bulanText = bulanSelect && bulanSelect.value ? bulanSelect.options[bulanSelect.selectedIndex].text : 'Semua';
+
+            pdf.setFont('helvetica', 'bold');
+            pdf.setFontSize(16);
+            pdf.text('LAPORAN TEMUAN SUPERVISI PPI', pageWidth / 2, 38, {
+                align: 'center'
             });
 
-
-
-            pdf.setFontSize(16);
-            pdf.text("LAPORAN TEMUAN SUPERVISI PPI",
-                pdf.internal.pageSize.getWidth() / 2,
-                40, {
-                    align: "center"
-                }
-            );
-
+            pdf.setFont('helvetica', 'normal');
             pdf.setFontSize(10);
-            pdf.text(
-                "Dicetak: " + new Date().toLocaleDateString("id-ID"),
-                pdf.internal.pageSize.getWidth() / 2,
-                60, {
-                    align: "center"
-                }
-            );
+            pdf.text('Filter: Tahun ' + tahunText + ' | Bulan ' + bulanText, pageWidth / 2, 56, {
+                align: 'center'
+            });
+            pdf.text('Dicetak: ' + new Date().toLocaleString('id-ID') + ' | Total Data: ' + exportRows.length, pageWidth / 2, 72, {
+                align: 'center'
+            });
 
-            // ===== Tambahkan Foto Setelah Table Dibuat =====
             pdf.autoTable({
-                startY: 80,
+                startY: 86,
                 head: [
-                    [
-                        "Tanggal",
-                        "Unit",
-                        "Temuan",
-                        "Tindak Lanjut",
-                        "Rekomendasi",
-                        "Foto"
-                    ]
+                    ['No', 'Tanggal', 'Unit', 'Temuan', 'Tindak Lanjut', 'Rekomendasi', 'Foto']
                 ],
-                body: bodyData,
-                theme: "grid",
-                styles: {
-                    fontSize: 10,
-                    cellPadding: 8,
-                    valign: "middle",
-                    overflow: 'linebreak',
-                    minCellHeight: 75 // 👈 ini penting
+                body: exportRows.map(item => [
+                    item.no,
+                    item.tanggal,
+                    item.unit,
+                    item.temuan,
+                    item.tindak,
+                    item.rekom,
+                    ''
+                ]),
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [30, 64, 175],
+                    textColor: 255,
+                    halign: 'center',
+                    valign: 'middle',
+                    fontStyle: 'bold'
                 },
-
-
-
-
+                bodyStyles: {
+                    textColor: [15, 23, 42],
+                    valign: 'top'
+                },
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 6,
+                    overflow: 'linebreak',
+                    minCellHeight: 64
+                },
                 columnStyles: {
                     0: {
-                        cellWidth: 65
-                    }, // Tanggal
+                        cellWidth: 34,
+                        halign: 'center'
+                    },
                     1: {
-                        cellWidth: 85
-                    }, // Unit
+                        cellWidth: 64,
+                        halign: 'center'
+                    },
                     2: {
-                        cellWidth: 190
-                    }, // Temuan (utama)
+                        cellWidth: 90
+                    },
                     3: {
-                        cellWidth: 160
-                    }, // Tindak Lanjut
-                    4: {
                         cellWidth: 150
-                    }, // Rekomendasi
+                    },
+                    4: {
+                        cellWidth: 135
+                    },
                     5: {
-                        cellWidth: 115
-                    } // Foto
+                        cellWidth: 130
+                    },
+                    6: {
+                        cellWidth: 86,
+                        halign: 'center',
+                        valign: 'middle'
+                    }
                 },
-
-
-
-
                 didDrawCell: function(data) {
+                    if (data.column.index !== 6 || data.cell.section !== 'body') {
+                        return;
+                    }
 
-                    if (data.column.index === 5 && data.cell.section === 'body') {
+                    const rowData = exportRows[data.row.index];
+                    if (!rowData || !rowData.imageData) {
+                        return;
+                    }
 
-                        const imgElement = rows[data.row.index].querySelector("img");
+                    const maxWidth = 70;
+                    const maxHeight = 54;
+                    const x = data.cell.x + (data.cell.width - maxWidth) / 2;
+                    const y = data.cell.y + (data.cell.height - maxHeight) / 2;
 
-                        if (imgElement) {
-
-                            let imgWidth = imgElement.naturalWidth;
-                            let imgHeight = imgElement.naturalHeight;
-
-                            const maxWidth = 60;
-                            const maxHeight = 55;
-
-                            let ratio = Math.min(maxWidth / imgWidth, maxHeight / imgHeight);
-
-                            let newWidth = imgWidth * ratio;
-                            let newHeight = imgHeight * ratio;
-
-                            pdf.addImage(
-                                imgElement.src,
-                                "JPEG",
-                                data.cell.x + (data.cell.width - newWidth) / 2,
-                                data.cell.y + (data.cell.height - newHeight) / 2,
-                                newWidth,
-                                newHeight
-                            );
-                        }
+                    try {
+                        pdf.addImage(rowData.imageData, 'JPEG', x, y, maxWidth, maxHeight);
+                    } catch (err) {
+                        // Gagal render foto tidak menghentikan proses export.
                     }
                 }
             });
 
-
-
-
-            pdf.save("Laporan_Temuan_Supervisi.pdf");
+            const stamp = new Date().toISOString().slice(0, 10);
+            pdf.save('Laporan_Temuan_Supervisi_' + stamp + '.pdf');
         }
     </script>
 
