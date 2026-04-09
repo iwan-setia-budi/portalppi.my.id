@@ -69,11 +69,28 @@ if (!isset($_SESSION['username'])) {
 
 /* FORM */
 h2 { color: var(--navy); border-bottom: 3px solid var(--blue); padding-bottom: 6px; margin-top: 0; }
+.premium-form {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #dbe5f5;
+  background: linear-gradient(180deg, #f8fbff, #f1f6ff);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 10px 24px rgba(15,23,42,.06);
+}
 .form-section {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-bottom: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+.form-group { min-width: 0; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: #1e3a8a;
+  margin-bottom: 6px;
 }
 input, select, textarea {
   padding: 10px;
@@ -89,6 +106,22 @@ button.save { background: var(--blue); border: none; padding: 10px 16px; border-
 button.save:hover { background: #283593; }
 button.clear { background: var(--red); border: none; padding: 10px 16px; border-radius: 10px; }
 button.clear:hover { background: #b71c1c; }
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+.search-wrap {
+  margin-top: 8px;
+}
+.search-wrap label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 6px;
+}
 
 /* TABLE */
 .table-wrapper { margin-top: 15px; overflow-x: auto; }
@@ -123,7 +156,11 @@ main { min-width: 0; overflow-x: hidden; }
   .page-hero small { font-size: 12px; }
   .hero-btn { align-self: stretch; text-align: center; padding: 10px; }
   .lap-content { padding: 14px; }
-  .form-section { grid-template-columns: 1fr; }
+  .premium-form { padding: 12px; }
+  .form-section { grid-template-columns: 1fr; gap: 10px; }
+  .form-group.full { grid-column: auto; }
+  .form-actions { flex-direction: column; }
+  .form-actions button { width: 100%; }
   input, select, textarea { font-size: 16px !important; }
   .table-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
   .scroll-hint { display: block; }
@@ -211,6 +248,99 @@ main { min-width: 0; overflow-x: hidden; }
   font-size: 14px;
 }
 .btn-close-modal:hover { background: #cbd5e1; }
+  /* ===== DARK MODE: PREMIUM ===== */
+  body.dark-mode main {
+    background:
+      radial-gradient(circle at top, rgba(37, 99, 235, .12), transparent 38%),
+      linear-gradient(180deg, #09111d, #0f1b2d 45%, #0d1728 100%);
+  }
+  body.dark-mode .container-lap,
+  body.dark-mode .lap-content,
+  body.dark-mode .premium-form,
+  body.dark-mode .form-section,
+  body.dark-mode .table-wrapper,
+  body.dark-mode .modal-overlay .modal-box,
+  body.dark-mode .tab-nav {
+    background: linear-gradient(170deg, #16263b, #1b2d45);
+    border: 1.5px solid rgba(59, 130, 246, .32);
+    box-shadow: 0 14px 34px rgba(2, 6, 23, .36), inset 0 0 18px rgba(59, 130, 246, .08);
+    color: #e2e8f0;
+  }
+  body.dark-mode .page-hero {
+    box-shadow: 0 20px 48px rgba(2, 6, 23, .45);
+  }
+  body.dark-mode h2,
+  body.dark-mode .form-group label,
+  body.dark-mode .search-wrap label,
+  body.dark-mode .modal-title,
+  body.dark-mode .modal-label,
+  body.dark-mode .scroll-hint {
+    color: #e2e8f0;
+  }
+  body.dark-mode .lap-content,
+  body.dark-mode .lap-content h2,
+  body.dark-mode .lap-content th,
+  body.dark-mode .lap-content td,
+  body.dark-mode .lap-content .scroll-hint,
+  body.dark-mode .modal-title,
+  body.dark-mode .modal-label,
+  body.dark-mode .modal-value {
+    color: #f8fafc;
+  }
+  body.dark-mode table,
+  body.dark-mode thead,
+  body.dark-mode tbody tr {
+    background: #142238;
+    color: #e2e8f0;
+  }
+  body.dark-mode tbody tr:hover td {
+    background: #1a2c46;
+  }
+  body.dark-mode th,
+  body.dark-mode td {
+    border-color: rgba(96, 165, 250, .2);
+  }
+  body.dark-mode th {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #eff6ff;
+  }
+  body.dark-mode input,
+  body.dark-mode select,
+  body.dark-mode textarea {
+    background: #122035;
+    color: #f8fafc;
+    border: 1px solid rgba(59, 130, 246, .34);
+  }
+  body.dark-mode input[type="date"] {
+    color-scheme: dark;
+  }
+  body.dark-mode input::placeholder,
+  body.dark-mode textarea::placeholder {
+    color: rgba(248, 250, 252, .78);
+  }
+  body.dark-mode .modal-header {
+    border-bottom-color: rgba(96, 165, 250, .25);
+  }
+  body.dark-mode .modal-value {
+    background: #122035;
+    color: #f8fafc;
+    border-color: rgba(96, 165, 250, .2);
+  }
+  body.dark-mode .modal-close,
+  body.dark-mode .btn-close-modal {
+    background: #1e293b;
+    color: #dbeafe;
+    border: 1px solid rgba(96, 165, 250, .22);
+  }
+  body.dark-mode .modal-close:hover,
+  body.dark-mode .btn-close-modal:hover {
+    background: #273449;
+  }
+  body.dark-mode .hero-btn {
+    background: linear-gradient(180deg, #ffffff, #dbeafe);
+    color: #0f172a;
+    border: none;
+  }
 </style>
 </head>
 <body>
@@ -231,21 +361,44 @@ main { min-width: 0; overflow-x: hidden; }
       <div class="lap-content">
         <h2>🧾 Input Data Hasil Kultur</h2>
 
-        <div class="form-section">
-          <input type="text" id="nama" placeholder="Nama Pasien">
-          <input type="text" id="ruangan" placeholder="Ruangan">
-          <input type="date" id="tanggal">
-          <input type="text" id="spesimen" placeholder="Jenis Spesimen (misal: Urin, Sputum)">
-          <input type="text" id="hasil" placeholder="Hasil (misal: E. coli, MRSA)">
-          <textarea id="keterangan" rows="2" placeholder="Keterangan tambahan (misal: sensitif, resisten, dll)"></textarea>
+        <div class="premium-form">
+          <div class="form-section">
+            <div class="form-group">
+              <label for="nama">Nama Pasien</label>
+              <input type="text" id="nama" placeholder="Masukkan nama pasien">
+            </div>
+            <div class="form-group">
+              <label for="ruangan">Ruangan</label>
+              <input type="text" id="ruangan" placeholder="Contoh: ICU / Rawat Inap">
+            </div>
+            <div class="form-group">
+              <label for="tanggal">Tanggal Pemeriksaan</label>
+              <input type="date" id="tanggal">
+            </div>
+            <div class="form-group">
+              <label for="spesimen">Jenis Spesimen</label>
+              <input type="text" id="spesimen" placeholder="Contoh: Urin, Sputum, Darah">
+            </div>
+            <div class="form-group">
+              <label for="hasil">Hasil Kultur</label>
+              <input type="text" id="hasil" placeholder="Contoh: E. coli, MRSA">
+            </div>
+            <div class="form-group full">
+              <label for="keterangan">Keterangan Tambahan</label>
+              <textarea id="keterangan" rows="2" placeholder="Contoh: sensitif, resisten, atau catatan klinis lain"></textarea>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button class="save" onclick="tambahData()">💾 Simpan Data</button>
+            <button class="clear" onclick="hapusSemua()">🧹 Hapus Semua</button>
+          </div>
         </div>
 
-        <div style="margin:10px 0;">
-          <button class="save" onclick="tambahData()">💾 Simpan Data</button>
-          <button class="clear" onclick="hapusSemua()">🧹 Hapus Semua</button>
+        <div class="search-wrap">
+          <label for="search">Pencarian Data Kultur</label>
+          <input type="search" id="search" placeholder="🔍 Cari nama pasien, spesimen, atau hasil...">
         </div>
-
-        <input type="search" id="search" placeholder="🔍 Cari nama pasien, spesimen, atau hasil...">
         <p class="scroll-hint">← geser tabel →</p>
 
         <div class="table-wrapper">

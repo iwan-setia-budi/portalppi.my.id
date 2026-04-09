@@ -686,6 +686,122 @@ $pageTitle = "DOKUMEN DAN MEDIA";
             .upload-box { grid-template-columns: 1fr; }
             .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
         }
+    /* ===== DARK MODE: PREMIUM ===== */
+    body.dark-mode .container,
+    body.dark-mode .toolbar,
+    body.dark-mode .gallery {
+        background: linear-gradient(170deg, #16263b, #1b2d45);
+        border: 1.5px solid rgba(59, 130, 246, .3);
+        box-shadow: 0 14px 34px rgba(2, 6, 23, .36), inset 0 0 18px rgba(59, 130, 246, .08);
+        color: #e2e8f0;
+    }
+
+    body.dark-mode .hero-header {
+        box-shadow: 0 18px 42px rgba(2, 6, 23, .44);
+        border: 1.5px solid rgba(96, 165, 250, .28);
+    }
+
+    body.dark-mode .filter-box {
+        background: #1a2a40;
+        border: 1.5px solid rgba(59, 130, 246, .32);
+        box-shadow: 0 10px 24px rgba(2, 6, 23, .3), inset 0 0 12px rgba(59, 130, 246, .06);
+    }
+
+    body.dark-mode .filter-box label {
+        color: #bfdbfe;
+    }
+
+    body.dark-mode .card {
+        background: #142238;
+        border: 1.5px solid rgba(59, 130, 246, .28);
+        box-shadow: 0 10px 24px rgba(2, 6, 23, .32), inset 0 0 12px rgba(59, 130, 246, .06);
+    }
+
+    body.dark-mode .card:hover {
+        box-shadow: 0 16px 32px rgba(59, 130, 246, .24);
+    }
+
+    body.dark-mode .thumb {
+        background: linear-gradient(160deg, #1b2d46, #223754);
+        border-bottom: 1px solid rgba(96, 165, 250, .2);
+    }
+
+    body.dark-mode .card-body strong,
+    body.dark-mode .card-body small,
+    body.dark-mode .subtitle,
+    body.dark-mode .hero-stat span,
+    body.dark-mode .hero-badge {
+        color: #dbeafe;
+    }
+
+    body.dark-mode .empty-state {
+        background: #142238;
+        border-color: rgba(96, 165, 250, .3);
+        color: #9fb2c9;
+    }
+
+    body.dark-mode .pagination a {
+        background: #1b2d46;
+        color: #bfdbfe;
+        border-color: rgba(96, 165, 250, .32);
+    }
+
+    body.dark-mode .pagination a:hover {
+        background: linear-gradient(135deg, #1565c0, #1e88e5);
+        color: #fff;
+    }
+
+    body.dark-mode .pagination span.current {
+        background: linear-gradient(135deg, #1565c0, #1e88e5);
+        border-color: rgba(147, 197, 253, .48);
+    }
+
+    body.dark-mode .alert.success {
+        background: #163027;
+        color: #bbf7d0;
+        border-color: #2f6b4e;
+    }
+
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+        background: #122035;
+        color: #e2e8f0;
+        border: 1px solid rgba(59, 130, 246, .34);
+    }
+
+    body.dark-mode input::placeholder,
+    body.dark-mode textarea::placeholder {
+        color: #8fa8c5;
+    }
+
+    body.dark-mode input:focus,
+    body.dark-mode select:focus,
+    body.dark-mode textarea:focus {
+        border-color: rgba(96, 165, 250, .78);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
+        background: #142741;
+    }
+
+    /* Upload modal inline style override */
+    body.dark-mode #uploadModal > div {
+        background: linear-gradient(170deg, #16263b, #1b2d45) !important;
+        border: 1.5px solid rgba(59, 130, 246, .34) !important;
+        box-shadow: 0 24px 50px rgba(2, 6, 23, .42), inset 0 0 16px rgba(59, 130, 246, .08) !important;
+        color: #e2e8f0 !important;
+    }
+
+    body.dark-mode #uploadModal label,
+    body.dark-mode #uploadModal h3,
+    body.dark-mode #uploadModal p {
+        color: #e2e8f0 !important;
+    }
+
+    body.dark-mode #uploadModal button[onclick="closeUploadModal()"] {
+        background: #21354f !important;
+        color: #dbeafe !important;
+        border: 1px solid rgba(96, 165, 250, .32) !important;
+    }
     </style>
 </head>
 

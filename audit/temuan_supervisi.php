@@ -449,6 +449,18 @@ $pageTitle = "AUDIT DAN SUPERVISI";
             color: #e2e8f0;
         }
 
+        body.dark-mode .dashboard-btn {
+            background: linear-gradient(180deg, #ffffff, #dbeafe) !important;
+            color: #0f172a !important;
+            border: none !important;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, .22);
+        }
+
+        body.dark-mode .dashboard-btn:hover {
+            background: linear-gradient(180deg, #ffffff, #eff6ff) !important;
+            color: #0f172a !important;
+        }
+
 
         .tab-btn {
             padding: 10px 20px;

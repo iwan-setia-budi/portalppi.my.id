@@ -93,6 +93,29 @@ if (!isset($_SESSION['username'])) {
 }
 
 /* FORM */
+ .premium-form {
+  margin-top: 14px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #dbe5f5;
+  background: linear-gradient(180deg, #f8fbff, #f1f6ff);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.8), 0 10px 24px rgba(15,23,42,.06);
+}
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+.form-group { min-width: 0; }
+.form-group.full { grid-column: 1 / -1; }
+.form-group label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .03em;
+  color: #1e3a8a;
+  margin-bottom: 6px;
+}
 input, textarea, select {
   width: 100%;
   padding: 10px;
@@ -107,6 +130,22 @@ button.save { background: var(--blue); border: none; padding: 8px 14px; border-r
 button.save:hover { background: #283593; }
 button.clear { background: var(--red); border: none; padding: 8px 14px; border-radius: 8px;  }
 button.clear:hover { background: #b71c1c; }
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0 8px;
+}
+.search-wrap {
+  margin-top: 8px;
+}
+.search-wrap label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 6px;
+}
 
 /* TABLE */
 h2 { color: var(--navy); border-bottom: 3px solid var(--blue); padding-bottom: 6px; margin-top: 0; }
@@ -120,7 +159,7 @@ td.actions button { padding: 6px 10px; font-size: 0.85em; border-radius: 8px; ma
 .view { background: var(--blue); }
 .download { background: var(--green); }
 .delete { background: var(--red); }
-input#searchTri, input#searchTahunan { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border); margin: 10px 0; }
+input#searchTri, input#searchSemester, input#searchTahunan { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border); margin: 10px 0; }
 
 /* TAB CONTENT */
 .tab { display: none; }
@@ -179,6 +218,11 @@ main { min-width: 0; overflow-x: hidden; }
 
   /* Konten */
   .lap-content { padding: 14px; }
+  .premium-form { padding: 12px; }
+  .form-grid { grid-template-columns: 1fr; gap: 10px; }
+  .form-group.full { grid-column: auto; }
+  .form-actions { flex-direction: column; }
+  .form-actions button { width: 100%; }
 
   /* Form — font-size 16px agar tidak auto-zoom di iOS */
   input, textarea, select { font-size: 16px !important; }
@@ -296,6 +340,96 @@ main { min-width: 0; overflow-x: hidden; }
   font-size: 14px;
 }
 .btn-close-modal:hover { background: #cbd5e1; }
+  /* ===== DARK MODE: PREMIUM ===== */
+  body.dark-mode main {
+    background:
+      radial-gradient(circle at top, rgba(37, 99, 235, .12), transparent 38%),
+      linear-gradient(180deg, #09111d, #0f1b2d 45%, #0d1728 100%);
+  }
+  body.dark-mode .container-lap,
+  body.dark-mode .lap-content,
+  body.dark-mode .premium-form,
+  body.dark-mode .table-wrapper,
+  body.dark-mode .modal-overlay .modal-box,
+  body.dark-mode .tab-nav {
+    background: linear-gradient(170deg, #16263b, #1b2d45);
+    border: 1.5px solid rgba(59, 130, 246, .32);
+    box-shadow: 0 14px 34px rgba(2, 6, 23, .36), inset 0 0 18px rgba(59, 130, 246, .08);
+    color: #f8fafc;
+  }
+  body.dark-mode .page-hero {
+    box-shadow: 0 20px 48px rgba(2, 6, 23, .45);
+  }
+  body.dark-mode h2,
+  body.dark-mode .form-group label,
+  body.dark-mode .search-wrap label,
+  body.dark-mode .scroll-hint,
+  body.dark-mode .modal-title,
+  body.dark-mode .modal-label,
+  body.dark-mode th,
+  body.dark-mode td {
+    color: #f8fafc;
+  }
+  body.dark-mode table,
+  body.dark-mode thead,
+  body.dark-mode tbody tr {
+    background: #142238;
+    color: #f8fafc;
+  }
+  body.dark-mode tbody tr:hover td { background: #1a2c46; }
+  body.dark-mode th,
+  body.dark-mode td {
+    border-color: rgba(96, 165, 250, .2);
+  }
+  body.dark-mode th {
+    background: linear-gradient(135deg, #1d4ed8, #2563eb);
+    color: #eff6ff;
+  }
+  body.dark-mode input,
+  body.dark-mode select,
+  body.dark-mode textarea {
+    background: #122035;
+    color: #f8fafc;
+    border: 1px solid rgba(59, 130, 246, .34);
+  }
+  body.dark-mode input::placeholder,
+  body.dark-mode textarea::placeholder { color: rgba(248, 250, 252, .78); }
+  body.dark-mode input[type="file"] {
+    background: linear-gradient(180deg, #122035, #0f1d31) !important;
+    color: #f8fafc;
+    border: 1.5px dashed rgba(96, 165, 250, .38);
+    box-shadow: inset 0 0 0 1px rgba(59, 130, 246, .08);
+  }
+  body.dark-mode input[type="file"]::file-selector-button,
+  body.dark-mode input[type="file"]::-webkit-file-upload-button {
+    background: linear-gradient(180deg, #ffffff, #dbeafe);
+    color: #0f172a;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-right: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  body.dark-mode .modal-header { border-bottom-color: rgba(96, 165, 250, .25); }
+  body.dark-mode .modal-value {
+    background: #122035;
+    color: #f8fafc;
+    border-color: rgba(96, 165, 250, .2);
+  }
+  body.dark-mode .modal-close,
+  body.dark-mode .btn-close-modal {
+    background: #1e293b;
+    color: #dbeafe;
+    border: 1px solid rgba(96, 165, 250, .22);
+  }
+  body.dark-mode .modal-close:hover,
+  body.dark-mode .btn-close-modal:hover { background: #273449; }
+  body.dark-mode .hero-btn {
+    background: linear-gradient(180deg, #ffffff, #dbeafe);
+    color: #0f172a;
+    border: none;
+  }
 </style>
 </head>
 <body>
@@ -323,25 +457,50 @@ main { min-width: 0; overflow-x: hidden; }
         <!-- TRIWIULAN -->
   <section id="triwulan" class="tab active">
     <h2>🗓️ Laporan Triwulan Komite PPI</h2>
-    <select id="periode">
-      <option value="">Pilih Triwulan</option>
-      <option>Triwulan I (Jan–Mar)</option>
-      <option>Triwulan II (Apr–Jun)</option>
-      <option>Triwulan III (Jul–Sep)</option>
-      <option>Triwulan IV (Okt–Des)</option>
-    </select>
-    <input type="number" id="tahunTri" placeholder="Tahun (contoh: 2025)" min="2020" max="2100">
-    <input type="text" id="penanggungTri" placeholder="Penanggung Jawab">
-    <textarea id="ringkasanTri" placeholder="Ringkasan kegiatan selama triwulan"></textarea>
-    <textarea id="rekomendasiTri" placeholder="Rekomendasi & tindak lanjut"></textarea>
-    <input type="file" id="fileTri" accept=".pdf,.docx,.xlsx,.jpg,.png">
+    <div class="premium-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="periode">Periode Triwulan</label>
+          <select id="periode">
+            <option value="">Pilih Triwulan</option>
+            <option>Triwulan I (Jan–Mar)</option>
+            <option>Triwulan II (Apr–Jun)</option>
+            <option>Triwulan III (Jul–Sep)</option>
+            <option>Triwulan IV (Okt–Des)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tahunTri">Tahun Laporan</label>
+          <input type="number" id="tahunTri" placeholder="Contoh: 2025" min="2020" max="2100">
+        </div>
+        <div class="form-group full">
+          <label for="penanggungTri">Penanggung Jawab</label>
+          <input type="text" id="penanggungTri" placeholder="Nama PIC / penanggung jawab">
+        </div>
+        <div class="form-group full">
+          <label for="ringkasanTri">Ringkasan Kegiatan</label>
+          <textarea id="ringkasanTri" placeholder="Ringkasan kegiatan selama triwulan"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="rekomendasiTri">Rekomendasi &amp; Tindak Lanjut</label>
+          <textarea id="rekomendasiTri" placeholder="Rekomendasi dan tindak lanjut"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="fileTri">Lampiran Dokumen</label>
+          <input type="file" id="fileTri" accept=".pdf,.docx,.xlsx,.jpg,.png">
+        </div>
+      </div>
 
-    <div style="margin:10px 0;">
-      <button class="save" onclick="simpan('Tri')">💾 Simpan</button>
-      <button class="clear" onclick="hapusSemua('Tri')">🧹 Hapus Semua</button>
+      <div class="form-actions">
+        <button class="save" onclick="simpan('Tri')">💾 Simpan</button>
+        <button class="clear" onclick="hapusSemua('Tri')">🧹 Hapus Semua</button>
+      </div>
     </div>
 
-    <input type="search" id="searchTri" placeholder="🔍 Cari berdasarkan tahun, triwulan, atau penanggung...">
+    <div class="search-wrap">
+      <label for="searchTri">Pencarian Laporan Triwulan</label>
+      <input type="search" id="searchTri" placeholder="🔍 Cari berdasarkan tahun, triwulan, atau penanggung...">
+    </div>
     <p class="scroll-hint">← geser tabel →</p>
     <div class="table-wrapper">
       <table id="tabelTri">
@@ -364,23 +523,48 @@ main { min-width: 0; overflow-x: hidden; }
   <!-- SEMESTER -->
   <section id="semester" class="tab">
     <h2>📆 Laporan Semester Komite PPI</h2>
-    <select id="semesterPeriode">
-      <option value="">Pilih Semester</option>
-      <option>Semester I (Jan–Jun)</option>
-      <option>Semester II (Jul–Des)</option>
-    </select>
-    <input type="number" id="tahunSemester" placeholder="Tahun (contoh: 2025)" min="2020" max="2100">
-    <input type="text" id="penanggungSemester" placeholder="Penanggung Jawab">
-    <textarea id="ringkasanSemester" placeholder="Ringkasan kegiatan selama semester"></textarea>
-    <textarea id="rekomendasiSemester" placeholder="Rekomendasi &amp; tindak lanjut"></textarea>
-    <input type="file" id="fileSemester" accept=".pdf,.docx,.xlsx,.jpg,.png">
+    <div class="premium-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="semesterPeriode">Periode Semester</label>
+          <select id="semesterPeriode">
+            <option value="">Pilih Semester</option>
+            <option>Semester I (Jan–Jun)</option>
+            <option>Semester II (Jul–Des)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="tahunSemester">Tahun Laporan</label>
+          <input type="number" id="tahunSemester" placeholder="Contoh: 2025" min="2020" max="2100">
+        </div>
+        <div class="form-group full">
+          <label for="penanggungSemester">Penanggung Jawab</label>
+          <input type="text" id="penanggungSemester" placeholder="Nama PIC / penanggung jawab">
+        </div>
+        <div class="form-group full">
+          <label for="ringkasanSemester">Ringkasan Kegiatan</label>
+          <textarea id="ringkasanSemester" placeholder="Ringkasan kegiatan selama semester"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="rekomendasiSemester">Rekomendasi &amp; Tindak Lanjut</label>
+          <textarea id="rekomendasiSemester" placeholder="Rekomendasi dan tindak lanjut"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="fileSemester">Lampiran Dokumen</label>
+          <input type="file" id="fileSemester" accept=".pdf,.docx,.xlsx,.jpg,.png">
+        </div>
+      </div>
 
-    <div style="margin:10px 0;">
-      <button class="save" onclick="simpan('Semester')">💾 Simpan</button>
-      <button class="clear" onclick="hapusSemua('Semester')">🧹 Hapus Semua</button>
+      <div class="form-actions">
+        <button class="save" onclick="simpan('Semester')">💾 Simpan</button>
+        <button class="clear" onclick="hapusSemua('Semester')">🧹 Hapus Semua</button>
+      </div>
     </div>
 
-    <input type="search" id="searchSemester" placeholder="🔍 Cari berdasarkan tahun, semester, atau penanggung...">
+    <div class="search-wrap">
+      <label for="searchSemester">Pencarian Laporan Semester</label>
+      <input type="search" id="searchSemester" placeholder="🔍 Cari berdasarkan tahun, semester, atau penanggung...">
+    </div>
     <p class="scroll-hint">← geser tabel →</p>
     <div class="table-wrapper">
       <table id="tabelSemester">
@@ -403,18 +587,40 @@ main { min-width: 0; overflow-x: hidden; }
   <!-- TAHUNAN -->
   <section id="tahunan" class="tab">
     <h2>📅 Laporan Tahunan Komite PPI</h2>
-    <input type="number" id="tahunTahunan" placeholder="Tahun (contoh: 2025)" min="2020" max="2100">
-    <input type="text" id="penanggungTahunan" placeholder="Penanggung Jawab">
-    <textarea id="ringkasanTahunan" placeholder="Ringkasan kegiatan tahunan"></textarea>
-    <textarea id="rekomendasiTahunan" placeholder="Rekomendasi & tindak lanjut tahun berikutnya"></textarea>
-    <input type="file" id="fileTahunan" accept=".pdf,.docx,.xlsx,.jpg,.png">
+    <div class="premium-form">
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tahunTahunan">Tahun Laporan</label>
+          <input type="number" id="tahunTahunan" placeholder="Contoh: 2025" min="2020" max="2100">
+        </div>
+        <div class="form-group">
+          <label for="penanggungTahunan">Penanggung Jawab</label>
+          <input type="text" id="penanggungTahunan" placeholder="Nama PIC / penanggung jawab">
+        </div>
+        <div class="form-group full">
+          <label for="ringkasanTahunan">Ringkasan Kegiatan Tahunan</label>
+          <textarea id="ringkasanTahunan" placeholder="Ringkasan kegiatan tahunan"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="rekomendasiTahunan">Rekomendasi Tahun Berikutnya</label>
+          <textarea id="rekomendasiTahunan" placeholder="Rekomendasi dan tindak lanjut tahun berikutnya"></textarea>
+        </div>
+        <div class="form-group full">
+          <label for="fileTahunan">Lampiran Dokumen</label>
+          <input type="file" id="fileTahunan" accept=".pdf,.docx,.xlsx,.jpg,.png">
+        </div>
+      </div>
 
-    <div style="margin:10px 0;">
-      <button class="save" onclick="simpan('Tahunan')">💾 Simpan</button>
-      <button class="clear" onclick="hapusSemua('Tahunan')">🧹 Hapus Semua</button>
+      <div class="form-actions">
+        <button class="save" onclick="simpan('Tahunan')">💾 Simpan</button>
+        <button class="clear" onclick="hapusSemua('Tahunan')">🧹 Hapus Semua</button>
+      </div>
     </div>
 
-    <input type="search" id="searchTahunan" placeholder="🔍 Cari berdasarkan tahun atau penanggung...">
+    <div class="search-wrap">
+      <label for="searchTahunan">Pencarian Laporan Tahunan</label>
+      <input type="search" id="searchTahunan" placeholder="🔍 Cari berdasarkan tahun atau penanggung...">
+    </div>
     <p class="scroll-hint">← geser tabel →</p>
     <div class="table-wrapper">
       <table id="tabelTahunan">

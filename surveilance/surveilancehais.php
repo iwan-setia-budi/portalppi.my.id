@@ -83,28 +83,73 @@ $pageTitle = "SURVEILANCE";
 
         /* ================= CARD FORM ================= */
 
+        .surveilans .card.form-premium {
+            background: linear-gradient(180deg, #ffffff, #f7faff);
+            border: 1px solid #dbeafe;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .surveilans .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px 14px;
+            margin-top: 6px;
+        }
+
+        .surveilans .card.form-premium h2 {
+            margin: 0 0 18px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dbeafe;
+        }
+
+        .surveilans .form-group {
+            min-width: 0;
+        }
+
+        .surveilans .form-group.full {
+            grid-column: 1 / -1;
+        }
+
         .surveilans form label {
             display: block;
-            margin-top: 14px;
-            font-weight: 600;
-            font-size: 14px;
+            margin-top: 0;
+            margin-bottom: 6px;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: .03em;
+            color: #1e3a8a;
         }
 
         .surveilans form input,
         .surveilans form select {
             width: 100%;
-            padding: 8px 10px;
-            margin-top: 6px;
+            padding: 10px 12px;
+            margin-top: 0;
             border: 1px solid #dbeafe;
             border-radius: var(--radius-sm);
+            transition: .2s ease;
+        }
+
+        .surveilans form input:focus,
+        .surveilans form select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .16);
         }
 
         .surveilans .result {
-            margin-top: 16px;
+            margin-top: 4px;
             padding: 10px;
             background: var(--blue-soft);
             border-radius: var(--radius-sm);
             font-weight: 600;
+        }
+
+        .surveilans .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 6px;
         }
 
         .surveilans .save {
@@ -296,6 +341,23 @@ $pageTitle = "SURVEILANCE";
                 gap: 12px;
             }
 
+            .surveilans .form-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .surveilans .form-group.full {
+                grid-column: auto;
+            }
+
+            .surveilans .form-actions {
+                flex-direction: column;
+            }
+
+            .surveilans .form-actions .save {
+                width: 100%;
+            }
+
             .surveilans .tab-nav {
                 gap: 6px;
             }
@@ -374,6 +436,134 @@ $pageTitle = "SURVEILANCE";
         .surveilans table {
             min-width: 650px;
         }
+
+        /* ================= DARK MODE PREMIUM ================= */
+        body.dark-mode main {
+            background:
+                radial-gradient(circle at top, rgba(37, 99, 235, .12), transparent 38%),
+                linear-gradient(180deg, #09111d, #0f1b2d 45%, #0d1728 100%);
+        }
+
+        body.dark-mode .surveilans .page-header {
+            box-shadow: 0 20px 44px rgba(2, 6, 23, .45);
+        }
+
+        body.dark-mode .surveilans .tab-nav button {
+            background: linear-gradient(180deg, rgba(20, 34, 56, .96), rgba(16, 28, 46, .96));
+            border: 1px solid rgba(96, 165, 250, .22);
+            color: #dbeafe;
+            box-shadow: 0 8px 18px rgba(2, 6, 23, .2);
+        }
+
+        body.dark-mode .surveilans .tab-nav button:hover {
+            background: linear-gradient(180deg, rgba(28, 45, 72, .98), rgba(20, 34, 56, .98));
+            border-color: rgba(96, 165, 250, .42);
+        }
+
+        body.dark-mode .surveilans .tab-nav button.active {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            box-shadow: 0 12px 26px rgba(37, 99, 235, .32);
+        }
+
+        body.dark-mode .surveilans .card,
+        body.dark-mode .surveilans .card.form-premium {
+            background: linear-gradient(170deg, #16263b, #1b2d45);
+            border: 1.5px solid rgba(59, 130, 246, .34);
+            box-shadow: 0 16px 36px rgba(2, 6, 23, .36), inset 0 0 20px rgba(59, 130, 246, .08);
+            color: #f8fafc;
+        }
+
+        body.dark-mode .surveilans h2,
+        body.dark-mode .surveilans .tab>h2,
+        body.dark-mode .surveilans form label,
+        body.dark-mode .surveilans .form-group label,
+        body.dark-mode .surveilans .filter label,
+        body.dark-mode .surveilans tbody td,
+        body.dark-mode .surveilans th {
+            color: #f8fafc;
+        }
+
+        body.dark-mode .surveilans form input,
+        body.dark-mode .surveilans form select,
+        body.dark-mode .surveilans .filter select {
+            background: #122035;
+            color: #f8fafc;
+            border: 1px solid rgba(59, 130, 246, .34);
+        }
+
+        body.dark-mode .surveilans form input::placeholder {
+            color: rgba(248, 250, 252, .76);
+        }
+
+        body.dark-mode .surveilans form input:focus,
+        body.dark-mode .surveilans form select:focus,
+        body.dark-mode .surveilans .filter select:focus {
+            border-color: rgba(96, 165, 250, .78);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
+        }
+
+        body.dark-mode .surveilans .result {
+            background: linear-gradient(180deg, #122a48, #10233d);
+            color: #e2e8f0;
+            border: 1px solid rgba(96, 165, 250, .25);
+        }
+
+        body.dark-mode .surveilans .save {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, .3);
+        }
+
+        body.dark-mode .surveilans .save:hover {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+        }
+
+        body.dark-mode .surveilans table {
+            background: #142238;
+            border: 1px solid rgba(96, 165, 250, .2);
+            box-shadow: 0 14px 28px rgba(2, 6, 23, .34);
+        }
+
+        body.dark-mode .surveilans thead {
+            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        }
+
+        body.dark-mode .surveilans thead th {
+            border-bottom-color: rgba(191, 219, 254, .28);
+            color: #eff6ff;
+        }
+
+        body.dark-mode .surveilans tbody tr {
+            border-bottom-color: rgba(96, 165, 250, .18);
+        }
+
+        body.dark-mode .surveilans tbody td {
+            border-bottom-color: rgba(96, 165, 250, .18);
+            color: #dbeafe;
+        }
+
+        body.dark-mode .surveilans tbody tr:hover {
+            background: #1a2c46;
+        }
+
+        body.dark-mode .surveilans .tab>h2 {
+            border-bottom-color: rgba(96, 165, 250, .24);
+        }
+
+        body.dark-mode .surveilans .card.form-premium h2 {
+            border-bottom-color: rgba(96, 165, 250, .24);
+        }
+
+        body.dark-mode .surveilans .dashboard-btn {
+            background: linear-gradient(180deg, #ffffff, #dbeafe) !important;
+            color: #0f172a !important;
+            border: none !important;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, .22);
+        }
+
+        body.dark-mode .surveilans .btn-export {
+            box-shadow: 0 10px 20px rgba(34, 197, 94, .25);
+        }
     </style>
 
 </head>
@@ -410,55 +600,73 @@ $pageTitle = "SURVEILANCE";
                 <!-- TAB INPUT -->
 
                 <div id="input" class="tab active">
-                    <div class="card">
+                    <div class="card form-premium">
 
                         <h2>🧾 Form Input Data Surveilans</h2>
 
                         <form id="formSurveilans">
-                            <label>Tahun</label>
-                            <input type="number" id="tahun" placeholder="Misal: 2025" min="2020" required>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="tahun">Tahun</label>
+                                    <input type="number" id="tahun" placeholder="Misal: 2025" min="2020" required>
+                                </div>
 
-                            <label>Bulan</label>
-                            <select id="bulan" required>
-                                <option value="">Pilih Bulan</option>
-                                <option>Januari</option>
-                                <option>Februari</option>
-                                <option>Maret</option>
-                                <option>April</option>
-                                <option>Mei</option>
-                                <option>Juni</option>
-                                <option>Juli</option>
-                                <option>Agustus</option>
-                                <option>September</option>
-                                <option>Oktober</option>
-                                <option>November</option>
-                                <option>Desember</option>
-                            </select>
+                                <div class="form-group">
+                                    <label for="bulan">Bulan</label>
+                                    <select id="bulan" required>
+                                        <option value="">Pilih Bulan</option>
+                                        <option>Januari</option>
+                                        <option>Februari</option>
+                                        <option>Maret</option>
+                                        <option>April</option>
+                                        <option>Mei</option>
+                                        <option>Juni</option>
+                                        <option>Juli</option>
+                                        <option>Agustus</option>
+                                        <option>September</option>
+                                        <option>Oktober</option>
+                                        <option>November</option>
+                                        <option>Desember</option>
+                                    </select>
+                                </div>
 
-                            <label>Jenis Surveilans</label>
-                            <select id="jenis" required>
-                                <option value="">Pilih Jenis</option>
-                                <option value="ISK">ISK (Infeksi Saluran Kemih)</option>
-                                <option value="IDO">IDO (Infeksi Daerah Operasi)</option>
-                                <option value="VAP">VAP (Ventilator Associated Pneumonia)</option>
-                                <option value="IADP">IADP (Infeksi Aliran Darah Primer)</option>
-                            </select>
+                                <div class="form-group full">
+                                    <label for="jenis">Jenis Surveilans</label>
+                                    <select id="jenis" required>
+                                        <option value="">Pilih Jenis</option>
+                                        <option value="ISK">ISK (Infeksi Saluran Kemih)</option>
+                                        <option value="IDO">IDO (Infeksi Daerah Operasi)</option>
+                                        <option value="VAP">VAP (Ventilator Associated Pneumonia)</option>
+                                        <option value="IADP">IADP (Infeksi Aliran Darah Primer)</option>
+                                    </select>
+                                </div>
 
-                            <label>Numerator (Kasus Infeksi)</label>
-                            <input type="number" id="num" placeholder="Jumlah kasus infeksi" min="0" required>
+                                <div class="form-group">
+                                    <label for="num">Numerator (Kasus Infeksi)</label>
+                                    <input type="number" id="num" placeholder="Jumlah kasus infeksi" min="0" required>
+                                </div>
 
-                            <label>Denominator (Pasien berisiko)</label>
-                            <input type="number" id="denum" placeholder="Jumlah pasien berisiko" min="1" required>
+                                <div class="form-group">
+                                    <label for="denum">Denominator (Pasien Berisiko)</label>
+                                    <input type="number" id="denum" placeholder="Jumlah pasien berisiko" min="1" required>
+                                </div>
 
-                            <label>Jenis Hasil</label>
-                            <select id="tipeHasil">
-                                <option value="persentase">Persentase (%)</option>
-                                <option value="permil">Permil (‰)</option>
-                            </select>
+                                <div class="form-group full">
+                                    <label for="tipeHasil">Jenis Hasil</label>
+                                    <select id="tipeHasil">
+                                        <option value="persentase">Persentase (%)</option>
+                                        <option value="permil">Permil (‰)</option>
+                                    </select>
+                                </div>
 
-                            <div class="result" id="hasil">Hasil: -</div>
+                                <div class="form-group full">
+                                    <div class="result" id="hasil">Hasil: -</div>
+                                </div>
+                            </div>
 
-                            <button type="button" class="save" onclick="simpanData()">💾 Simpan Data</button>
+                            <div class="form-actions">
+                                <button type="button" class="save" onclick="simpanData()">💾 Simpan Data</button>
+                            </div>
                         </form>
 
                     </div>

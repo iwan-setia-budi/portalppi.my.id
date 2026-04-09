@@ -390,7 +390,7 @@ $pageTitle = "DOKUMEN DAN MEDIA";
         }
 
 main {
-  min-width: 0;
+    min-width: 0;
 }
 
 .layout {
@@ -405,7 +405,7 @@ main {
     main{
         width:100% !important;
         margin:0 !important;
-        padding:0 12px !important;
+        padding:calc(var(--topbar-height) + 14px) 12px 0 !important;
     }
 
     .container-supervise{
@@ -416,14 +416,16 @@ main {
         padding:15px !important;
     }
 
-}
-
 @media (max-width: 768px){
 
     header{
         flex-direction: column;
         align-items: center; /* Biar rata tengah */
         text-align: center;
+    }
+
+    main{
+        padding:calc(var(--topbar-height) + 10px) 10px 0 !important;
     }
 
     .dashboard-btn{
@@ -433,6 +435,113 @@ main {
 
 }
 
+    /* ===== DARK MODE: PREMIUM ===== */
+    body.dark-mode .container-supervise,
+    body.dark-mode .content-box,
+    body.dark-mode .table-container {
+        background: linear-gradient(170deg, #16263b, #1b2d45);
+        border: 1.5px solid rgba(59, 130, 246, .32);
+        box-shadow: 0 14px 34px rgba(2, 6, 23, .36), inset 0 0 18px rgba(59, 130, 246, .08);
+        color: #e2e8f0;
+    }
+
+    body.dark-mode h2 {
+        color: #e2e8f0;
+        border-bottom-color: rgba(96, 165, 250, .7);
+    }
+
+    body.dark-mode .filter-box {
+        background: linear-gradient(160deg, #14243a, #1a2e49);
+        border: 1.5px solid rgba(59, 130, 246, .34);
+        box-shadow: 0 8px 20px rgba(2, 6, 23, .28), inset 0 0 14px rgba(59, 130, 246, .08);
+    }
+
+    body.dark-mode .filter-box label {
+        color: #bfdbfe;
+    }
+
+    body.dark-mode table,
+    body.dark-mode thead,
+    body.dark-mode tbody tr {
+        background: #142238;
+        color: #e2e8f0;
+    }
+
+    body.dark-mode th {
+        background: linear-gradient(180deg, #1b3350 0%, #1f3e5f 100%);
+        color: #dbeafe;
+    }
+
+    body.dark-mode tbody tr:nth-child(even),
+    body.dark-mode tbody tr:nth-child(odd) {
+        background: #142238;
+    }
+
+    body.dark-mode tbody tr:hover {
+        background: #1a3150;
+    }
+
+    body.dark-mode th,
+    body.dark-mode td {
+        border-color: rgba(96, 165, 250, .2);
+    }
+
+    body.dark-mode .modal-content {
+        background: linear-gradient(170deg, #16263b, #1b2d45);
+        border: 1.5px solid rgba(59, 130, 246, .34);
+        color: #e2e8f0;
+        box-shadow: 0 18px 36px rgba(2, 6, 23, .42), inset 0 0 16px rgba(59, 130, 246, .09);
+    }
+
+    body.dark-mode .modal-content label,
+    body.dark-mode .modal-content h3,
+    body.dark-mode .modal-content p,
+    body.dark-mode .close {
+        color: #e2e8f0;
+    }
+
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea {
+        background: #122035;
+        color: #e2e8f0;
+        border: 1px solid rgba(59, 130, 246, .34);
+    }
+
+    body.dark-mode select option {
+        background: #122035;
+        color: #e2e8f0;
+    }
+
+    body.dark-mode input:focus,
+    body.dark-mode select:focus,
+    body.dark-mode textarea:focus {
+        border-color: rgba(96, 165, 250, .78);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
+    }
+
+    body.dark-mode .dashboard-btn {
+        background: linear-gradient(135deg, #ffffff, #eef2f7) !important;
+        color: #0f172a !important;
+        border: 1px solid rgba(148, 163, 184, .45) !important;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, .2) !important;
+    }
+
+    body.dark-mode .dashboard-btn:hover {
+        background: linear-gradient(135deg, #ffffff, #f8fafc) !important;
+        color: #020617 !important;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, .26) !important;
+    }
+
+    body.dark-mode .save {
+        background: linear-gradient(135deg, #0f5fa6, #1e88e5);
+    }
+
+    body.dark-mode .view,
+    body.dark-mode .delete,
+    body.dark-mode .add-btn {
+        box-shadow: 0 10px 20px rgba(2, 6, 23, .34);
+    }
     </style>
 </head>
 

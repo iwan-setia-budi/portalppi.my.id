@@ -2122,10 +2122,10 @@ $pageTitle = 'PENYIMPANAN DATA';
         /* ── Page Footer (Drive only) ───────────────────── */
         .drive-page-footer {
             margin-top: 8px;
-            border: 1px solid #dbe7f5;
+            border: 1px solid rgba(110, 231, 183, 0.26);
             border-radius: 16px;
-            background: linear-gradient(135deg, #f8fbff, #ffffff 55%, #f0f7ff);
-            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+            background: linear-gradient(135deg, #08334f 0%, #0b5b8c 46%, #16a34a 100%);
+            box-shadow: 0 12px 28px rgba(8, 51, 79, 0.24), inset 0 0 14px rgba(255, 255, 255, 0.06);
             padding: 14px 16px;
             display: flex;
             align-items: center;
@@ -2141,7 +2141,7 @@ $pageTitle = 'PENYIMPANAN DATA';
         .drive-page-footer .footer-brand strong {
             display: block;
             font-size: 14px;
-            color: #0f172a;
+            color: #ffffff;
             letter-spacing: .01em;
             margin-bottom: 2px;
         }
@@ -2149,14 +2149,14 @@ $pageTitle = 'PENYIMPANAN DATA';
         .drive-page-footer .footer-brand span {
             display: block;
             font-size: 12px;
-            color: #64748b;
+            color: rgba(224, 242, 254, 0.9);
         }
 
         .drive-page-footer .footer-meta {
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            color: #475569;
+            color: #e2e8f0;
             font-size: 12px;
             font-weight: 600;
             flex-wrap: wrap;
@@ -2166,7 +2166,7 @@ $pageTitle = 'PENYIMPANAN DATA';
             width: 4px;
             height: 4px;
             border-radius: 50%;
-            background: #94a3b8;
+            background: rgba(191, 219, 254, 0.75);
             display: inline-block;
         }
 
@@ -2276,6 +2276,169 @@ $pageTitle = 'PENYIMPANAN DATA';
                 right: 0;
             }
         }
+    /* ===== DARK MODE: PREMIUM ===== */
+    body.dark-mode .drive-wrapper {
+        background: radial-gradient(circle at 8% -10%, rgba(59, 130, 246, .14), transparent 35%);
+    }
+
+    /* Hero tetap cerah-keren seperti mode terang */
+    body.dark-mode .hero {
+        background: linear-gradient(135deg, #08334f 0%, #0b5b8c 45%, #16a34a 100%);
+        border: 1.5px solid rgba(110, 231, 183, .22);
+        box-shadow: 0 20px 40px rgba(8, 51, 79, .36), inset 0 0 20px rgba(255, 255, 255, .04);
+        color: #fff;
+    }
+    body.dark-mode .hero p {
+        color: rgba(255, 255, 255, .92);
+    }
+    body.dark-mode .stat {
+        background: rgba(255, 255, 255, .14);
+        border-color: rgba(255, 255, 255, .22);
+        color: #fff;
+    }
+
+    /* Konten dark premium tanpa putih */
+    body.dark-mode .controls,
+    body.dark-mode .card,
+    body.dark-mode .toolbar,
+    body.dark-mode .grid,
+    body.dark-mode .preview-dialog,
+    body.dark-mode .context-menu,
+    body.dark-mode .item-menu {
+        background: linear-gradient(170deg, #16263b, #1b2d45);
+        border: 1.5px solid rgba(59, 130, 246, .32);
+        box-shadow: 0 14px 34px rgba(2, 6, 23, .36), inset 0 0 18px rgba(59, 130, 246, .08);
+        color: #e2e8f0;
+    }
+
+    body.dark-mode .card h3,
+    body.dark-mode .item-filetype,
+    body.dark-mode .name,
+    body.dark-mode .meta,
+    body.dark-mode .preview-title strong,
+    body.dark-mode .preview-title span,
+    body.dark-mode .upload-progress-text,
+    body.dark-mode .breadcrumb,
+    body.dark-mode .breadcrumb a {
+        color: #dbeafe;
+    }
+
+    body.dark-mode .item {
+        background: #142238;
+        border: 1.5px solid rgba(59, 130, 246, .28);
+        color: #e2e8f0;
+    }
+    body.dark-mode .item:hover {
+        box-shadow: 0 14px 30px rgba(59, 130, 246, .25);
+    }
+    body.dark-mode .item.selected {
+        background: linear-gradient(180deg, #1a2f49 0%, #203956 100%);
+        border-color: rgba(96, 165, 250, .75);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, .25), 0 14px 30px rgba(59, 130, 246, .26);
+    }
+
+    body.dark-mode .preview,
+    body.dark-mode .preview.folder-preview,
+    body.dark-mode .preview.file-preview,
+    body.dark-mode .preview-body {
+        background: linear-gradient(160deg, #13243a, #1a2f49);
+        border-color: rgba(96, 165, 250, .24);
+        color: #dbeafe;
+    }
+    body.dark-mode .preview-body iframe,
+    body.dark-mode .preview-body audio,
+    body.dark-mode .preview-body video,
+    body.dark-mode .preview-body img {
+        background: #0f1b2f;
+    }
+
+    body.dark-mode .drop-zone,
+    body.dark-mode .drop-root {
+        background: #13243a;
+        border-color: rgba(96, 165, 250, .5);
+        color: #bfdbfe;
+    }
+    body.dark-mode .drop-root.drag-over,
+    body.dark-mode .folder-drop.drag-over {
+        background: #1a3150;
+        border-color: rgba(125, 211, 252, .82);
+    }
+
+    body.dark-mode .view-toggle {
+        background: #112239;
+        border-color: rgba(96, 165, 250, .32);
+    }
+    body.dark-mode .view-btn {
+        color: #9fb2c9;
+    }
+    body.dark-mode .view-btn.active {
+        background: linear-gradient(135deg, #1565c0, #1e88e5);
+        color: #fff;
+    }
+
+    body.dark-mode .item-menu a,
+    body.dark-mode .item-menu button,
+    body.dark-mode .context-menu a,
+    body.dark-mode .context-menu button {
+        color: #dbeafe;
+    }
+    body.dark-mode .item-menu a:hover,
+    body.dark-mode .item-menu button:hover,
+    body.dark-mode .context-menu a:hover,
+    body.dark-mode .context-menu button:hover {
+        background: #223754;
+    }
+
+    body.dark-mode input,
+    body.dark-mode select,
+    body.dark-mode textarea,
+    body.dark-mode .input,
+    body.dark-mode .file-input,
+    body.dark-mode .sort-select,
+    body.dark-mode .search {
+        background: #122035;
+        color: #e2e8f0;
+        border: 1px solid rgba(59, 130, 246, .34);
+    }
+    body.dark-mode input::placeholder,
+    body.dark-mode textarea::placeholder,
+    body.dark-mode .input::placeholder {
+        color: #8fa8c5;
+    }
+    body.dark-mode input:focus,
+    body.dark-mode select:focus,
+    body.dark-mode textarea:focus,
+    body.dark-mode .input:focus,
+    body.dark-mode .file-input:focus {
+        border-color: rgba(96, 165, 250, .78);
+        box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
+    }
+
+    body.dark-mode #pickFolderBtn {
+        background: #132742 !important;
+        color: #dbeafe !important;
+        border-color: rgba(96, 165, 250, .36) !important;
+    }
+
+    body.dark-mode .toast {
+        background: #1a2a40;
+        border: 1px solid rgba(59, 130, 246, .3);
+        color: #e2e8f0;
+    }
+
+    body.dark-mode .drive-page-footer {
+        background: linear-gradient(135deg, #072741 0%, #0a4f7c 46%, #15803d 100%);
+        border-color: rgba(110, 231, 183, .24);
+        box-shadow: 0 14px 30px rgba(2, 6, 23, .4), inset 0 0 14px rgba(255, 255, 255, .05);
+    }
+    body.dark-mode .drive-page-footer .footer-brand strong,
+    body.dark-mode .drive-page-footer .footer-brand span,
+    body.dark-mode .drive-page-footer .footer-meta {
+        color: #e2e8f0;
+    }
+    body.dark-mode .drive-page-footer .dot {
+        background: rgba(191, 219, 254, .78);
+    }
     </style>
 </head>
 <body>

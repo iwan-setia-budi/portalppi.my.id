@@ -174,7 +174,7 @@ $pageTitle = "SURVEILANCE";
 
         /* LABEL */
         .form-group label {
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 600;
             margin-bottom: 6px;
             color: #334155;
@@ -455,8 +455,10 @@ $pageTitle = "SURVEILANCE";
         }
 
         body.dark-mode .dashboard-btn {
-            background: #1e293b;
-            color: #93c5fd;
+            background: linear-gradient(180deg, #ffffff, #dbeafe) !important;
+            color: #0f172a !important;
+            border: none !important;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, .22);
         }
 
         body.dark-mode table {

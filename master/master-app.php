@@ -324,6 +324,36 @@ $pageTitle = "Master Aplikasi";
                 padding: 16px 10px;
             }
         }
+    /* ===== DARK MODE: PREMIUM ===== */
+    body.dark-mode .container-supervise,
+    body.dark-mode .audit-wrapper,
+    body.dark-mode .audit-card,
+    body.dark-mode .internal-grid,
+    body.dark-mode .internal-card {
+        background: linear-gradient(170deg, #16263b, #1b2d45);
+        border: 1.5px solid rgba(59, 130, 246, .32);
+        box-shadow: 0 14px 34px rgba(2, 6, 23, .36), inset 0 0 18px rgba(59, 130, 246, .08);
+        color: #e2e8f0;
+    }
+    body.dark-mode .internal-icon {
+        background: rgba(59, 130, 246, .16);
+        border: 1px solid rgba(96, 165, 250, .35);
+        box-shadow: 0 10px 20px rgba(2, 6, 23, .28);
+    }
+    body.dark-mode .main-title,
+    body.dark-mode .audit-title,
+    body.dark-mode .audit-subtitle,
+    body.dark-mode .internal-card h4 {
+        color: #e2e8f0;
+    }
+
+    body.dark-mode .audit-title {
+        background: none !important;
+        background-clip: initial !important;
+        -webkit-background-clip: initial !important;
+        -webkit-text-fill-color: #e2e8f0 !important;
+        color: #e2e8f0 !important;
+    }
     </style>
 
 </head>

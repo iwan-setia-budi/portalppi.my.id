@@ -114,8 +114,8 @@ main {
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.05);
     margin: 10px auto;
-    width: calc(100% - 40px);
-    max-width: 1400px;
+    width: calc(100% - 24px);
+    max-width: none;
 }
 
 
@@ -145,9 +145,9 @@ main {
 }
 
 /* Tombol dashboard */
-.dashboard-btn {
-    background: #ffffff;
-    color: #1e3a8a;
+.container.struktur header .dashboard-btn {
+    background: linear-gradient(180deg, #ffffff, #eef2ff);
+    color: #0f172a;
     border: none;
     padding: 8px 15px;
     border-radius: 10px;
@@ -155,11 +155,12 @@ main {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.25s ease;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.18);
     
 }
 
-.dashboard-btn:hover {
-    background: #f1f5ff;
+.container.struktur header .dashboard-btn:hover {
+    background: linear-gradient(180deg, #ffffff, #dbeafe);
     transform: translateY(-2px);
     box-shadow: 0 6px 14px rgba(0,0,0,0.15);
 }
@@ -894,7 +895,139 @@ button.save:hover {
     }
 }
     
-  </style>
+        /* ===== DARK MODE: PREMIUM ===== */
+        body.dark-mode main {
+            background:
+                radial-gradient(circle at top, rgba(37, 99, 235, .12), transparent 38%),
+                linear-gradient(180deg, #09111d, #0f1b2d 45%, #0d1728 100%);
+        }
+        body.dark-mode .container.struktur {
+            background: linear-gradient(170deg, rgba(15, 27, 45, .96), rgba(21, 37, 60, .96));
+            border: 1.5px solid rgba(59, 130, 246, .34);
+            box-shadow: 0 18px 40px rgba(2, 6, 23, .42), inset 0 0 24px rgba(59, 130, 246, .08);
+            color: #e2e8f0;
+        }
+        body.dark-mode .container.struktur header {
+            box-shadow: 0 16px 34px rgba(30, 64, 175, .28);
+        }
+        body.dark-mode .container.struktur header .dashboard-btn {
+            background: linear-gradient(180deg, #ffffff, #dbeafe) !important;
+            color: #0f172a !important;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, .22) !important;
+        }
+        body.dark-mode .container.struktur header .dashboard-btn:hover {
+            background: linear-gradient(180deg, #ffffff, #eff6ff) !important;
+            color: #0f172a !important;
+        }
+        body.dark-mode .navbar,
+        body.dark-mode .jadwal {
+            background: transparent;
+            color: #e2e8f0;
+        }
+        body.dark-mode .navbar button {
+            background: linear-gradient(180deg, rgba(20, 34, 56, .96), rgba(16, 28, 46, .96));
+            border: 1px solid rgba(96, 165, 250, .22);
+            color: #dbeafe;
+            box-shadow: 0 8px 18px rgba(2, 6, 23, .2);
+        }
+        body.dark-mode .navbar button:hover {
+            background: linear-gradient(180deg, rgba(28, 45, 72, .98), rgba(20, 34, 56, .98));
+            border-color: rgba(96, 165, 250, .4);
+        }
+        body.dark-mode .navbar button.active {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            border-color: rgba(191, 219, 254, .3);
+            box-shadow: 0 12px 26px rgba(37, 99, 235, .32);
+        }
+        body.dark-mode .jadwal h2,
+        body.dark-mode .year-header h2,
+        body.dark-mode #yearTableWrapper h2,
+        body.dark-mode .month-box h4,
+        body.dark-mode .scroll-hint {
+            color: #e2e8f0;
+        }
+        body.dark-mode .jadwal form,
+        body.dark-mode #calendar,
+        body.dark-mode .month-box,
+        body.dark-mode .calendar-table,
+        body.dark-mode .jadwal table,
+        body.dark-mode #yearTableWrapper {
+            background: linear-gradient(180deg, rgba(20, 34, 56, .98), rgba(16, 28, 46, .98));
+            border: 1px solid rgba(96, 165, 250, .22);
+            box-shadow: 0 14px 30px rgba(2, 6, 23, .3), inset 0 0 18px rgba(59, 130, 246, .05);
+            color: #e2e8f0;
+        }
+        body.dark-mode .month-box table,
+        body.dark-mode table,
+        body.dark-mode .calendar {
+            background: transparent;
+            color: #e2e8f0;
+        }
+        body.dark-mode .jadwal th,
+        body.dark-mode .calendar-table th,
+        body.dark-mode .month-box th {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #eff6ff;
+            border-color: rgba(191, 219, 254, .16);
+        }
+        body.dark-mode .month-box th:first-child {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+        body.dark-mode .jadwal td,
+        body.dark-mode .calendar-table td,
+        body.dark-mode .month-box td {
+            background: rgba(15, 23, 42, .42);
+            color: #dbeafe;
+            border-color: rgba(96, 165, 250, .18);
+        }
+        body.dark-mode .jadwal tr:hover td,
+        body.dark-mode .calendar-table tr:hover td {
+            background: rgba(30, 41, 59, .82);
+        }
+        body.dark-mode .month-box td:first-child {
+            background: rgba(127, 29, 29, .2);
+        }
+        body.dark-mode .month-box td:first-child .date-number {
+            color: #fecaca;
+        }
+        body.dark-mode .month-box td .date-number {
+            color: #dbeafe;
+        }
+        body.dark-mode .month-box td.has-event .date-number {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            box-shadow: 0 8px 18px rgba(37, 99, 235, .34);
+        }
+        body.dark-mode .month-box td.has-event:first-child .date-number {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            box-shadow: 0 8px 18px rgba(220, 38, 38, .32);
+        }
+        body.dark-mode .month-box td.has-event:hover .date-number {
+            background: linear-gradient(135deg, #60a5fa, #2563eb);
+        }
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #122035;
+            color: #e2e8f0;
+            border: 1px solid rgba(59, 130, 246, .34);
+        }
+        body.dark-mode input::placeholder,
+        body.dark-mode textarea::placeholder {
+            color: #94a3b8;
+        }
+        body.dark-mode input:focus,
+        body.dark-mode select:focus,
+        body.dark-mode textarea:focus {
+            border-color: rgba(96, 165, 250, .78);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, .2);
+        }
+        body.dark-mode .edit-btn {
+            box-shadow: 0 8px 18px rgba(245, 158, 11, .22);
+        }
+        body.dark-mode .delete-btn {
+            box-shadow: 0 8px 18px rgba(239, 68, 68, .25);
+        }
+    </style>
 </head>
 <body>
 
