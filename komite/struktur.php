@@ -43,8 +43,13 @@ $pageTitle = "KOMITE PPI";
 
     <style>
         /* === HEADER STRUKTUR SESUAI BRAND === */
+        main {
+            padding: calc(var(--topbar-height) + 20px) 20px 24px;
+        }
+
         .container.struktur {
-            background: #ffffff;
+            background: var(--card);
+            color: var(--text);
             padding: 0px 30px 30px 30px;
             border-radius: 18px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
@@ -72,12 +77,18 @@ $pageTitle = "KOMITE PPI";
         }
 
         a.btn-dashboard {
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            color: white;
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            color: #0f172a;
             padding: 10px 18px;
-            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 999px;
             text-decoration: none;
             font-weight: 600;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+        }
+
+        a.btn-dashboard:hover {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
         }
 
         /*.org-chart{display:flex;flex-direction:column;align-items:center;max-width:900px;width:100%;}*/
@@ -96,23 +107,30 @@ $pageTitle = "KOMITE PPI";
 
         .box {
             background: var(--card);
-            box-shadow: var(--shadow);
+            color: var(--text);
+            box-shadow: var(--shadow-md);
             border-radius: var(--radius);
             padding: 16px;
             min-width: 260px;
             margin: 12px;
             text-align: center;
+            border: 1px solid rgba(148, 163, 184, 0.18);
         }
 
         .box h3 {
             margin: 0;
-            color: var(--primary);
+            color: #2563eb;
+        }
+
+        .box p,
+        .box .name {
+            color: var(--text);
         }
 
         .connector-vertical {
             width: 2px;
             height: 30px;
-            background: #ccc;
+            background: #cbd5e1;
         }
 
         .branch {
@@ -132,29 +150,32 @@ $pageTitle = "KOMITE PPI";
             left: 5%;
             right: 5%;
             height: 2px;
-            background: #d1d5db;
+            background: #cbd5e1;
         }
 
         .group {
             background: var(--card);
             border-radius: var(--radius);
-            box-shadow: var(--shadow);
+            color: var(--text);
+            box-shadow: var(--shadow-md);
             padding: 16px;
             width: 360px;
             text-align: left;
+            border: 1px solid rgba(148, 163, 184, 0.18);
         }
 
         .group h4 {
             text-align: center;
-            color: var(--secondary);
+            color: #2563eb;
         }
 
         .member {
-            background: #f9f9ff;
+            background: #f8fbff;
             border: 1px solid #e0e4ff;
             border-radius: 8px;
             padding: 8px;
             margin: 5px 0;
+            color: var(--text);
         }
 
         /*.add-btn{background:var(--secondary);color:white;border:none;border-radius:8px;padding:8px;margin-top:8px;cursor:pointer;width:100%;}*/
@@ -201,6 +222,32 @@ $pageTitle = "KOMITE PPI";
         }
 
         @media(max-width:900px) {
+            main {
+                padding: calc(var(--topbar-height) + 16px) 14px 18px;
+            }
+
+            .container.struktur {
+                padding: 0 16px 24px;
+                margin: 0 0 24px;
+            }
+
+            .container.struktur header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+                padding: 18px 18px;
+            }
+
+            .container.struktur header h1 {
+                font-size: 18px;
+                line-height: 1.35;
+            }
+
+            a.btn-dashboard {
+                width: 100%;
+                text-align: center;
+            }
+
             .branch {
                 flex-direction: column;
                 align-items: center;
@@ -213,9 +260,30 @@ $pageTitle = "KOMITE PPI";
             .group {
                 width: 90%;
             }
+
+            .box {
+                min-width: 0;
+                width: 100%;
+                margin: 10px 0;
+            }
         }
 
         /* === DARK MODE FIX: IPCLN & Penanggung Jawab === */
+        body.dark-mode .container.struktur {
+            border: 1px solid #1f2937;
+            box-shadow: 0 18px 42px rgba(2, 6, 23, 0.5);
+        }
+
+        body.dark-mode .container.struktur header {
+            box-shadow: 0 18px 38px rgba(2, 6, 23, 0.42);
+        }
+
+        body.dark-mode a.btn-dashboard {
+            background: linear-gradient(135deg, #e2e8f0, #f8fafc);
+            color: #0f172a;
+            border-color: rgba(148, 163, 184, 0.4);
+        }
+
         body.dark-mode .member {
             background: #1e293b;
             border-color: #334155;
@@ -233,6 +301,7 @@ $pageTitle = "KOMITE PPI";
 
         body.dark-mode .box {
             background: #111827;
+            border-color: #334155;
         }
 
         body.dark-mode .box h3 {
@@ -242,6 +311,15 @@ $pageTitle = "KOMITE PPI";
         body.dark-mode .box p,
         body.dark-mode .box .name {
             color: #e2e8f0;
+        }
+
+        body.dark-mode .connector-vertical,
+        body.dark-mode .branch::before {
+            background: #475569;
+        }
+
+        body.dark-mode .group .add-btn {
+            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.35);
         }
     </style>
 </head>

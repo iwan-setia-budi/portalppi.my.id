@@ -585,7 +585,7 @@ $pageTitle = "KOMITE PPI";
             .layout main {
                 width: 100% !important;
                 margin: 0 !important;
-                padding: 0 !important;
+                padding: calc(var(--topbar-height) + 6px) 0 0 0 !important;
             }
 
             .container.kalender {
@@ -905,6 +905,9 @@ $pageTitle = "KOMITE PPI";
             border: 1px solid #d1d5db;
             width: 220px;
             font-size: 14px;
+            background: #ffffff;
+            color: #0f172a;
+            appearance: none;
         }
 
         .filter-input:focus {
@@ -1066,8 +1069,9 @@ $pageTitle = "KOMITE PPI";
             color: #e2e8f0;
         }
 
-        body.dark-mode.kalender-page .filter-input::placeholder {
-            color: #94a3b8;
+        body.dark-mode.kalender-page .filter-input option {
+            background: #1e293b;
+            color: #e2e8f0;
         }
 
         body.dark-mode.kalender-page .calendar {
@@ -1280,10 +1284,7 @@ $pageTitle = "KOMITE PPI";
         }
     </style>
 
-
-
 </head>
-
 
 <body class="kalender-page">
 
@@ -1327,11 +1328,9 @@ $pageTitle = "KOMITE PPI";
                         </div>
 
                         <!--Filter Kategori -->
-                        <input
-                            type="text"
-                            id="filterKategori"
-                            class="filter-input"
-                            placeholder="🔎 Filter kategori...">
+                        <select id="filterKategori" class="filter-input" aria-label="Filter kategori">
+                            <option value="">🔎 Semua kategori bulan ini</option>
+                        </select>
 
                     </div>
 
@@ -1688,6 +1687,7 @@ $pageTitle = "KOMITE PPI";
             const cal = document.getElementById("calendar");
             const monthLabel = document.getElementById("monthLabel");
             const filteredTable = document.getElementById("filteredTable");
+            const filterKategoriEl = document.getElementById('filterKategori');
 
             let date = new Date();
             let activeFilter = '';
@@ -1800,6 +1800,45 @@ $pageTitle = "KOMITE PPI";
                 }
             }
 
+            function getMonthlyCategories(currentYear, currentMonth) {
+
+                const kategoriSet = new Set();
+                const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const isoDate = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                    events.forEach(e => {
+                        if (e.tanggal === isoDate || isRecurringMatch(e, isoDate)) {
+                            kategoriSet.add(e.nama_kegiatan);
+                        }
+                    });
+                }
+
+                return Array.from(kategoriSet).sort((a, b) => a.localeCompare(b, 'id'));
+            }
+
+            function renderMonthlyFilter(currentYear, currentMonth) {
+
+                const categories = getMonthlyCategories(currentYear, currentMonth);
+
+                filterKategoriEl.innerHTML = '<option value="">🔎 Semua kategori bulan ini</option>';
+
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.textContent = cat;
+                    filterKategoriEl.appendChild(opt);
+                });
+
+                if (activeFilter !== '' && !categories.includes(activeFilter)) {
+                    activeFilter = '';
+                }
+
+                filterKategoriEl.value = activeFilter;
+                filterKategoriEl.disabled = categories.length === 0;
+            }
+
             // ================= TAB SWITCH =================
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
@@ -1904,6 +1943,7 @@ $pageTitle = "KOMITE PPI";
                         month: 'long',
                         year: 'numeric'
                     });
+                renderMonthlyFilter(year, month);
                 renderLegend(year, month);
 
                 const firstDay = new Date(year, month, 1).getDay();
@@ -1969,7 +2009,7 @@ $pageTitle = "KOMITE PPI";
 
                             if (activeFilter === '') return true;
 
-                            return e.nama_kegiatan.toLowerCase().includes(activeFilter);
+                            return e.nama_kegiatan === activeFilter;
                         });
 
 
@@ -2029,7 +2069,7 @@ $pageTitle = "KOMITE PPI";
 
                     if (activeFilter === '') return true;
 
-                    return e.nama_kegiatan.toLowerCase().includes(activeFilter);
+                    return e.nama_kegiatan === activeFilter;
                 });
 
                 filteredTable.innerHTML = '';
@@ -2215,9 +2255,13 @@ $pageTitle = "KOMITE PPI";
             };
 
             // FILTER KATEGORI
-            document.getElementById('filterKategori').addEventListener('input', function() {
-                activeFilter = this.value.toLowerCase();
+            filterKategoriEl.addEventListener('change', function() {
+                activeFilter = this.value;
                 renderCalendar();
+
+                if (selectedDate) {
+                    highlightDate(selectedDate);
+                }
             });
 
 

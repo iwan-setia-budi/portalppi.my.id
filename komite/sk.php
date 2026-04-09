@@ -98,7 +98,8 @@ $pageTitle = "KOMITE PPI";
     <style>
         .container.sk {
             padding: 0 22px 30px 22px;
-            background: #ffffff;
+            background: var(--card);
+            color: var(--text);
             border-radius: 18px;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
             margin: 20px 0 40px 0;
@@ -151,8 +152,10 @@ $pageTitle = "KOMITE PPI";
 
         .search-box input {
             padding: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--line);
             border-radius: 8px;
+            background: var(--card);
+            color: var(--text);
             min-width: 240px;
         }
 
@@ -173,8 +176,9 @@ $pageTitle = "KOMITE PPI";
         th,
         td {
             padding: 12px 10px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid var(--line);
             text-align: left;
+            color: var(--text);
         }
 
         th {
@@ -185,7 +189,7 @@ $pageTitle = "KOMITE PPI";
         }
 
         tr:hover td {
-            background: #f9fafb;
+            background: var(--blue-soft);
         }
 
         .actions {
@@ -336,7 +340,8 @@ $pageTitle = "KOMITE PPI";
         }
 
         .popup-form {
-            background: white;
+            background: var(--card);
+            color: var(--text);
             border-radius: 12px;
             padding: 24px;
             width: 90%;
@@ -346,7 +351,7 @@ $pageTitle = "KOMITE PPI";
 
         .popup-form h2 {
             text-align: center;
-            color: var(--primary);
+            color: #1e3a8a;
             margin-top: 0;
         }
 
@@ -361,9 +366,50 @@ $pageTitle = "KOMITE PPI";
         input[type=file] {
             width: 100%;
             padding: 8px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--line);
+            background: var(--card);
+            color: var(--text);
             border-radius: 8px;
             margin-top: 4px;
+        }
+
+        body.dark-mode .container.sk {
+            border: 1px solid #1f2937;
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+        }
+
+        body.dark-mode .btn-white {
+            background: linear-gradient(135deg, #e2e8f0, #f8fafc);
+            color: #0f172a;
+            border-color: rgba(148, 163, 184, 0.55);
+            box-shadow: 0 6px 14px rgba(2, 6, 23, 0.22);
+        }
+
+        body.dark-mode .btn-white:hover {
+            background: linear-gradient(135deg, #f1f5f9, #ffffff);
+            color: #0b1220;
+        }
+
+        body.dark-mode .search-box input {
+            background: #0f172a;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .search-box input::placeholder {
+            color: #94a3b8;
+        }
+
+        body.dark-mode tr:hover td {
+            background: #1e293b;
+        }
+
+        body.dark-mode .overlay {
+            background: rgba(2, 6, 23, 0.68);
+        }
+
+        body.dark-mode .popup-form h2 {
+            color: #93c5fd;
         }
 
         button.full {
@@ -373,7 +419,7 @@ $pageTitle = "KOMITE PPI";
 
         @media(max-width:768px) {
             main {
-                padding: 16px;
+                padding: calc(var(--topbar-height) + 12px) 12px 16px;
             }
 
             .search-box {
@@ -427,7 +473,7 @@ $pageTitle = "KOMITE PPI";
             }
 
             tr {
-                background: white;
+                background: var(--card);
                 margin-bottom: 15px;
                 border-radius: 12px;
                 box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
@@ -449,7 +495,7 @@ $pageTitle = "KOMITE PPI";
                 top: 6px;
                 width: 100px;
                 font-weight: 600;
-                color: #374151;
+                color: var(--muted);
             }
 
             td:nth-child(1):before {

@@ -330,6 +330,138 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                 padding: 16px 10px;
             }
         }
+
+        /* =========================================
+   DARK MODE - PREMIUM
+========================================= */
+        body.dark-mode .container-supervise {
+            background: #0f1927;
+            box-shadow: 0 16px 36px rgba(2, 6, 23, 0.4);
+        }
+
+        body.dark-mode .audit-card {
+            background: #1a2a40;
+            border: 1.5px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 18px 38px rgba(2, 6, 23, 0.35), inset 0 0 20px rgba(59, 130, 246, 0.08);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .audit-card:hover {
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 28px 54px rgba(59, 130, 246, 0.2), inset 0 0 20px rgba(59, 130, 246, 0.12);
+        }
+
+        body.dark-mode .card-label {
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .dashboard-btn {
+            background: linear-gradient(135deg, #ffffff, #e5ebf3);
+            color: #0b1220;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        body.dark-mode .dashboard-btn:hover {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            color: #020617;
+        }
+
+        body.dark-mode .audit-wrapper {
+            background: linear-gradient(145deg, rgba(20, 35, 58, 0.6), rgba(17, 31, 51, 0.6));
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 24px 46px rgba(2, 6, 23, 0.4), inset 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark-mode .audit-title {
+            background: linear-gradient(to right, #60a5fa, #93c5fd);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        body.dark-mode .audit-subtitle {
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .main-title {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .audit-item {
+            background: #16253a;
+            border: 1.2px solid rgba(59, 130, 246, 0.35);
+            color: #e2e8f0;
+            transition: 0.25s ease;
+        }
+
+        body.dark-mode .audit-item:hover {
+            background: #1a2d45;
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25), inset 0 0 15px rgba(59, 130, 246, 0.08);
+            transform: translateX(6px);
+        }
+
+        body.dark-mode .audit-item .arrow {
+            color: #60a5fa;
+        }
+
+        body.dark-mode .audit-item:hover .arrow {
+            color: #93c5fd;
+        }
+
+        body.dark-mode .page-hero {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            box-shadow: 0 20px 50px rgba(37, 99, 235, 0.35);
+        }
+
+        body.dark-mode .hero-btn {
+            background: linear-gradient(135deg, #ffffff, #e5ebf3);
+            color: #0b1220;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        body.dark-mode .hero-btn:hover {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            color: #020617;
+        }
+
+        body.dark-mode .internal-grid {
+            gap: 18px;
+        }
+
+        body.dark-mode .internal-card {
+            background: linear-gradient(145deg, #1a2f48, #1e3a54);
+            border: 1.5px solid rgba(59, 130, 246, 0.4);
+            color: #e2e8f0;
+            box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15), inset 0 0 15px rgba(59, 130, 246, 0.08);
+            transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark-mode .internal-card:hover {
+            background: linear-gradient(145deg, #1f3d54, #2a4a6a);
+            border-color: rgba(59, 130, 246, 0.6);
+            box-shadow: 0 18px 40px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.12);
+        }
+
+        body.dark-mode .internal-icon {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.2), rgba(37, 99, 235, 0.15));
+            box-shadow: 0 10px 22px rgba(59, 130, 246, 0.25), inset 0 0 15px rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        body.dark-mode .internal-card h4 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .audit-list {
+            gap: 14px;
+        }
+
+        body.dark-mode .breadcrumb {
+            background: #16253a !important;
+            border-color: rgba(59, 130, 246, 0.25) !important;
+            color: #cbd5e1 !important;
+        }
     </style>
 
 </head>

@@ -193,6 +193,9 @@ $pageTitle = "KOMITE PPI";
         .container .table-container {
             overflow-x: auto;
             margin-top: 20px;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.72);
         }
 
         .container table {
@@ -201,6 +204,7 @@ $pageTitle = "KOMITE PPI";
             font-size: 14px;
             border-radius: 14px;
             overflow: hidden;
+            table-layout: fixed;
         }
 
         .container thead {
@@ -214,12 +218,33 @@ $pageTitle = "KOMITE PPI";
             padding: 10px 14px;
             /* sebelumnya 14px */
             font-size: 13px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.16);
         }
 
         .container tbody td {
             padding: 7px 14px;
             /* sebelumnya 14px */
             font-size: 14px;
+            text-align: left;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .container thead th+th,
+        .container tbody td+td {
+            border-left: 1px solid rgba(148, 163, 184, 0.14);
+        }
+
+        .container thead th:nth-child(1),
+        .container tbody td:nth-child(1),
+        .container thead th:nth-child(5),
+        .container tbody td:nth-child(5),
+        .container thead th:nth-child(6),
+        .container tbody td:nth-child(6),
+        .container thead th:nth-child(7),
+        .container tbody td:nth-child(7) {
+            text-align: center;
         }
 
         .container tbody tr {
@@ -239,7 +264,35 @@ $pageTitle = "KOMITE PPI";
         }
 
         .container .actions {
-            text-align: left;
+            text-align: center;
+        }
+
+        .container thead th:first-child,
+        .container tbody td:first-child {
+            width: 58px;
+            min-width: 58px;
+            white-space: nowrap;
+        }
+
+        .container thead th:nth-child(2),
+        .container tbody td:nth-child(2),
+        .container thead th:nth-child(3),
+        .container tbody td:nth-child(3),
+        .container thead th:nth-child(4),
+        .container tbody td:nth-child(4) {
+            width: 18%;
+        }
+
+        .container thead th:nth-child(5),
+        .container tbody td:nth-child(5) {
+            width: 16%;
+        }
+
+        .container thead th:nth-child(6),
+        .container tbody td:nth-child(6),
+        .container thead th:nth-child(7),
+        .container tbody td:nth-child(7) {
+            width: 12%;
         }
 
         /* ================= OVERLAY POPUP ================= */
@@ -389,6 +442,10 @@ $pageTitle = "KOMITE PPI";
                 width: 100%;
             }
 
+            .container table {
+                table-layout: auto;
+            }
+
             .container thead {
                 display: none;
             }
@@ -415,33 +472,79 @@ $pageTitle = "KOMITE PPI";
 
 
             .container tbody td {
-                display: flex;
-                gap: 12px;
-                /* jarak antara label dan value */
-                align-items: flex-start;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                column-gap: 10px;
+                align-items: start;
                 border: none;
-                padding: 6px 0;
+                padding: 7px 0;
                 font-size: 14px;
+                text-align: left !important;
+                width: 100% !important;
+                min-width: 0 !important;
             }
 
             .container tbody td::before {
                 content: attr(data-label);
                 font-weight: 600;
                 color: var(--blue-1);
-                flex: 0 0 45%;
+                line-height: 1.35;
+                text-align: left;
             }
 
             .container tbody td.actions {
-                display: flex;
-                gap: 12px;
-                align-items: flex-start;
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+                gap: 8px 10px;
                 margin-top: 8px;
+                text-align: left !important;
+            }
+
+            .container tbody td.actions a,
+            .container tbody td[data-label='File'] a {
+                width: auto;
+                min-width: 96px;
+                justify-self: start;
+            }
+
+            .container thead th:nth-child(1),
+            .container tbody td:nth-child(1),
+            .container thead th:nth-child(5),
+            .container tbody td:nth-child(5),
+            .container thead th:nth-child(6),
+            .container tbody td:nth-child(6),
+            .container thead th:nth-child(7),
+            .container tbody td:nth-child(7) {
+                text-align: left !important;
             }
 
             .container .btn-hapus,
-            .container .btn-dashboard {
+            .container header .btn-dashboard {
                 width: 100%;
 
+            }
+
+            .container tbody td[data-label='File'] .btn-dashboard,
+            .container tbody td.actions .btn-hapus {
+                width: auto;
+            }
+
+            .container thead th:first-child,
+            .container tbody td:first-child,
+            .container thead th:nth-child(2),
+            .container tbody td:nth-child(2),
+            .container thead th:nth-child(3),
+            .container tbody td:nth-child(3),
+            .container thead th:nth-child(4),
+            .container tbody td:nth-child(4),
+            .container thead th:nth-child(5),
+            .container tbody td:nth-child(5),
+            .container thead th:nth-child(6),
+            .container tbody td:nth-child(6),
+            .container thead th:nth-child(7),
+            .container tbody td:nth-child(7) {
+                width: 100% !important;
+                min-width: 0 !important;
             }
 
             .popup-form {
@@ -503,6 +606,16 @@ $pageTitle = "KOMITE PPI";
             box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
         }
 
+        body.dark-mode.program-page .container .table-container {
+            background: rgba(15, 23, 42, 0.72);
+            border-color: #334155;
+            box-shadow: inset 0 0 0 1px rgba(51, 65, 85, 0.35);
+        }
+
+        body.dark-mode.program-page .container thead th {
+            border-bottom-color: rgba(191, 219, 254, 0.18);
+        }
+
         body.dark-mode.program-page .container tbody tr {
             background: #111827;
         }
@@ -513,7 +626,12 @@ $pageTitle = "KOMITE PPI";
 
         body.dark-mode.program-page .container tbody td {
             color: #e2e8f0;
-            border-color: #1e293b;
+            border-bottom-color: #334155;
+        }
+
+        body.dark-mode.program-page .container thead th+th,
+        body.dark-mode.program-page .container tbody td+td {
+            border-left-color: #334155;
         }
 
         body.dark-mode.program-page .container tbody td::before {

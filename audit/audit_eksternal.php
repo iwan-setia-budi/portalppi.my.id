@@ -37,14 +37,12 @@ $pageTitle = "Audit External";
         main {
             background: #f6f8fc;
             margin: 0;
-            padding: 0;
+            padding: calc(var(--topbar-height) + 20px) 0 0 0;
         }
 
         .main-content {
             padding: 0px 25px 15px 25px;
         }
-
-        1
 
         /* WRAPPER PUSAT */
         .audit-container {
@@ -157,6 +155,70 @@ $pageTitle = "Audit External";
                 padding: 15px;
             }
         }
+
+        /* ================================
+   DARK MODE - PREMIUM
+================================ */
+        body.dark-mode main {
+            background: #0f1927;
+        }
+
+        body.dark-mode .main-content {
+            background: #0f1927;
+        }
+
+        body.dark-mode .audit-container {
+            background: #0f1927;
+        }
+
+        body.dark-mode .title {
+            color: #60a5fa;
+            text-shadow: 0 0 20px rgba(96, 165, 250, 0.3);
+        }
+
+        body.dark-mode .subtitle {
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .breadcrumb {
+            color: #cbd5e1;
+            background: #16253a !important;
+            border-color: rgba(59, 130, 246, 0.25) !important;
+        }
+
+        body.dark-mode .audit-grid {
+            gap: 24px;
+        }
+
+        body.dark-mode .audit-card {
+            background: linear-gradient(145deg, #1a2f48, #1e3a54);
+            border: 1.5px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 6px 18px rgba(59, 130, 246, 0.15), inset 0 0 15px rgba(59, 130, 246, 0.08);
+            color: #e2e8f0;
+            transition: 0.25s ease;
+        }
+
+        body.dark-mode .audit-card:hover {
+            background: linear-gradient(145deg, #1f3d54, #2a4a6a);
+            border-color: rgba(59, 130, 246, 0.6);
+            transform: translateY(-6px);
+            box-shadow: 0 10px 28px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.12);
+        }
+
+        body.dark-mode .icon-audit {
+            background: linear-gradient(135deg, rgba(30, 64, 175, 0.2), rgba(37, 99, 235, 0.15));
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 18px rgba(59, 130, 246, 0.2), inset 0 0 15px rgba(59, 130, 246, 0.1);
+            color: #93c5fd;
+        }
+
+        body.dark-mode .audit-card h3 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .audit-card p {
+            color: #9fb2c9;
+        }
     </style>
 
 </head>
@@ -175,10 +237,6 @@ $pageTitle = "Audit External";
             <?php include_once '../topbar.php'; ?>
 
             <div class="main-content">
-
-                <div class="breadcrumb">
-                    <?php include_once '../breadcrumb.php'; ?>
-                </div>
 
                 <div class="audit-container">
 

@@ -4,6 +4,7 @@ include_once '../koneksi.php';
 include "../cek_akses.php";
 $conn = $koneksi;
 $csrfToken = csrf_token();
+$pageTitle = "KOMITE PPI";
 $targetDir = __DIR__ . '/../uploads/umanf';
 $allowedUploadMap = [
     'pdf' => ['application/pdf', 'application/x-pdf'],
@@ -251,6 +252,8 @@ foreach ($allRows as $r) {
     if (!empty($r['file_foto'])) { $arr = json_decode($r['file_foto'],true); $totalFoto += count($arr); }
 }
 ?>
+
+
 <!DOCTYPE html>
 <html lang="id">
 
@@ -431,11 +434,18 @@ foreach ($allRows as $r) {
 
         /* Back btn in hero */
         .btn-back {
-            background: rgba(255,255,255,.15);
-            color: white; border: 1px solid rgba(255,255,255,.25);
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            color: #0f172a;
+            border: 1px solid rgba(148,163,184,.5);
+            box-shadow: 0 10px 22px rgba(15,23,42,.24);
             backdrop-filter: blur(6px);
         }
-        .btn-back:hover { background: rgba(255,255,255,.25); }
+        .btn-back:hover {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9);
+            color: #020617;
+            transform: translateY(-2px);
+            box-shadow: 0 14px 30px rgba(15,23,42,.28);
+        }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
@@ -534,6 +544,147 @@ foreach ($allRows as $r) {
             display: flex; gap: 10px; justify-content: flex-end;
         }
 
+        /* ===== DARK MODE (SOFT) ===== */
+        body.dark-mode main {
+            background: linear-gradient(180deg, #0c1a2d 0%, #0f1f35 100%);
+        }
+
+        body.dark-mode .umanf-wrap {
+            background: linear-gradient(180deg, rgba(20, 35, 58, 0.72), rgba(17, 31, 51, 0.7));
+            border: 1.5px solid rgba(59, 130, 246, 0.5);
+            border-radius: 20px;
+            box-shadow: 0 14px 34px rgba(2, 6, 23, 0.35), inset 0 0 20px rgba(59, 130, 246, 0.12);
+        }
+
+        body.dark-mode .stat-card,
+        body.dark-mode .meeting-card,
+        body.dark-mode .empty-state {
+            background: #1b2a40;
+            border: 1.5px solid rgba(59, 130, 246, 0.45);
+            box-shadow: 0 10px 26px rgba(2, 6, 23, 0.32), inset 0 0 15px rgba(59, 130, 246, 0.08);
+        }
+
+        body.dark-mode .stat-val,
+        body.dark-mode .mc-title,
+        body.dark-mode .empty-state h4 {
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .stat-lbl,
+        body.dark-mode .mc-num,
+        body.dark-mode .empty-state p {
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .search-wrap input {
+            background: #1a2a3f;
+            border: 1.2px solid rgba(59, 130, 246, 0.4);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .search-wrap input::placeholder {
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .search-wrap input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+        }
+
+        body.dark-mode .mc-actions {
+            border-top-color: #2f435c;
+        }
+
+        body.dark-mode .btn-ghost {
+            background: #24364e;
+            color: #cbd5e1;
+            border: 1px solid #38506b;
+        }
+
+        body.dark-mode .btn-ghost:hover {
+            background: #2a3f5b;
+        }
+
+        body.dark-mode .umanf-hero .btn-back {
+            background: linear-gradient(135deg, #ffffff, #e5ebf3) !important;
+            color: #0b1220 !important;
+            border-color: rgba(148,163,184,.55) !important;
+            box-shadow: 0 10px 22px rgba(15,23,42,.22) !important;
+        }
+
+        body.dark-mode .umanf-hero .btn-back:hover {
+            background: linear-gradient(135deg, #ffffff, #f1f5f9) !important;
+            color: #020617 !important;
+        }
+
+        body.dark-mode .badge-no {
+            background: #22344c;
+            color: #b6c7da;
+            border: 1px solid rgba(107, 114, 128, 0.5);
+        }
+
+        body.dark-mode .badge-ok {
+            background: #1e3a2f;
+            color: #86efac;
+            border: 1px solid rgba(34, 197, 94, 0.4);
+        }
+
+        body.dark-mode .badge-foto {
+            background: #1f3653;
+            color: #93c5fd;
+            border: 1.2px solid rgba(59, 130, 246, 0.5);
+        }
+
+        body.dark-mode .modal-box {
+            background: #1b2a40;
+            border: 1.5px solid rgba(59, 130, 246, 0.4);
+            box-shadow: 0 28px 60px rgba(2, 6, 23, 0.52), inset 0 0 20px rgba(59, 130, 246, 0.1);
+        }
+
+        body.dark-mode .form-group label,
+        body.dark-mode .upload-lbl {
+            color: #dbe6f2;
+        }
+
+        body.dark-mode .upload-hint {
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .form-group input[type="text"] {
+            background: #16253a;
+            border: 1.2px solid rgba(59, 130, 246, 0.35);
+            color: #e2e8f0;
+        }
+
+        body.dark-mode .form-group input[type="text"]:focus {
+            background: #1a2d45;
+            border: 1.2px solid rgba(96, 165, 250, 0.7);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25), inset 0 0 10px rgba(96, 165, 250, 0.1);
+        }
+
+        body.dark-mode .upload-field {
+            background: #16253a;
+            border: 1.2px solid rgba(59, 130, 246, 0.35);
+        }
+
+        body.dark-mode .upload-field:hover {
+            background: #1b2f48;
+            border: 1.2px solid rgba(59, 130, 246, 0.5);
+        }
+
+        body.dark-mode .upload-field.has-file {
+            background: #1a3a31;
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        body.dark-mode .upload-thumb {
+            background: #1f3653;
+        }
+
+        body.dark-mode .modal-footer {
+            border-top-color: #2f435c;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .umanf-wrap { padding: 14px 15px; gap: 16px; }
@@ -553,6 +704,7 @@ foreach ($allRows as $r) {
 </head>
 
 <body>
+
 <?php if (isset($_GET['success'])): ?>
     <script>
         alert('✅ Data berhasil disimpan');

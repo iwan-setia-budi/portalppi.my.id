@@ -269,6 +269,82 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
         .btn-back:hover { background:rgba(255,255,255,.25); }
         .btn-sm { padding:7px 13px; font-size:12px; }
 
+        /* ===== DARK MODE (DESKTOP + GLOBAL) ===== */
+        body.dark-mode main {
+            background: radial-gradient(circle at 15% -10%, rgba(30, 64, 175, 0.2), transparent 42%), #0b1220;
+        }
+        body.dark-mode .view-wrap {
+            background: linear-gradient(180deg, rgba(11, 18, 32, 0.2), rgba(11, 18, 32, 0));
+        }
+        body.dark-mode .view-hero {
+            background: linear-gradient(140deg, #0a2540 0%, #1a3f7a 50%, #1d5fa8 100%);
+            border: 1.5px solid rgba(96, 165, 250, 0.35);
+            box-shadow: 0 18px 44px rgba(2, 6, 23, 0.5), inset 0 0 22px rgba(59, 130, 246, 0.14);
+        }
+        body.dark-mode .hero-icon {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(191, 219, 254, 0.45);
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.32);
+        }
+
+        body.dark-mode .sum-card {
+            background: linear-gradient(165deg, #17263b, #1b2d45);
+            border: 1.5px solid rgba(59, 130, 246, 0.42);
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.35), inset 0 0 14px rgba(59, 130, 246, 0.08);
+        }
+        body.dark-mode .sum-val { color: #e2e8f0; }
+        body.dark-mode .sum-lbl { color: #9fb2c9; }
+        body.dark-mode .sum-icon.blue  { background: rgba(59, 130, 246, 0.16); }
+        body.dark-mode .sum-icon.green { background: rgba(34, 197, 94, 0.14); }
+        body.dark-mode .sum-icon.amber { background: rgba(251, 191, 36, 0.14); }
+
+        body.dark-mode .tab-bar {
+            background: #16263b;
+            border: 1.5px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 8px 22px rgba(2, 6, 23, 0.34);
+        }
+        body.dark-mode .tab-btn { color: #9fb2c9; }
+        body.dark-mode .tab-btn:hover {
+            background: #21354f;
+            color: #e2e8f0;
+        }
+        body.dark-mode .tab-btn.active {
+            background: linear-gradient(135deg, #1565c0, #1e88e5);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(30, 136, 229, 0.42);
+        }
+        body.dark-mode .tab-btn:not(.active) .tab-badge {
+            background: #2a3d59;
+            color: #9fb2c9;
+        }
+
+        body.dark-mode .doc-card {
+            background: linear-gradient(165deg, #17263b, #1b2d45);
+            border: 1.5px solid rgba(59, 130, 246, 0.36);
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.36), inset 0 0 16px rgba(59, 130, 246, 0.08);
+        }
+        body.dark-mode .doc-card-header {
+            border-bottom-color: rgba(96, 165, 250, 0.2);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+        }
+        body.dark-mode .doc-card-title h4 { color: #e2e8f0; }
+        body.dark-mode #tabFoto .doc-card-header span { color: #9fb2c9 !important; }
+
+        body.dark-mode .file-frame {
+            background: #101b2d;
+            box-shadow: 0 8px 24px rgba(2, 6, 23, 0.42), inset 0 0 0 1px rgba(59, 130, 246, 0.28);
+        }
+        body.dark-mode .file-img {
+            box-shadow: 0 8px 24px rgba(2, 6, 23, 0.42), 0 0 0 1px rgba(59, 130, 246, 0.24);
+        }
+        body.dark-mode .no-file { color: #7f93aa; }
+        body.dark-mode .photo-item {
+            box-shadow: 0 8px 20px rgba(2, 6, 23, 0.4), 0 0 0 1.5px rgba(59, 130, 246, 0.3);
+        }
+        body.dark-mode .photo-item:hover {
+            box-shadow: 0 14px 30px rgba(59, 130, 246, 0.28), 0 0 0 2px rgba(59, 130, 246, 0.54);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media(max-width:900px){
             .view-wrap { padding:14px 15px; }
@@ -277,9 +353,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
             .file-frame { height: 62vh; min-height: 320px; }
         }
         @media(max-width:768px){
-            .layout {
-                display: block;
-            }
+            .layout { display: block; }
             .sidebar {
                 position: fixed;
                 top: 0;
@@ -291,34 +365,74 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                 transform: none;
             }
             .sidebar.open,
-            .sidebar.show {
-                left: 0;
-            }
+            .sidebar.show { left: 0; }
+
             main {
                 width: 100%;
                 margin-left: 0 !important;
                 padding-left: 0 !important;
+                padding-top: calc(var(--topbar-height)) !important;
                 min-width: 0;
             }
 
-            .view-wrap { padding:12px; gap:14px; }
-            .view-hero { padding:18px 16px; border-radius:16px; }
-            .hero-left { gap:12px; }
-            .hero-icon { width:44px; height:44px; border-radius:12px; font-size:20px; }
-            .hero-label { font-size:10px; }
-            .hero-title { font-size:16px; line-height:1.35; word-break:break-word; }
+            .view-wrap { padding: 14px 12px; gap: 14px; }
+            .view-hero {
+                padding: 20px 18px;
+                border-radius: 20px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .hero-left { gap: 14px; width: 100%; }
+            .hero-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 14px;
+                font-size: 22px;
+            }
+            .hero-label { font-size: 10.5px; letter-spacing: .6px; opacity: .8; }
+            .hero-title { font-size: 17px; line-height: 1.35; word-break: break-word; }
+            .hero-actions {
+                width: 100%;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+            .hero-actions .btn {
+                justify-content: center;
+                padding: 10px 12px;
+                font-size: 12.5px;
+                border-radius: 12px;
+            }
 
-            .summary-row { grid-template-columns:1fr; gap:10px; }
-            .sum-card { padding:14px 14px; border-radius:12px; }
-            .sum-icon { width:38px; height:38px; font-size:16px; border-radius:10px; }
-            .sum-val { font-size:20px; }
+            .summary-row {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+            .sum-card {
+                padding: 14px 10px;
+                border-radius: 16px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 8px;
+            }
+            .sum-icon {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                border-radius: 11px;
+            }
+            .sum-val { font-size: 22px; }
+            .sum-lbl { font-size: 10px; line-height: 1.3; }
 
             .tab-bar {
                 display: grid;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-                gap: 8px;
-                padding: 6px;
-                border-radius: 12px;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 7px;
+                padding: 7px;
+                border-radius: 16px;
                 overflow: visible;
                 white-space: normal;
             }
@@ -329,55 +443,66 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                 text-align: center;
                 white-space: normal;
                 flex: unset;
-                padding: 9px 8px;
+                padding: 10px 6px;
                 font-size: 11px;
-                border-radius: 9px;
-                gap: 4px;
-                line-height: 1.2;
+                border-radius: 10px;
+                gap: 3px;
+                line-height: 1.25;
+                flex-direction: column;
+                align-items: center;
             }
-            .tab-badge { font-size:10px; padding:2px 5px; }
+            .tab-btn:last-child:nth-child(3n+1) { grid-column: 1 / -1; }
+            .tab-badge {
+                font-size: 10px;
+                padding: 2px 6px;
+                border-radius: 20px;
+                margin-top: 2px;
+            }
 
-            .doc-card { border-radius:14px; }
+            .doc-card { border-radius: 16px; }
             .doc-card-header {
-                padding:14px;
-                flex-direction:column;
-                align-items:flex-start;
+                padding: 14px 16px;
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
             }
-            .doc-card-body { padding:14px; }
-            .doc-card-title .dci { font-size:18px; }
-            .doc-card-title h4 { font-size:14px; }
+            .doc-card-body { padding: 14px 16px; }
+            .doc-card-title .dci { font-size: 18px; }
+            .doc-card-title h4 { font-size: 14px; }
 
-            .btn { padding:8px 12px; font-size:12px; }
-            .btn-sm { padding:7px 11px; font-size:11px; }
-
-            .file-frame { height:55vh; min-height:280px; }
-            .file-img { max-height:65vh; }
+            .btn { padding: 8px 12px; font-size: 12px; }
+            .btn-sm { padding: 7px 11px; font-size: 11px; }
+            .file-frame { height: 55vh; min-height: 280px; }
+            .file-img { max-height: 65vh; }
             .desktop-only { display: none; }
-            .pdf-mobile-action { display: block; }
+            .pdf-mobile-action {
+                display: flex;
+                justify-content: flex-end;
+                margin-bottom: 10px;
+            }
 
-            .photo-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); gap:10px; }
+            .photo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+            .photo-item { border-radius: 12px; }
         }
-        @media(max-width:600px){
-            .view-hero { flex-direction:column; align-items:flex-start; gap:14px; }
-            .hero-actions { width:100%; }
-            .hero-actions .btn { flex:1; justify-content:center; }
-            .summary-row { grid-template-columns:1fr; }
-            .hero-actions { display:grid; grid-template-columns:1fr; gap:8px; }
-            .hero-actions .btn { width:100%; }
-            .photo-grid { grid-template-columns:repeat(2,1fr); }
-            .file-frame { height:52vh; min-height:240px; }
-            .file-img { max-height:60vh; }
+
+        @media(max-width:480px){
+            .summary-row { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+            .sum-card { padding: 12px 6px; border-radius: 14px; }
+            .sum-val { font-size: 20px; }
+            .sum-lbl { font-size: 9.5px; }
+            .sum-icon { width: 36px; height: 36px; font-size: 16px; }
+            .tab-bar { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; padding: 6px; }
+            .tab-btn { padding: 9px 4px; font-size: 10.5px; }
+            .view-hero { padding: 16px 14px; }
+            .hero-title { font-size: 15px; }
         }
-        @media(max-width:420px){
-            .view-wrap { padding:10px; }
-            .view-hero { padding:14px; }
-            .hero-title { font-size:15px; }
-            .sum-card { padding:12px; }
-            .tab-bar { grid-template-columns: 1fr; }
-            .tab-btn { padding:7px 10px; font-size:11px; }
-            .doc-card-header, .doc-card-body { padding:12px; }
-            .photo-grid { grid-template-columns:1fr; }
-            .file-frame { min-height:220px; }
+
+        @media(max-width:360px){
+            .view-wrap { padding: 10px 9px; }
+            .tab-btn { padding: 8px 3px; font-size: 10px; }
+            .doc-card-header,
+            .doc-card-body { padding: 10px 12px; }
+            .photo-grid { grid-template-columns: 1fr 1fr; }
         }
     </style>
 </head>
@@ -386,9 +511,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
     <?php include_once '../sidebar.php'; ?>
     <main>
         <?php include_once '../topbar.php'; ?>
-
         <div class="view-wrap">
-
             <!-- HERO -->
             <div class="view-hero">
                 <div class="hero-left">
@@ -403,7 +526,6 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                     <a href="umanf.php" class="btn btn-back">← Kembali</a>
                 </div>
             </div>
-
             <!-- SUMMARY -->
             <div class="summary-row">
                 <div class="sum-card">
@@ -419,7 +541,6 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                     <div><div class="sum-val"><?= 4 - $availCount ?></div><div class="sum-lbl">Dokumen Belum Ada</div></div>
                 </div>
             </div>
-
             <!-- TABS -->
             <div class="tab-bar" id="tabBar">
                 <?php foreach ($docSections as $i => [$key,$icon,$label]):
@@ -435,7 +556,6 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                     <span class="tab-badge"><?= $jumlahFoto ?></span>
                 </button>
             </div>
-
             <!-- TAB PANELS -->
             <?php foreach ($docSections as $i => [$key,$icon,$label]): ?>
             <div class="tab-panel <?= $i===0?'active':'' ?>" id="tab<?= $i ?>">
