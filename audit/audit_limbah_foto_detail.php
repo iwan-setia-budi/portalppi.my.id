@@ -14,7 +14,7 @@ $ket     = mysqli_real_escape_string($koneksi, $_GET['ket']);
 
 $fotos = mysqli_query($koneksi, "
     SELECT id, foto 
-    FROM tb_audit_laundry_foto
+    FROM tb_audit_limbah_foto
     WHERE tanggal='$tanggal'
     AND keterangan='$ket'
     ORDER BY id DESC
@@ -24,7 +24,7 @@ $fotos = mysqli_query($koneksi, "
 
 <!--Tulisan di topbar otomatis-->
 <?php
-$pageTitle = "LIHAT FOTO AUDIT LAUNDRY";
+$pageTitle = "LIHAT FOTO AUDIT LIMBAH";
 ?>
 <!--end-->
 
@@ -232,7 +232,7 @@ $pageTitle = "LIHAT FOTO AUDIT LAUNDRY";
 
                     <div class="foto-header">
                         <div class="foto-title">
-                            <h2>Detail Foto Audit Laundry</h2>
+                            <h2>Detail Foto Audit Limbah</h2>
                             <div class="foto-meta">
                                 Tanggal: <b>
                                     <?= htmlspecialchars($tanggal) ?>
@@ -243,7 +243,7 @@ $pageTitle = "LIHAT FOTO AUDIT LAUNDRY";
                             </div>
                         </div>
 
-                        <a href="audit_laundry.php?tab=foto" class="btn-back">← Kembali</a>
+                        <a href="audit_limbah.php?tab=foto" class="btn-back">← Kembali</a>
 
                     </div>
 
@@ -251,8 +251,8 @@ $pageTitle = "LIHAT FOTO AUDIT LAUNDRY";
                     <div class="foto-grid">
                         <?php while($f = mysqli_fetch_assoc($fotos)): ?>
                         <div class="foto-card">
-                            <a href="../uploads/audit_laundry/<?= $f['foto'] ?>" target="_blank">
-                                <img src="../uploads/audit_laundry/<?= $f['foto'] ?>" alt="Foto Audit">
+                            <a href="../uploads/audit_limbah/<?= $f['foto'] ?>" target="_blank">
+                                <img src="../uploads/audit_limbah/<?= $f['foto'] ?>" alt="Foto Audit">
                             </a>
                         </div>
                         <?php endwhile; ?>
@@ -281,4 +281,3 @@ $pageTitle = "LIHAT FOTO AUDIT LAUNDRY";
 </body>
 
 </html>
-

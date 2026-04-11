@@ -187,7 +187,7 @@ if (isset($_POST['simpan_foto'])) {
 
 <!--Tulisan di topbar otomatis-->
 <?php
-$pageTitle = "Audit External";
+$pageTitle = "Audit Laundry";
 ?>
 <!--end-->
 
@@ -198,7 +198,7 @@ $pageTitle = "Audit External";
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=3.0" />
-    <title>Audit Loundry</title>
+    <title>Audit Laundry</title>
 
     <!-- === Link CSS eksternal === -->
     <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
@@ -211,8 +211,7 @@ $pageTitle = "Audit External";
             --bg: #f7f9fc;
             --border: #d6e0f2;
             margin-left: 0px;
-            /* lebar sidebar */
-            padding: 0px;
+            padding: 16px;
             width: 100%;
         }
 
@@ -225,16 +224,12 @@ $pageTitle = "Audit External";
 
         .wrapper {
             width: 100%;
-            max-width: 100%;
-            /* HAPUS batas 1100px */
-            margin: 0;
-            /* jangan center */
+            max-width: 1380px;
+            margin: 0 auto 24px;
             background: var(--card);
-            border-radius: 0;
-            /* opsional biar full modern */
-            padding: 20px;
-            box-shadow: none;
-            /* opsional */
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 14px 40px rgba(43, 96, 211, 0.08);
         }
 
         @media print {
@@ -248,8 +243,10 @@ $pageTitle = "Audit External";
         .header-row {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+            gap: 18px;
+            margin-bottom: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e7eefb;
         }
 
         #logo {
@@ -262,34 +259,43 @@ $pageTitle = "Audit External";
 
         .title-wrap {
             flex: 1;
-            text-align: center;
+            text-align: left;
         }
 
         h1 {
             margin: 0;
-            font-size: 20px;
+            font-size: clamp(20px, 2vw, 28px);
             color: var(--audit-brand);
             font-weight: 700;
+            line-height: 1.2;
         }
 
         .meta {
             font-size: 13px;
             color: var(--muted);
+            margin-top: 6px;
         }
 
         .tabbar {
             display: flex;
             gap: 8px;
             margin: 14px 0 12px;
+            flex-wrap: wrap;
         }
 
         .tab {
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 10px 16px;
+            border-radius: 12px;
             background: #eaf0ff;
-            border: 0;
+            border: 1px solid #d8e4fb;
             cursor: pointer;
             font-weight: 600;
+            min-width: 120px;
+            transition: .2s ease;
+        }
+
+        .tab:hover {
+            background: #dfe9ff;
         }
 
         .tab.active {
@@ -303,21 +309,42 @@ $pageTitle = "Audit External";
             align-items: center;
             margin-bottom: 12px;
             flex-wrap: wrap;
+            padding: 14px 16px;
+            background: linear-gradient(180deg, #f8fbff 0%, #f2f7ff 100%);
+            border: 1px solid #dce6f7;
+            border-radius: 14px;
+        }
+
+        .controls label {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            color: #18314f;
+        }
+
+        .controls input[type="date"] {
+            min-height: 42px;
+            padding: 8px 12px;
+            border: 1px solid #ccd9f5;
+            border-radius: 10px;
+            background: #fff;
         }
 
         .table-wrap {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 14px;
             background: #fff;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
         }
 
-        /* ===== PAKSA TABEL FULL WIDTH ===== */
-
-        .wrapper {
-            width: 100% !important;
-            max-width: 100% !important;
+        .table-hint {
+            display: none;
+            margin: 0 0 10px;
+            font-size: 12px;
+            color: var(--muted);
         }
 
         .table-wrap {
@@ -332,8 +359,43 @@ $pageTitle = "Audit External";
 
         /* FORM TAB saja yang bisa scroll horizontal */
         #formTab .table-wrap table {
-            min-width: 900px;
+            min-width: 760px;
             width: max-content;
+        }
+
+        #auditTable th:nth-child(1),
+        #auditTable td:nth-child(1) {
+            width: 52px;
+            min-width: 52px;
+        }
+
+        #auditTable th:nth-child(2),
+        #auditTable td:nth-child(2) {
+            min-width: 360px;
+        }
+
+        #auditTable th:nth-child(3),
+        #auditTable th:nth-child(4),
+        #auditTable td:nth-child(3),
+        #auditTable td:nth-child(4) {
+            width: 64px;
+            min-width: 64px;
+        }
+
+        #auditTable th:nth-child(5),
+        #auditTable td:nth-child(5) {
+            min-width: 220px;
+        }
+
+        #auditTable .ket {
+            min-width: 180px;
+            border: 1px solid #d7e2f5;
+            border-radius: 8px;
+            background: #fbfdff;
+        }
+
+        .audit-item-row td {
+            transition: background .2s ease, border-color .2s ease;
         }
 
         /* Rekap & Foto normal full width */
@@ -368,10 +430,18 @@ $pageTitle = "Audit External";
 
         .result-box {
             margin-top: 12px;
-            padding: 12px;
+            padding: 14px 16px;
             background: #eef4ff;
             border-left: 5px solid var(--audit-brand);
-            border-radius: 6px;
+            border-radius: 12px;
+            line-height: 1.6;
+        }
+
+        #resultSummary {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            align-items: center;
         }
 
         .signatures {
@@ -383,8 +453,8 @@ $pageTitle = "Audit External";
 
         .sig {
             background: #fff;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 14px;
             border: 1px solid var(--border);
             width: calc(50% - 9px);
             min-width: 260px;
@@ -430,6 +500,24 @@ $pageTitle = "Audit External";
             border-collapse: collapse;
         }
 
+        #rekapTab td:last-child a,
+        #fotoTab td:last-child a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 34px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin: 2px 4px 2px 0;
+            background: #edf4ff;
+        }
+
+        #rekapTab td:last-child a[style*="red"],
+        #fotoTab td:last-child a[style*="red"] {
+            background: #fff1f1;
+        }
+
         .rekap-table th,
         .rekap-table td {
             padding: 8px;
@@ -461,8 +549,8 @@ $pageTitle = "Audit External";
 
         .ket-full {
             background: #fff;
-            padding: 12px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 14px;
             border: 1px solid var(--border);
             margin-top: 12px;
         }
@@ -510,6 +598,10 @@ $pageTitle = "Audit External";
         /* ===== MOBILE OPTIMIZATION ===== */
         @media(max-width: 600px) {
 
+            .main-content {
+                padding: 8px;
+            }
+
             #logo {
                 width: 80px;
                 height: auto;
@@ -524,8 +616,9 @@ $pageTitle = "Audit External";
             }
 
             .tab {
-                flex: 1;
+                flex: 1 1 calc(50% - 8px);
                 text-align: center;
+                min-width: 0;
             }
 
 
@@ -564,6 +657,115 @@ $pageTitle = "Audit External";
                 font-size: 15px;
                 border-radius: 12px;
             }
+
+            #formTab .table-wrap table {
+                min-width: unset;
+                width: 100% !important;
+            }
+
+            #formTab .table-wrap {
+                border: none;
+                background: transparent;
+                box-shadow: none;
+                overflow: visible;
+            }
+
+            #auditTable {
+                display: block;
+                width: 100% !important;
+            }
+
+            #auditTable thead {
+                display: none;
+            }
+
+            #auditTable tbody {
+                display: grid;
+                gap: 10px;
+            }
+
+            #auditTable tr.audit-item-row {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+                padding: 12px;
+                border: 1px solid rgba(214, 224, 242, .95);
+                border-radius: 14px;
+                background: #ffffff;
+                box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            }
+
+            #auditTable tr.audit-item-row td {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 6px;
+                padding: 0;
+                border: none;
+                font-size: 12px;
+                min-width: 0;
+            }
+
+            #auditTable tr.audit-item-row td::before {
+                content: attr(data-label);
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: .02em;
+                text-transform: uppercase;
+                color: var(--muted);
+            }
+
+            #auditTable tr.audit-item-row .cell-monitoring,
+            #auditTable tr.audit-item-row .cell-ket {
+                grid-column: 1 / -1;
+            }
+
+            #auditTable tr.audit-item-row .cell-monitoring {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            #auditTable tr.audit-item-row .cell-no,
+            #auditTable tr.audit-item-row .cell-ya,
+            #auditTable tr.audit-item-row .cell-tidak {
+                justify-content: center;
+                min-height: 52px;
+                border-radius: 10px;
+                background: #f7faff;
+                padding: 8px 10px;
+                border: 1px solid #e3ebf9;
+            }
+
+            #auditTable tr.audit-item-row .cell-no {
+                align-items: center;
+                font-weight: 700;
+                color: #193761;
+            }
+
+            #auditTable tr.audit-item-row .cell-ya input,
+            #auditTable tr.audit-item-row .cell-tidak input {
+                width: 18px;
+                height: 18px;
+                margin: 0;
+            }
+
+            #auditTable tr.audit-item-row .cell-ket input {
+                width: 100% !important;
+                min-width: 0;
+            }
+
+            #auditTable .cat-row {
+                display: block;
+                margin-top: 2px;
+            }
+
+            #auditTable .cat-row td {
+                display: block;
+                padding: 10px 12px;
+                border: none;
+                border-radius: 12px;
+                font-size: 13px;
+            }
         }
 
 
@@ -577,7 +779,7 @@ $pageTitle = "Audit External";
             }
 
             #formTab table {
-                min-width: 700px;
+                min-width: 680px;
             }
         }
 
@@ -613,15 +815,37 @@ $pageTitle = "Audit External";
 
         @media(max-width: 768px) {
 
+            .main-content {
+                padding: 10px;
+            }
+
             .wrapper {
-                margin: 6px;
+                margin: 0 auto 16px;
                 padding: 14px;
+                border-radius: 16px;
+            }
+
+            .header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .title-wrap {
+                width: 100%;
+                text-align: left;
             }
 
             .controls {
                 flex-direction: column;
                 align-items: stretch;
                 gap: 8px;
+            }
+
+            .controls label {
+                width: 100%;
+                align-items: flex-start;
+                flex-direction: column;
             }
 
             .controls input {
@@ -637,6 +861,12 @@ $pageTitle = "Audit External";
                 font-size: 13px;
             }
 
+            #resultSummary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 4px;
+            }
+
             input[type="text"],
             input[type="date"],
             textarea {
@@ -646,6 +876,22 @@ $pageTitle = "Audit External";
 
             button {
                 min-height: 44px;
+            }
+
+            .table-hint {
+                display: block;
+            }
+
+            #rekapTab td:last-child,
+            #fotoTab td:last-child {
+                white-space: nowrap;
+            }
+
+            #rekapTab td:last-child a,
+            #fotoTab td:last-child a {
+                display: flex;
+                width: 100%;
+                margin: 4px 0;
             }
         }
 
@@ -667,6 +913,10 @@ $pageTitle = "Audit External";
 
 
         @media(max-width:600px) {
+
+            .header-row {
+                padding-bottom: 14px;
+            }
 
             .wrapper {
                 padding: 10px !important;
@@ -700,7 +950,7 @@ $pageTitle = "Audit External";
             background: #f8fbff;
             padding: 14px;
             border: 1px solid #d6e0f2;
-            border-radius: 8px;
+            border-radius: 14px;
             margin: 15px 0;
         }
 
@@ -734,12 +984,439 @@ $pageTitle = "Audit External";
                 width: 100%;
             }
         }
-        
-        .tanggal-input{
-    margin-left:8px;
-}
-        
-        
+
+        .tanggal-input {
+            margin-left: 8px;
+        }
+
+
+        /* ============================================================
+           DARK MODE — PREMIUM
+        ============================================================ */
+        @keyframes dmGlowBorder {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 1px rgba(56, 189, 248, .18), 0 8px 32px rgba(0, 0, 0, .45);
+            }
+
+            50% {
+                box-shadow: 0 0 0 1px rgba(56, 189, 248, .45), 0 8px 40px rgba(56, 189, 248, .12);
+            }
+        }
+
+        @keyframes dmShimmerLine {
+            0% {
+                background-position: -400px 0;
+            }
+
+            100% {
+                background-position: 400px 0;
+            }
+        }
+
+        /* Variabel ulang untuk dark mode */
+        body.dark-mode .main-content {
+            --audit-brand: #38bdf8;
+            --muted: #94a3b8;
+            --card: #111827;
+            --bg: #0b1220;
+            --border: rgba(56, 189, 248, .18);
+            background: var(--bg);
+        }
+
+        body.dark-mode main {
+            background: #0b1220;
+        }
+
+        /* Wrapper utama */
+        body.dark-mode .wrapper {
+            background: #111827;
+            border: 1px solid rgba(56, 189, 248, .15);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, .1), 0 20px 60px rgba(0, 0, 0, .6);
+            animation: dmGlowBorder 4s ease-in-out infinite;
+        }
+
+        /* Header judul */
+        body.dark-mode h1 {
+            color: #38bdf8;
+            text-shadow: 0 0 18px rgba(56, 189, 248, .4);
+        }
+
+        body.dark-mode .meta {
+            color: #94a3b8;
+        }
+
+        body.dark-mode #logo {
+            border-color: rgba(56, 189, 248, .2);
+            filter: brightness(.9);
+        }
+
+        /* Tab bar */
+        body.dark-mode .tab {
+            background: rgba(56, 189, 248, .08);
+            color: #94a3b8;
+            border: 1px solid rgba(56, 189, 248, .18);
+            transition: all .25s;
+        }
+
+        body.dark-mode .tab:hover {
+            background: rgba(56, 189, 248, .15);
+            color: #e2e8f0;
+            border-color: rgba(56, 189, 248, .45);
+            box-shadow: 0 0 14px rgba(56, 189, 248, .2);
+        }
+
+        body.dark-mode .tab.active {
+            background: linear-gradient(135deg, #0f5fa6, #1e88e5);
+            color: #fff;
+            border-color: rgba(56, 189, 248, .6);
+            box-shadow: 0 0 22px rgba(56, 189, 248, .35), inset 0 1px 0 rgba(255, 255, 255, .1);
+        }
+
+        /* Tabel container */
+        body.dark-mode .table-wrap {
+            background: #0f172a;
+            border-color: rgba(56, 189, 248, .15);
+            box-shadow: inset 0 1px 0 rgba(56, 189, 248, .06);
+        }
+
+        body.dark-mode table {
+            background: transparent;
+        }
+
+        body.dark-mode th {
+            background: linear-gradient(180deg, #0f2744 0%, #0b1e35 100%);
+            color: #7dd3fc;
+            border-bottom: 1px solid rgba(56, 189, 248, .25);
+            border-right: 1px solid rgba(56, 189, 248, .1);
+            text-shadow: 0 0 10px rgba(56, 189, 248, .3);
+            letter-spacing: .04em;
+        }
+
+        body.dark-mode td {
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(56, 189, 248, .07);
+            border-right: 1px solid rgba(56, 189, 248, .05);
+        }
+
+        body.dark-mode tbody tr {
+            background: transparent;
+            transition: background .2s, box-shadow .2s;
+        }
+
+        body.dark-mode tbody tr:hover {
+            background: rgba(56, 189, 248, .06);
+            box-shadow: inset 0 0 0 1px rgba(56, 189, 248, .18);
+        }
+
+        /* Input / select dalam form */
+        body.dark-mode input[type="date"],
+        body.dark-mode input[type="text"],
+        body.dark-mode input[type="file"],
+        body.dark-mode textarea,
+        body.dark-mode select {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: rgba(56, 189, 248, .25);
+            caret-color: #38bdf8;
+        }
+
+        body.dark-mode input[type="date"]:focus,
+        body.dark-mode input[type="text"]:focus,
+        body.dark-mode textarea:focus {
+            outline: none;
+            border-color: rgba(56, 189, 248, .6);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, .12);
+        }
+
+        /* Checkbox estetika dark */
+        body.dark-mode input[type="checkbox"] {
+            accent-color: #38bdf8;
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Keterangan input di kolom tabel */
+        body.dark-mode td input[type="text"] {
+            background: rgba(56, 189, 248, .06);
+            border: 1px solid rgba(56, 189, 248, .2);
+            border-radius: 6px;
+            color: #e2e8f0;
+            padding: 5px 8px;
+        }
+
+        /* Tombol utama */
+        body.dark-mode .small,
+        body.dark-mode button.small {
+            background: linear-gradient(135deg, #0f5fa6, #1e88e5);
+            border: 1px solid rgba(56, 189, 248, .4);
+            box-shadow: 0 0 16px rgba(56, 189, 248, .25);
+            transition: all .25s;
+        }
+
+        body.dark-mode .small:hover {
+            background: linear-gradient(135deg, #1e88e5, #38bdf8);
+            box-shadow: 0 0 28px rgba(56, 189, 248, .45);
+            transform: translateY(-1px);
+        }
+
+        body.dark-mode .btn-secondary {
+            background: rgba(110, 140, 207, .25);
+            border: 1px solid rgba(110, 140, 207, .4);
+        }
+
+        body.dark-mode .btn-secondary:hover {
+            background: rgba(110, 140, 207, .4);
+            box-shadow: 0 0 18px rgba(110, 140, 207, .3);
+        }
+
+        /* Result box */
+        body.dark-mode .result-box {
+            background: rgba(30, 136, 229, .12);
+            border-left-color: #38bdf8;
+            color: #e2e8f0;
+            box-shadow: inset 0 0 18px rgba(56, 189, 248, .06);
+        }
+
+        /* Signature area */
+        body.dark-mode .sig {
+            background: #0f172a;
+            border-color: rgba(56, 189, 248, .2);
+        }
+
+        body.dark-mode .canvas-wrap {
+            background: #0b1735;
+            border-color: rgba(56, 189, 248, .3);
+        }
+
+        /* Keterangan tambahan area */
+        body.dark-mode .ket-full {
+            background: #0f172a;
+            border-color: rgba(56, 189, 248, .18);
+        }
+
+        body.dark-mode .ket-full textarea {
+            background: #0b1220;
+            border-color: rgba(56, 189, 248, .25);
+            color: #e2e8f0;
+        }
+
+        /* Foto form */
+        body.dark-mode .foto-form {
+            background: rgba(15, 23, 42, .8);
+            border-color: rgba(56, 189, 248, .18);
+        }
+
+        body.dark-mode .foto-form input[type="date"],
+        body.dark-mode .foto-form input[type="file"],
+        body.dark-mode .foto-ket {
+            background: #0b1220;
+            border-color: rgba(56, 189, 248, .25);
+            color: #e2e8f0;
+        }
+
+        /* Foto grid gambar */
+        body.dark-mode .foto-view-grid img {
+            border-color: rgba(56, 189, 248, .2);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .4);
+        }
+
+        /* Modal */
+        body.dark-mode .modal .card {
+            background: #111827;
+            border: 1px solid rgba(56, 189, 248, .25);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, .15), 0 30px 80px rgba(0, 0, 0, .7);
+            color: #e2e8f0;
+        }
+
+        /* Rekap table */
+        body.dark-mode .rekap-table th,
+        body.dark-mode .rekap-table td {
+            border-color: rgba(56, 189, 248, .1);
+        }
+
+        /* Scrollbar dark mode */
+        body.dark-mode .table-wrap::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        body.dark-mode .table-wrap::-webkit-scrollbar-track {
+            background: #0b1220;
+        }
+
+        body.dark-mode .table-wrap::-webkit-scrollbar-thumb {
+            background: rgba(56, 189, 248, .35);
+            border-radius: 3px;
+        }
+
+        body.dark-mode .table-wrap::-webkit-scrollbar-thumb:hover {
+            background: rgba(56, 189, 248, .6);
+        }
+
+        /* Garis shimmer atas wrapper */
+
+        /* ===== CATEGORY ROW (light mode) ===== */
+        .cat-row td {
+            background: #dfe9ff;
+            color: #1a355c;
+        }
+
+        /* ===== INFO BOX (light mode) ===== */
+        .info-box {
+            padding: 14px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 8px;
+            color: #856404;
+        }
+
+        /* ===== DARK MODE — tambahan ===== */
+
+        /* Category row dark */
+        body.dark-mode .cat-row td {
+            background: linear-gradient(90deg, rgba(15, 63, 116, .6), rgba(11, 18, 32, .4));
+            color: #7dd3fc;
+            border-bottom: 1px solid rgba(56, 189, 248, .2);
+            text-shadow: 0 0 10px rgba(56, 189, 248, .25);
+        }
+
+        /* Info box dark */
+        body.dark-mode .info-box {
+            background: rgba(30, 58, 38, .5);
+            border-color: rgba(74, 222, 128, .3);
+            color: #86efac;
+        }
+
+        /* Label, strong, default text */
+        body.dark-mode .wrapper label,
+        body.dark-mode .wrapper strong,
+        body.dark-mode .wrapper .controls label {
+            color: #cbd5e1;
+        }
+
+        body.dark-mode .controls {
+            background: linear-gradient(180deg, rgba(15, 23, 42, .92) 0%, rgba(11, 18, 32, .92) 100%);
+            border-color: rgba(56, 189, 248, .18);
+            box-shadow: inset 0 1px 0 rgba(56, 189, 248, .08);
+        }
+
+        body.dark-mode .controls input[type="date"] {
+            background: #0f172a;
+            color: #e2e8f0;
+            border-color: rgba(56, 189, 248, .32);
+            box-shadow: 0 0 0 1px rgba(56, 189, 248, .08);
+            color-scheme: dark;
+        }
+
+        body.dark-mode .controls input[type="date"]:focus {
+            border-color: rgba(56, 189, 248, .68);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, .14);
+            outline: none;
+        }
+
+        body.dark-mode .controls input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(92%) sepia(8%) saturate(347%) hue-rotate(176deg) brightness(104%) contrast(95%);
+            opacity: .92;
+            cursor: pointer;
+        }
+
+        /* Link dalam tabel rekap */
+        body.dark-mode .rekap-table a {
+            color: #38bdf8;
+        }
+
+        body.dark-mode .rekap-table a[style*="red"] {
+            color: #f87171 !important;
+        }
+
+        /* Sig label teks */
+        body.dark-mode .sig label {
+            color: #94a3b8;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Tombol hapus tanda tangan */
+        body.dark-mode .sig button {
+            background: rgba(110, 140, 207, .2);
+            color: #94a3b8;
+            border: 1px solid rgba(56, 189, 248, .2);
+            border-radius: 6px;
+            padding: 6px 10px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        body.dark-mode .sig button:hover {
+            background: rgba(56, 189, 248, .15);
+            color: #e2e8f0;
+            border-color: rgba(56, 189, 248, .45);
+        }
+
+        /* breadcrumb dark */
+        body.dark-mode .breadcrumb {
+            background: rgba(15, 23, 42, .8);
+            border-color: rgba(56, 189, 248, .18);
+            color: #94a3b8;
+        }
+
+        body.dark-mode .breadcrumb a {
+            color: #38bdf8;
+        }
+
+        body.dark-mode .breadcrumb .sep {
+            color: #475569;
+        }
+
+        /* Judul rekap h3 */
+        body.dark-mode .wrapper h3 {
+            color: #e2e8f0;
+        }
+
+        /* foto grid thumbnail border */
+        body.dark-mode .foto-grid img {
+            border: 1px solid rgba(56, 189, 248, .2);
+            border-radius: 4px;
+        }
+
+        body.dark-mode .wrapper::before {
+            content: '';
+            display: block;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #38bdf8, transparent);
+            background-size: 400px 2px;
+            border-radius: 2px 2px 0 0;
+            margin: -20px -20px 20px;
+            animation: dmShimmerLine 3s linear infinite;
+            opacity: .7;
+        }
+
+        @media(max-width: 600px) {
+            body.dark-mode #formTab .table-wrap {
+                background: transparent;
+                border: none;
+                box-shadow: none;
+            }
+
+            body.dark-mode #auditTable tr.audit-item-row {
+                background: #121c30;
+                border-color: rgba(56, 189, 248, .16);
+                box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+            }
+
+            body.dark-mode #auditTable tr.audit-item-row .cell-no,
+            body.dark-mode #auditTable tr.audit-item-row .cell-ya,
+            body.dark-mode #auditTable tr.audit-item-row .cell-tidak {
+                background: rgba(56, 189, 248, .07);
+                border-color: rgba(56, 189, 248, .14);
+            }
+
+            body.dark-mode #auditTable tr.audit-item-row td::before {
+                color: #7dd3fc;
+            }
+        }
     </style>
 
 </head>
@@ -789,10 +1466,12 @@ $pageTitle = "Audit External";
                         <div id="formTab" class="tabContent">
                             <div class="controls">
                                 <label><strong>Tanggal:</strong>
-                                <input id="tanggal" type="date" class="tanggal-input">
+                                    <input id="tanggal" type="date" class="tanggal-input">
                                 </label>
                                 <div style="flex:1"></div>
                             </div>
+
+                            <div class="table-hint">Geser tabel ke samping jika semua kolom belum terlihat.</div>
 
                             <div class="table-wrap">
                                 <table id="auditTable" aria-label="Audit table">
@@ -933,13 +1612,7 @@ $pageTitle = "Audit External";
 
 
 
-                    <div style="
-        padding:14px;
-        background:#fff3cd;
-        border:1px solid #ffeeba;
-        border-radius:8px;
-        color:#856404;
-    ">
+                        <div class="info-box">
                         <b>Info:</b><br>
                         Simpan data audit terlebih dahulu sebelum menambahkan foto.
                     </div>
@@ -987,9 +1660,7 @@ $pageTitle = "Audit External";
                                         <?= $f['jumlah'] ?>
                                     </td>
                                     <td style="text-align:center">
-                                        <a href="audit_laundry_foto_detail.php?
-            tanggal=<?= urlencode($f['tanggal']) ?>&
-            ket=<?= urlencode($f['keterangan']) ?>">
+                                        <a href="audit_laundry_foto_detail.php?tanggal=<?= urlencode($f['tanggal']) ?>&ket=<?= urlencode($f['keterangan']) ?>">
                                             Lihat
                                         </a>
 
@@ -1151,22 +1822,24 @@ $pageTitle = "Audit External";
 
                 // Tambahkan baris kategori
                 const catRow = document.createElement("tr");
-                catRow.innerHTML = `
-            <td colspan="5" style="background:#dfe9ff; font-weight:700; font-size:14px;">
-                ${category}
-            </td>
-        `;
+                    catRow.className = "cat-row";
+                    catRow.innerHTML = `
+                <td colspan="5" style="font-weight:700; font-size:14px;">
+                    ${category}
+                </td>
+            `;
                 tbodyAudit.appendChild(catRow);
 
                 // Tambahkan item-itemnya
                 items.forEach(text => {
                     const tr = document.createElement("tr");
+                    tr.className = "audit-item-row";
                     tr.innerHTML = `
-                <td class="center">${index}</td>
-                <td>${text}</td>
-                <td class="center"><input type="checkbox" class="ya" data-idx="${index}"></td>
-                <td class="center"><input type="checkbox" class="tidak" data-idx="${index}"></td>
-                <td><input type="text" class="ket" placeholder="Keterangan..." style="width:100%; padding:6px;"></td>
+                <td class="center cell-no" data-label="No">${index}</td>
+                <td class="cell-monitoring" data-label="Monitoring">${text}</td>
+                <td class="center cell-ya" data-label="Ya"><input type="checkbox" class="ya" data-idx="${index}"></td>
+                <td class="center cell-tidak" data-label="Tidak"><input type="checkbox" class="tidak" data-idx="${index}"></td>
+                <td class="cell-ket" data-label="Keterangan"><input type="text" class="ket" placeholder="Keterangan..." style="width:100%; padding:6px;"></td>
             `;
                     tbodyAudit.appendChild(tr);
 
@@ -1233,6 +1906,10 @@ $pageTitle = "Audit External";
             const canvas = document.getElementById(canvasId);
             if (!canvas) return null;
 
+            function getSignatureStrokeColor() {
+                return document.body.classList.contains('dark-mode') ? '#ffffff' : '#000000';
+            }
+
             function resizeCanvas() {
                 const rect = canvas.getBoundingClientRect();
                 const ratio = window.devicePixelRatio || 1;
@@ -1245,6 +1922,7 @@ $pageTitle = "Audit External";
                 ctx.scale(ratio, ratio);
                 ctx.lineWidth = 2;
                 ctx.lineCap = 'round';
+                ctx.strokeStyle = getSignatureStrokeColor();
 
                 // 🔥 GAMBAR ULANG TTD JIKA ADA
                 const key = canvasId === 'canvasPetugas' ? 'Petugas' : 'Auditor';
@@ -1262,6 +1940,7 @@ $pageTitle = "Audit External";
 
             const ctx = canvas.getContext('2d');
             let drawing = false;
+            ctx.strokeStyle = getSignatureStrokeColor();
 
             function getPos(e) {
                 const rect = canvas.getBoundingClientRect();
@@ -1273,6 +1952,7 @@ $pageTitle = "Audit External";
             canvas.addEventListener('pointerdown', (ev) => {
                 drawing = true;
                 const p = getPos(ev);
+                ctx.strokeStyle = getSignatureStrokeColor();
                 ctx.beginPath();
                 ctx.moveTo(p.x, p.y);
                 ev.preventDefault();

@@ -86,6 +86,23 @@ function cleanName($text) {
         border-radius: 8px;
     }
 }
+
+/* DARK MODE */
+body.dark-mode .breadcrumb {
+    background: rgba(15, 23, 42, 0.85);
+    border-color: rgba(56, 189, 248, .18);
+    color: #94a3b8;
+    box-shadow: 0 4px 16px rgba(0,0,0,.35);
+}
+body.dark-mode .breadcrumb a {
+    color: #38bdf8;
+}
+body.dark-mode .breadcrumb .home {
+    color: #38bdf8;
+}
+body.dark-mode .breadcrumb .sep {
+    color: #334155;
+}
 </style>
 
 <!-- ================== HTML / PHP BREADCRUMB ================== -->

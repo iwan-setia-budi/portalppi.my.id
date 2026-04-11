@@ -15,17 +15,93 @@
   margin-bottom:24px;
 }
 
+/* ================= GLOW ANIMATIONS ================= */
+@keyframes glowPulseBlue {
+  0%,100%{ box-shadow:var(--shadow-md),0 0 0 1px rgba(30,136,229,.25),0 0 18px rgba(30,136,229,.12); }
+  50%    { box-shadow:var(--shadow-md),0 0 0 1px rgba(56,189,248,.55),0 0 40px rgba(56,189,248,.28); }
+}
+@keyframes glowPulseAmber {
+  0%,100%{ box-shadow:var(--shadow-md),0 0 0 1px rgba(245,158,11,.25),0 0 18px rgba(245,158,11,.12); }
+  50%    { box-shadow:var(--shadow-md),0 0 0 1px rgba(251,191,36,.55),0 0 40px rgba(251,191,36,.28); }
+}
+@keyframes glowPulseRed {
+  0%,100%{ box-shadow:var(--shadow-md),0 0 0 1px rgba(220,38,38,.25),0 0 18px rgba(220,38,38,.12); }
+  50%    { box-shadow:var(--shadow-md),0 0 0 1px rgba(248,113,113,.55),0 0 40px rgba(248,113,113,.28); }
+}
+@keyframes glowPulseGeneral {
+  0%,100%{ box-shadow:var(--shadow-md),0 0 0 1px rgba(30,136,229,.2),0 0 14px rgba(30,136,229,.08); }
+  50%    { box-shadow:var(--shadow-md),0 0 0 1px rgba(56,189,248,.45),0 0 32px rgba(56,189,248,.2); }
+}
+
 /* ================= CARD ================= */
 .card{
   background:var(--card);
   border-radius:var(--radius);
   padding:20px;
   box-shadow:var(--shadow-md);
-  transition:.3s;
+  border:1px solid rgba(30,136,229,.12);
+  transition:transform .3s, box-shadow .3s, border-color .3s;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Garis cahaya atas card */
+.card::before{
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(90deg,transparent,rgba(56,189,248,.6),transparent);
+  opacity:0;
+  transition:opacity .3s;
+}
+
+.card:hover::before{
+  opacity:1;
 }
 
 .card:hover{
-  transform:translateY(-4px);
+  transform:translateY(-5px);
+  border-color:rgba(56,189,248,.5);
+  box-shadow:var(--shadow-md),0 0 0 1px rgba(56,189,248,.4),0 0 50px rgba(56,189,248,.25);
+}
+
+/* ===== Dark mode: glow animasi aktif ===== */
+body.dark-mode .card{
+  border-color:rgba(30,136,229,.25);
+  animation: glowPulseGeneral 4s ease-in-out infinite;
+}
+
+body.dark-mode .card:hover{
+  animation:none;
+  border-color:rgba(56,189,248,.7);
+  box-shadow:var(--shadow-md),0 0 0 1px rgba(56,189,248,.6),0 0 60px rgba(56,189,248,.35);
+}
+
+body.dark-mode .card::before{
+  background:linear-gradient(90deg,transparent,rgba(56,189,248,.9),transparent);
+}
+
+/* KPI Card 1 – Cuci Tangan (biru) */
+body.dark-mode .grid:first-of-type .card:nth-child(1){
+  border-color:rgba(30,136,229,.4);
+  animation:glowPulseBlue 3.5s ease-in-out infinite;
+}
+/* KPI Card 2 – APD (amber) */
+body.dark-mode .grid:first-of-type .card:nth-child(2){
+  border-color:rgba(245,158,11,.4);
+  animation:glowPulseAmber 3.5s ease-in-out infinite;
+}
+body.dark-mode .grid:first-of-type .card:nth-child(2)::before{
+  background:linear-gradient(90deg,transparent,rgba(251,191,36,.9),transparent);
+}
+/* KPI Card 3 – Rate HAI (merah) */
+body.dark-mode .grid:first-of-type .card:nth-child(3){
+  border-color:rgba(220,38,38,.4);
+  animation:glowPulseRed 3.5s ease-in-out infinite;
+}
+body.dark-mode .grid:first-of-type .card:nth-child(3)::before{
+  background:linear-gradient(90deg,transparent,rgba(248,113,113,.9),transparent);
 }
 
 /* KPI */
@@ -69,6 +145,16 @@ thead th{
 tbody tr{
   background:linear-gradient(90deg,#eaf3ff,#ffffff);
   border-radius:14px;
+  transition: box-shadow .3s, background .3s;
+}
+
+body.dark-mode tbody tr{
+  background:linear-gradient(90deg,rgba(15,95,166,.18),rgba(17,24,39,.6));
+  border: 1px solid rgba(56,189,248,.12);
+}
+
+tbody tr:hover{
+  box-shadow: 0 0 0 1px rgba(56,189,248,.35), 0 0 16px rgba(56,189,248,.15);
 }
 
 tbody td{
@@ -77,3 +163,34 @@ tbody td{
 
 tbody td:first-child{border-radius:14px 0 0 14px;}
 tbody td:last-child{border-radius:0 14px 14px 0;}
+
+/* ===== Tautan regulasi ===== */
+.card a{
+  display:block;
+  padding:8px 10px;
+  margin:6px 0;
+  border-radius:10px;
+  color:var(--text);
+  text-decoration:none;
+  font-size:14px;
+  border:1px solid rgba(30,136,229,.12);
+  transition:all .3s;
+}
+
+.card a:hover{
+  background:rgba(30,136,229,.08);
+  border-color:rgba(56,189,248,.5);
+  box-shadow:0 0 14px rgba(56,189,248,.2);
+  transform:translateX(4px);
+}
+
+body.dark-mode .card a{
+  border-color:rgba(56,189,248,.18);
+  color:var(--text);
+}
+
+body.dark-mode .card a:hover{
+  background:rgba(56,189,248,.1);
+  border-color:rgba(56,189,248,.6);
+  box-shadow:0 0 20px rgba(56,189,248,.25);
+}

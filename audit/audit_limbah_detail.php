@@ -10,7 +10,7 @@ if ($id <= 0) {
 }
 
 /* ===== HEADER DATA ===== */
-$qHeader = mysqli_query($koneksi, "SELECT * FROM tb_audit_laundry WHERE id=$id");
+$qHeader = mysqli_query($koneksi, "SELECT * FROM tb_audit_limbah WHERE id=$id");
 $data = mysqli_fetch_assoc($qHeader);
 if (!$data) {
     echo "<script>alert('Data tidak ditemukan'); history.back();</script>";
@@ -20,87 +20,48 @@ if (!$data) {
 /* ===== DETAIL ===== */
 $detail = mysqli_query($koneksi, "
     SELECT item_no, jawaban, keterangan
-    FROM tb_audit_laundry_detail
+    FROM tb_audit_limbah_detail
     WHERE audit_id=$id
     ORDER BY item_no
 ");
 
 
 $monitoring = [
-
-    // ======================
-    // HYGIENE PERSONAL
-    // ======================
-    1 => "Hygiene Personal – Bersih, rapih, dan menggunakan pakaian yang sesuai",
-    2 => "Hygiene Personal – Kuku pendek dan bersih",
-    3 => "Hygiene Personal – Tidak menggunakan perhiasan tangan",
-    4 => "Hygiene Personal – Rambut rapih, dan menggunakan APD dengan tepat ketika menangani linen kotor dan bersih",
-    5 => "Hygiene Personal – Staf mendapat vaksinasi penyakit menular",
-    6 => "Hygiene Personal – Pemeriksaan kesehatan berkala untuk staf",
-    7 => "Hygiene Personal – Petugas Laundry tidak menggunakan pakaian kerja dari rumah",
-
-    // ======================
-    // TEMPAT & PROSES PENCUCIAN
-    // ======================
-    8 => "Tempat dan Proses Pencucian – Tersedia sarana cuci tangan",
-    9 => "Tempat dan Proses Pencucian – Tersedia fasilitas APD",
-    10 => "Tempat dan Proses Pencucian – Temperatur suhu pencucian sesuai standar 70°C (25 menit) / 95°C (10 menit)",
-    11 => "Tempat dan Proses Pencucian – Linen kotor terpisah dari linen bersih",
-    12 => "Tempat dan Proses Pencucian – Penyortiran linen kotor tidak diletakkan di lantai",
-    13 => "Tempat dan Proses Pencucian – Ada ruangan & mesin cuci terpisah untuk linen infeksius & non-infeksius",
-    14 => "Tempat dan Proses Pencucian – Penggunaan chemical & detergen sesuai IFU",
-    15 => "Tempat dan Proses Pencucian – Linen infeksius tidak dilakukan penghitungan",
-    16 => "Tempat dan Proses Pencucian – Pembersihan & pemeliharaan mesin rutin",
-    17 => "Tempat dan Proses Pencucian – Petugas menggunakan APD lengkap",
-    18 => "Tempat dan Proses Pencucian – Area pencucian bersih dan kering",
-    19 => "Tempat dan Proses Pencucian – Menggunakan troli infeksius & non infeksius",
-    20 => "Tempat dan Proses Pencucian – Troli dibersihkan setiap habis digunakan",
-    21 => "Tempat dan Proses Pencucian – Pemeriksaan air bersih & IPAL berkala",
-    22 => "Tempat dan Proses Pencucian – Ada bukti sertifikasi swab linen",
-    23 => "Tempat dan Proses Pencucian – Tersedia eyewash berfungsi",
-    24 => "Tempat dan Proses Pencucian – Memiliki saluran pembuangan tertutup & pre-treatment",
-
-    // ======================
-    // TEMPAT PENGERINGAN
-    // ======================
-    25 => "Tempat Pengeringan – Tersedia sarana cuci tangan",
-    26 => "Tempat Pengeringan – Petugas menggunakan APD (penutup kepala, masker)",
-    27 => "Tempat Pengeringan – Area pengeringan terpisah dari area pencucian",
-    28 => "Tempat Pengeringan – Temperatur pengeringan 70–80°C (40–60 menit)",
-    29 => "Tempat Pengeringan – Proses pengeringan 15–30 menit",
-    30 => "Tempat Pengeringan – Petugas khusus menangani linen bersih",
-    31 => "Tempat Pengeringan – Tidak melakukan penjemuran linen",
-    32 => "Tempat Pengeringan – Menggunakan troli bersih & dibersihkan rutin",
-
-    // ======================
-    // PENYETRIKAAN & PELIPATAN
-    // ======================
-    33 => "Penyetrikaan & Pelipatan – Tersedia sarana cuci tangan",
-    34 => "Penyetrikaan & Pelipatan – Petugas menggunakan APD lengkap",
-    35 => "Penyetrikaan & Pelipatan – Linen kering langsung disetrika",
-    36 => "Penyetrikaan & Pelipatan – Linen dipisahkan sesuai jenis",
-    37 => "Penyetrikaan & Pelipatan – Menggunakan mesin press/roll press suhu 160°C",
-    38 => "Penyetrikaan & Pelipatan – Area setrika bersih dan kering",
-    39 => "Penyetrikaan & Pelipatan – Mesin setrika dibersihkan rutin",
-    40 => "Penyetrikaan & Pelipatan – Linen bersih tidak diletakkan di lantai",
-
-    // ======================
-    // TEMPAT PENYIMPANAN
-    // ======================
-    41 => "Tempat Penyimpanan – Linen disimpan di rak atau lemari tertutup",
-    42 => "Tempat Penyimpanan – Penyimpanan linen sesuai jenis & FIFO",
-    43 => "Tempat Penyimpanan – Tidak ada debu, sarang laba-laba, jamur",
-    44 => "Tempat Penyimpanan – Ruangan dibersihkan rutin",
-    45 => "Tempat Penyimpanan – Suhu ruang 22–26°C, RH 40–60%",
-    46 => "Tempat Penyimpanan – Penyimpanan linen 30–50 cm dari lantai & 5 cm dari dinding",
-
-    // ======================
-    // PENDISTRIBUSIAN
-    // ======================
-    47 => "Pendistribusian – Pintu distribusi bersih berbeda dengan kotor",
-    48 => "Pendistribusian – Linen bersih dibungkus plastik",
-    49 => "Pendistribusian – Kendaraan transportasi bersih & didisinfeksi rutin",
-    50 => "Pendistribusian – Ada bukti ceklist pembersihan kendaraan",
+    1 => "Personal – Bersih, rapih, dan menggunakan pakaian yang sesuai",
+    2 => "Personal – Kuku pendek dan bersih",
+    3 => "Personal – Tidak menggunakan perhiasan tangan",
+    4 => "Personal – Rambut rapih, dan menggunakan APD dengan tepat ketika menangani limbah infeksius",
+    5 => "Personal – Staf mendapat vaksinasi penyakit menular",
+    6 => "Personal – Pemeriksaan kesehatan berkala untuk staf",
+    7 => "Pengangkutan – Penunjukan personil yang bertanggung jawab untuk setiap zona atau area",
+    8 => "Pengangkutan – Kantong limbah medis padat sebelum dimasukkan ke kendaraan pengangkut harus diletakkan dalam kontainer yang kuat dan tertutup",
+    9 => "Pengangkutan – Alat angkut tidak memiliki sudut tajam yang dapat merusak kantong, tertutup dan aman dari tumpahan cairan",
+    10 => "Pengangkutan – Kantong limbah medis padat harus aman dari jangkauan manusia maupun binatang",
+    11 => "Pengangkutan – Peralatan diberi label dan berwarna sesuai dengan kategori limbah",
+    12 => "Pengangkutan – Pelekatan simbol limbah B3 pada badan kendaraan pengangkut sebagai bentuk komunikasi bahaya atas limbah B3 yang diangkut",
+    13 => "Pengangkutan – Penerapan aturan segregasi dalam pemuatan limbah B3 ke dalam alat angkut",
+    14 => "Pengangkutan – Penerapan inspeksi kondisi limbah B3 yang diangkut oleh pengemudi",
+    15 => "Pengangkutan – Pastikan hanya melakukan bongkar-muat di lokasi yang sudah ditentukan",
+    16 => "Pengangkutan – Usahakan lokasi bongkar-muat dibuat tertutup (indoor), atau minimal memiliki atap",
+    17 => "Pengangkutan – Buat saluran penampungan tumpahan yang kedap air dan bak penampungan tumpahan yang buntu di lokasi bongkar-muat",
+    18 => "Pengangkutan – Tutup saluran penampungan limpasan air hujan saat kegiatan bongkar-muat berlangsung untuk menghindari masuknya tumpahan limbah B3 ke dalam saluran tersebut",
+    19 => "Pengangkutan – Hindari melakukan kegiatan bongkar-muat saat hujan untuk menghindari potensi tumpahan yang akan larut dan terbawa oleh limpasan air hujan",
+    20 => "Pengangkutan – Seluruh muatan harus diikat kuat selama dan posisinya diatur dengan baik sehingga bebannya terdistribusi secara merata di sumbu-sumbu kendaraan",
+    21 => "Pengangkutan – Pastikan pemuatan kemasan ke dalam kendaraan juga memperhitungkan kemudahan dan keamanan saat pembongkaran",
+    22 => "Penyimpanan sementara sebelum dimusnahkan – Tempat penampungan harus memiliki lantai yang kokoh dilengkapi dengan drainase yang baik dan mudah dibersihkan serta didesinfeksi",
+    23 => "Penyimpanan sementara sebelum dimusnahkan – Tidak boleh berada dekat dengan lokasi penyimpanan bahan makanan atau dapur",
+    24 => "Penyimpanan sementara sebelum dimusnahkan – Harus ada pencahayaan yang baik serta kemudahan akses untuk kendaraan pengumpul limbah",
+    25 => "Penyimpanan sementara sebelum dimusnahkan – Lokasi untuk tempat penyimpanan limbah yang berbahaya dan beracun minimum berjarak 50 meter dari lokasi fasilitas umum dan daerah bebas banjir sehingga aman dari kemungkinan terkena banjir",
+    26 => "Penyimpanan sementara sebelum dimusnahkan – Area penyimpanan harus diamankan untuk mencegah binatang, anak-anak, dll memasuki dan mengakses daerah tersebut",
+    27 => "Penyimpanan sementara sebelum dimusnahkan – Selain itu, harus kedap air (sebaiknya beton), terlindung dari air hujan, harus aman, dipagari dengan penanda yang tepat",
+    28 => "Penyimpanan sementara sebelum dimusnahkan – Penyimpanan limbah medis padat harus sesuai iklim tropis yaitu pada musim hujan paling lama 48 jam dan musim kemarau paling lama 24 jam",
+    29 => "Pengolahan Insinerator – Menggunakan pembakaran suhu tinggi (misalnya: pirolisis, gasifikasi, plasma arc). Pembakaran dilakukan dengan suhu 800°C sampai 1200°C",
+    30 => "Pengolahan Insinerator – Suatu sistem yang terkontrol dan terisolir dari lingkungannya agar sifat bahayanya hilang atau berkurang",
+    31 => "Pembuangan Akhir Limbah Medis – Hasil dari pengolahan limbah medis berupa abu",
+    32 => "Pembuangan Akhir Limbah Medis – Penimbunan (landfill)",
+    33 => "Pembuangan Akhir Limbah Medis – Lokasi bekas pengolahan dan penimbunan limbah medis B3 pun harus ditangani dengan baik untuk mencegah hal-hal yang tidak diinginkan",
+    34 => "Pembuangan Akhir Limbah Medis – Tempat atau lokasi yang diperuntukkan khusus sebagai tempat penimbunan (secure landfill) limbah medis didesain sesuai dengan persyaratan penimbunan limbah B3",
+    35 => "Pembuangan Akhir Limbah Medis – Tempat penimbunan mempunyai sistem pengumpulan dan pengolahan lindi",
 ];
 
 ?>
@@ -108,7 +69,7 @@ $monitoring = [
 
 <!--Tulisan di topbar otomatis-->
 <?php
-$pageTitle = "LIHAT DATA AUDIT LAUNDRY";
+$pageTitle = "LIHAT DATA AUDIT LIMBAH";
 ?>
 <!--end-->
 
@@ -127,6 +88,10 @@ $pageTitle = "LIHAT DATA AUDIT LAUNDRY";
     <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
     <style>
+        .main-content {
+            padding: 16px;
+        }
+
         .container {
             max-width: 1200px;
             width: 100%;
@@ -135,7 +100,13 @@ $pageTitle = "LIHAT DATA AUDIT LAUNDRY";
             border-radius: 14px;
             box-shadow: 0 12px 32px rgba(0, 0, 0, .08);
             padding: 20px 32px 28px 32px;
-            ;
+            border: 1px solid #e6ecf5;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .btn-download {
@@ -378,11 +349,6 @@ $pageTitle = "LIHAT DATA AUDIT LAUNDRY";
             border-bottom: 2px solid #e6ecf5;
         }
 
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-
         .note-box {
             background: #f7f9fd;
             border: 1px solid #e6ecf5;
@@ -559,13 +525,13 @@ $pageTitle = "LIHAT DATA AUDIT LAUNDRY";
 
                     <div class="header header-flex">
                         <div>
-                            <h2>Detail Audit Laundry</h2>
+                            <h2>Detail Audit Limbah</h2>
                             <small>Monitoring Audit PPI</small>
                         </div>
 
                         <div class="header-actions">
                             <button onclick="window.print()" class="btn-download">⬇ Unduh PDF</button>
-                            <a href="audit_laundry.php?tab=rekap" class="btn-back">← Kembali</a>
+                            <a href="audit_limbah.php?tab=rekap" class="btn-back">← Kembali</a>
                         </div>
                     </div>
 
