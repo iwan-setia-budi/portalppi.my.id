@@ -29,28 +29,199 @@ function pathToUrl($path) {
     return str_replace('../', '/', $path);
 }
 
+function resolveFilePathForZip($path) {
+    if (empty($path) || !is_string($path)) return '';
+
+    $candidate = str_replace('\\', '/', trim($path));
+    $docRoot = rtrim(str_replace('\\', '/', realpath(__DIR__ . '/..')), '/');
+    $basePath = trim(parse_url((string)BASE_URL, PHP_URL_PATH) ?? '', '/');
+
+    if (file_exists($candidate)) return $candidate;
+
+    // Support URL-like values in DB: /portalppi.my.id/uploads/... or /uploads/...
+    $urlPath = trim(parse_url($candidate, PHP_URL_PATH) ?? $candidate, '/');
+    if ($basePath !== '' && strpos($urlPath, $basePath . '/') === 0) {
+        $urlPath = substr($urlPath, strlen($basePath) + 1);
+    }
+
+    $tryPaths = [
+        $docRoot . '/' . ltrim($candidate, '/'),
+        $docRoot . '/' . ltrim(str_replace('../', '', $candidate), '/'),
+        $docRoot . '/' . ltrim($urlPath, '/'),
+    ];
+
+    foreach ($tryPaths as $tryPath) {
+        if (file_exists($tryPath)) return $tryPath;
+    }
+
+    return '';
+}
+
+function collectDownloadItems($data) {
+    $items = [];
+    $map = [
+        'file_undangan' => 'Undangan',
+        'file_materi'   => 'Materi',
+        'file_absensi'  => 'Absensi',
+        'file_notulen'  => 'Notulen',
+    ];
+
+    foreach ($map as $key => $label) {
+        if (!empty($data[$key])) {
+            $url = pathToUrl($data[$key]);
+            if ($url !== '') {
+                $items[] = [
+                    'label' => $label,
+                    'url'   => $url,
+                    'name'  => basename((string) $data[$key]),
+                ];
+            }
+        }
+    }
+
+    if (!empty($data['file_foto'])) {
+        $fotos = json_decode($data['file_foto'], true);
+        if (is_array($fotos)) {
+            foreach ($fotos as $i => $foto) {
+                $url = pathToUrl($foto);
+                if ($url !== '') {
+                    $items[] = [
+                        'label' => 'Foto ' . ($i + 1),
+                        'url'   => $url,
+                        'name'  => basename((string) $foto),
+                    ];
+                }
+            }
+        }
+    }
+
+    return $items;
+}
+
 // === ZIP DOWNLOAD ===
 if (isset($_GET['download']) && $_GET['download'] == 'zip') {
+    if (!class_exists('ZipArchive')) {
+        echo "<script>alert('Fitur ZIP belum aktif di server (ext-zip). Hubungi admin untuk mengaktifkan modul ZIP pada PHP Apache.');location.href='umanf_view.php?id=" . $id . "';<\/script>";
+        exit;
+    }
+
     $zipname = "dokumen_rapat_" . $id . ".zip";
     $zip     = new ZipArchive();
     $tmpZip  = tempnam(sys_get_temp_dir(), "zip");
-    if ($zip->open($tmpZip, ZipArchive::CREATE) === TRUE) {
+
+    if ($tmpZip === false) {
+        echo "<script>alert('Gagal menyiapkan file ZIP sementara. Coba lagi.');location.href='umanf_view.php?id=" . $id . "';<\/script>";
+        exit;
+    }
+
+    if ($zip->open($tmpZip, ZipArchive::CREATE | ZipArchive::OVERWRITE) === true) {
+        $addedFiles = 0;
+
         foreach (['file_undangan','file_materi','file_absensi','file_notulen'] as $f) {
-            if (!empty($data[$f]) && file_exists($data[$f]))
-                $zip->addFile($data[$f], basename($data[$f]));
+            $resolved = resolveFilePathForZip($data[$f] ?? '');
+            if ($resolved !== '') {
+                $zip->addFile($resolved, basename($resolved));
+                $addedFiles++;
+            }
         }
+
         if (!empty($data['file_foto'])) {
             $fotos = json_decode($data['file_foto'], true);
-            foreach ($fotos as $foto)
-                if (file_exists($foto)) $zip->addFile($foto, "foto/" . basename($foto));
+            if (is_array($fotos)) {
+                foreach ($fotos as $foto) {
+                    $resolvedFoto = resolveFilePathForZip($foto);
+                    if ($resolvedFoto !== '') {
+                        $zip->addFile($resolvedFoto, "foto/" . basename($resolvedFoto));
+                        $addedFiles++;
+                    }
+                }
+            }
         }
+
         $zip->close();
+
+        if ($addedFiles === 0) {
+            @unlink($tmpZip);
+            echo "<script>alert('Tidak ada file yang bisa dimasukkan ke ZIP.');location.href='umanf_view.php?id=" . $id . "';<\/script>";
+            exit;
+        }
+
         header('Content-Type: application/zip');
         header('Content-Disposition: attachment; filename="' . $zipname . '"');
+        header('Content-Length: ' . filesize($tmpZip));
         readfile($tmpZip);
         unlink($tmpZip);
         exit;
     }
+
+    @unlink($tmpZip);
+    echo "<script>alert('Gagal membuat file ZIP. Silakan coba lagi.');location.href='umanf_view.php?id=" . $id . "';<\/script>";
+    exit;
+}
+
+if (isset($_GET['download']) && $_GET['download'] == 'all') {
+    $downloadItems = collectDownloadItems($data);
+    ?>
+    <!DOCTYPE html>
+    <html lang="id">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Unduh Semua Berkas</title>
+        <style>
+            body { font-family: Arial, sans-serif; background: #f5f7fb; margin: 0; padding: 20px; color: #1e293b; }
+            .wrap { max-width: 860px; margin: 0 auto; }
+            .card { background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.08); padding: 18px; }
+            h2 { margin: 0 0 6px; }
+            p { margin: 0 0 16px; color: #64748b; }
+            .row { display: grid; gap: 10px; }
+            .item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; }
+            .name { min-width: 0; }
+            .name strong { display: block; }
+            .name span { font-size: 12px; color: #64748b; word-break: break-all; }
+            .btn { text-decoration: none; background: #0ea5e9; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
+            .btn:hover { background: #0284c7; }
+            .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
+            .btn-back { background: #334155; }
+            .btn-back:hover { background: #1e293b; }
+        </style>
+    </head>
+    <body>
+        <div class="wrap">
+            <div class="card">
+                <h2>Semua Berkas Rapat</h2>
+                <p>Klik tombol Unduh di setiap berkas untuk mengunduh satu per satu.</p>
+
+                <div class="row">
+                    <?php if (!empty($downloadItems)): ?>
+                        <?php foreach ($downloadItems as $item): ?>
+                            <div class="item">
+                                <div class="name">
+                                    <strong><?= htmlspecialchars($item['label']) ?></strong>
+                                    <span><?= htmlspecialchars($item['name']) ?></span>
+                                </div>
+                                <a class="btn" href="<?= htmlspecialchars($item['url']) ?>" download>Unduh</a>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="item">
+                            <div class="name">
+                                <strong>Tidak ada berkas</strong>
+                                <span>Data ini belum memiliki file untuk diunduh.</span>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div class="actions">
+                    <a class="btn btn-back" href="umanf_view.php?id=<?= (int)$id ?>">Kembali ke Detail</a>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    <?php
+    exit;
 }
 
 $fotos       = !empty($data['file_foto']) ? json_decode($data['file_foto'], true) : [];
@@ -530,7 +701,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                     </div>
                 </div>
                 <div class="hero-actions">
-                    <a href="?id=<?= $id ?>&download=zip" class="btn btn-success">⬇️ Unduh ZIP</a>
+                    <a href="?id=<?= $id ?>&download=all" class="btn btn-success">⬇️ Unduh Semua</a>
                     <a href="umanf.php" class="btn btn-back">← Kembali</a>
                 </div>
             </div>
