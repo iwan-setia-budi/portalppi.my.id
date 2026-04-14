@@ -1436,6 +1436,15 @@ $pageTitle = "MOU & IZIN";
       document.getElementById('izinFields').style.display = kategori === 'izin' ? 'block' : 'none';
     }
 
+    document.querySelector('#formModal form').addEventListener('submit', function() {
+      const kategori = document.getElementById('kategoriSelect').value;
+      if (kategori === 'mou') {
+        document.querySelectorAll('#izinFields input').forEach(el => el.disabled = true);
+      } else if (kategori === 'izin') {
+        document.querySelectorAll('#moFields input').forEach(el => el.disabled = true);
+      }
+    });
+
     function hapusData(kategori, id) {
       if (confirm('Yakin ingin menghapus data ini?')) {
         const form = document.createElement('form');

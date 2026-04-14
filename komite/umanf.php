@@ -399,6 +399,18 @@ foreach ($allRows as $r) {
         .badge-no  .badge-dot { background: #cbd5e1; }
         .badge-foto .badge-dot { background: #3b82f6; }
 
+        /* file count pill */
+        .mc-file-count {
+            font-size: 12px; font-weight: 600;
+            padding: 5px 12px; border-radius: 20px;
+            display: inline-flex; align-items: center; gap: 5px;
+            background: #f1f5f9; color: #475569;
+            border: 1px solid #e2e8f0;
+            margin-top: 4px;
+        }
+        .mc-file-count.full  { background: #dcfce7; color: #16a34a; border-color: #bbf7d0; }
+        .mc-file-count.empty { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+
         /* card footer actions */
         .mc-actions { display: flex; gap: 8px; border-top: 1px solid #f1f5f9; padding-top: 14px; margin-top: 2px; }
 
@@ -594,6 +606,12 @@ foreach ($allRows as $r) {
         body.dark-mode .mc-actions {
             border-top-color: #2f435c;
         }
+
+        body.dark-mode .mc-file-count {
+            background: #1e3050; color: #93c5fd; border-color: #2d4a6e;
+        }
+        body.dark-mode .mc-file-count.full  { background: #14532d; color: #86efac; border-color: #166534; }
+        body.dark-mode .mc-file-count.empty { background: #451a03; color: #fcd34d; border-color: #78350f; }
 
         body.dark-mode .btn-ghost {
             background: #24364e;
@@ -801,6 +819,9 @@ foreach ($allRows as $r) {
                 <?php foreach ($allRows as $i => $r):
                     $fotos = !empty($r['file_foto']) ? json_decode($r['file_foto'], true) : [];
                     $jumlahFoto = count($fotos);
+                    $jumlahDok = (int)!empty($r['file_undangan']) + (int)!empty($r['file_materi'])
+                                + (int)!empty($r['file_absensi'])  + (int)!empty($r['file_notulen']);
+                    $jumlahTotal = $jumlahDok + ($jumlahFoto > 0 ? 1 : 0); // foto dihitung 1 slot
                 ?>
                 <div class="meeting-card" data-title="<?= strtolower(htmlspecialchars($r['jenis_rapat'])) ?>">
                     <div class="mc-top">
@@ -820,6 +841,16 @@ foreach ($allRows as $r) {
                             <span class="badge badge-foto"><span class="badge-dot"></span>📷 <?= $jumlahFoto ?> Foto</span>
                         <?php else: ?>
                             <span class="badge badge-no"><span class="badge-dot"></span>📷 Foto</span>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="mc-file-count <?= $jumlahTotal === 5 ? 'full' : ($jumlahTotal === 0 ? 'empty' : '') ?>">
+                        <?php if ($jumlahTotal === 0): ?>
+                            📭 Belum ada file
+                        <?php elseif ($jumlahTotal === 5): ?>
+                            ✅ <?= $jumlahTotal ?> / 5 file &mdash; Lengkap
+                        <?php else: ?>
+                            📁 <?= $jumlahTotal ?> / 5 file tersedia
                         <?php endif; ?>
                     </div>
 

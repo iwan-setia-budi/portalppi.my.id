@@ -18,6 +18,14 @@ if (!$data) {
 }
 
 function pathToUrl($path) {
+    if (empty($path)) return '';
+    // Handle absolute paths returned by ppi_store_uploaded_file
+    $docRoot = rtrim(str_replace('\\', '/', realpath(__DIR__ . '/..')), '/');
+    $normalPath = str_replace('\\', '/', $path);
+    if ($docRoot && strpos($normalPath, $docRoot) === 0) {
+        return substr($normalPath, strlen($docRoot));
+    }
+    // Legacy: relative path with ../
     return str_replace('../', '/', $path);
 }
 
