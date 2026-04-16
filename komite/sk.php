@@ -617,30 +617,41 @@ $pageTitle = "KOMITE PPI";
                             </tr>
                         </thead>
                         <tbody>
-                            <?php
-                            $no = 1;
-                            if (mysqli_num_rows($res) > 0) {
-                                while ($r = mysqli_fetch_assoc($res)) {
-                                    $tgl = date('d F Y', strtotime($r['tanggal']));
-                                    $file = str_replace("../", "", $r['link_file']);
-                                                                        $nomor = htmlspecialchars($r['nomor_sk'], ENT_QUOTES, 'UTF-8');
-                                                                        $judul = htmlspecialchars($r['judul_sk'], ENT_QUOTES, 'UTF-8');
-                                                                        $deleteUrl = '?hapus=' . (int) $r['id'] . '&csrf=' . urlencode($csrfToken);
-                                    echo "<tr>
-                              <td>$no</td>
-                                                            <td>{$nomor}</td>
-                                                            <td>{$judul}</td>
-                              <td>$tgl</td>
-                                                            <td><a href='/$file' target='_blank' rel='noopener noreferrer' class='btn-view'>Lihat</a></td>
-                                                            <td class='actions'><a href='{$deleteUrl}' onclick=\"return confirm('Yakin hapus data ini?')\" class='btn-del'>Hapus</a></td>
-                            </tr>";
-                                    $no++;
-                                }
-                            } else {
-                                echo "<tr><td colspan='6' align='center'>Tidak ada data ditemukan.</td></tr>";
-                            }
-                            ?>
-                        </tbody>
+<?php
+$no = 1;
+if (mysqli_num_rows($res) > 0) {
+    while ($r = mysqli_fetch_assoc($res)) {
+
+        $tgl = date('d F Y', strtotime($r['tanggal']));
+        $nomor = htmlspecialchars($r['nomor_sk'], ENT_QUOTES, 'UTF-8');
+        $judul = htmlspecialchars($r['judul_sk'], ENT_QUOTES, 'UTF-8');
+        $deleteUrl = '?hapus=' . (int)$r['id'] . '&csrf=' . urlencode($csrfToken);
+
+        // 🔥 FIX UTAMA: ubah path server jadi URL web
+        $filePath = $r['link_file'];
+        $publicFile = str_replace($_SERVER['DOCUMENT_ROOT'] . '/', '', $filePath);
+        $publicFile = ltrim($publicFile, '/');
+
+        echo "<tr>
+            <td>$no</td>
+            <td>{$nomor}</td>
+            <td>{$judul}</td>
+            <td>$tgl</td>
+            <td>
+                <a href='/$publicFile' target='_blank' rel='noopener noreferrer' class='btn-view'>Lihat</a>
+            </td>
+            <td class='actions'>
+                <a href='{$deleteUrl}' onclick=\"return confirm('Yakin hapus data ini?')\" class='btn-del'>Hapus</a>
+            </td>
+        </tr>";
+
+        $no++;
+    }
+} else {
+    echo "<tr><td colspan='6' align='center'>Tidak ada data ditemukan.</td></tr>";
+}
+?>
+</tbody>
                     </table>
                 </div>
                 <!--========= ISI emd ==========-->

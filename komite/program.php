@@ -711,26 +711,29 @@ $pageTitle = "KOMITE PPI";
                                 if (mysqli_num_rows($res) > 0) {
                                     while ($r = mysqli_fetch_assoc($res)) {
                                         $periode = date('M Y', strtotime($r['tanggal_mulai'])) . ' - ' . date('M Y', strtotime($r['tanggal_selesai']));
-                                        $file = str_replace("../", "", $r['file_path']);
-                                                                                $namaProgram = htmlspecialchars($r['nama_program'], ENT_QUOTES, 'UTF-8');
-                                                                                $deskripsi = htmlspecialchars($r['deskripsi'], ENT_QUOTES, 'UTF-8');
-                                                                                $penanggungJawab = htmlspecialchars($r['penanggung_jawab'], ENT_QUOTES, 'UTF-8');
-                                                                                $deleteUrl = '?hapus=' . (int) $r['id'] . '&csrf=' . urlencode($csrfToken);
+                                        $namaProgram = htmlspecialchars($r['nama_program'], ENT_QUOTES, 'UTF-8');
+                                        $deskripsi = htmlspecialchars($r['deskripsi'], ENT_QUOTES, 'UTF-8');
+                                        $penanggungJawab = htmlspecialchars($r['penanggung_jawab'], ENT_QUOTES, 'UTF-8');
+                                        $deleteUrl = '?hapus=' . (int) $r['id'] . '&csrf=' . urlencode($csrfToken);
+
+                                        // Ubah path server jadi path web
+                                        $filePath = $r['file_path'];
+                                        $publicFile = str_replace($_SERVER['DOCUMENT_ROOT'] . '/', '', $filePath);
+                                        $publicFile = ltrim($publicFile, '/');
+
                                         echo "<tr>
-                          <td data-label='No'>$no</td>
-                                                    <td data-label='Nama Program'>{$namaProgram}</td>
-                                                    <td data-label='Deskripsi'>{$deskripsi}</td>
-                                                    <td data-label='Penanggung Jawab'>{$penanggungJawab}</td>
-                                                    <td data-label='Periode'>{$periode}</td>
-                          <td data-label='File'>
-                                                        <a href='/$file' target='_blank' rel='noopener noreferrer' class='btn btn-dashboard'>Lihat</a>
-                          </td>
-                          <td data-label='Aksi' class='actions'>
-                                                        <a href='{$deleteUrl}' 
-                               onclick=\"return confirm('Yakin ingin menghapus data ini?')\" 
-                               class='btn btn-hapus'>🗑️ Hapus</a>
-                          </td>
-                        </tr>";
+                                        <td data-label='No'>$no</td>
+                                        <td data-label='Nama Program'>{$namaProgram}</td>
+                                        <td data-label='Deskripsi'>{$deskripsi}</td>
+                                        <td data-label='Penanggung Jawab'>{$penanggungJawab}</td>
+                                        <td data-label='Periode'>{$periode}</td>
+                                        <td data-label='File'>
+                                            <a href='/$publicFile' target='_blank' rel='noopener noreferrer' class='btn btn-dashboard'>Lihat</a>
+                                        </td>
+                                        <td data-label='Aksi' class='actions'>
+                                            <a href='{$deleteUrl}' onclick=\"return confirm('Yakin ingin menghapus data ini?')\" class='btn btn-hapus'>🗑️ Hapus</a>
+                                        </td>
+                                    </tr>";
                                         $no++;
                                     }
                                 } else {
@@ -751,7 +754,8 @@ $pageTitle = "KOMITE PPI";
                             <label>Nama Program</label>
                             <input type="text" name="nama_program" required placeholder="Contoh: Program Hand Hygiene">
                             <label>Deskripsi Singkat</label>
-                            <textarea name="deskripsi" required placeholder="Contoh: Program meningkatkan kepatuhan cuci tangan."></textarea>
+                            <textarea name="deskripsi" required
+                                placeholder="Contoh: Program meningkatkan kepatuhan cuci tangan."></textarea>
                             <label>Penanggung Jawab</label>
                             <input type="text" name="penanggung_jawab" required placeholder="Contoh: Ketua PPI">
                             <label>Tanggal Mulai</label>

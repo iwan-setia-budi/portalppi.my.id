@@ -7,171 +7,171 @@ $conn = $koneksi;
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // ===============================
 // SIMPAN DATA
 // ===============================
 if (isset($_POST['submit'])) {
-    // CSRF check
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("CSRF token validation failed.");
-    }
+  // CSRF check
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("CSRF token validation failed.");
+  }
 
-    // Validate and sanitize inputs
-    $judul = trim($_POST['judul'] ?? '');
-    $jenis = trim($_POST['jenis'] ?? '');
-    $tahun = intval($_POST['tahun'] ?? 0);
-    $sumber = trim($_POST['sumber'] ?? '');
-    $berkas = '';
+  // Validate and sanitize inputs
+  $judul = trim($_POST['judul'] ?? '');
+  $jenis = trim($_POST['jenis'] ?? '');
+  $tahun = intval($_POST['tahun'] ?? 0);
+  $sumber = trim($_POST['sumber'] ?? '');
+  $berkas = '';
 
-    // Validate input length
-    if (strlen($judul) > 255 || strlen($jenis) > 255 || strlen($sumber) > 255) {
-        echo "<script>alert('Beberapa field terlalu panjang.'); window.location.href='referensi.php';</script>";
-        exit;
-    }
-
-    if (empty($judul) || empty($jenis) || $tahun < 1900 || $tahun > 2100 || empty($sumber)) {
-        echo "<script>alert('Data tidak valid. Pastikan semua field diisi dengan benar.'); window.location.href='referensi.php';</script>";
-        exit;
-    }
-
-    // Validate: must have either file or link
-    if (empty($_FILES['berkas']['name']) && empty($_POST['link'])) {
-        echo "<script>alert('Anda harus mengisi file atau link. Salah satu harus ada.'); window.location.href='referensi.php';</script>";
-        exit;
-    }
-
-    // Prevent both file and link being filled
-    if (!empty($_FILES['berkas']['name']) && !empty($_POST['link'])) {
-        echo "<script>alert('Pilih salah satu: upload file atau isi link. Tidak boleh keduanya.'); window.location.href='referensi.php';</script>";
-        exit;
-    }
-
-    // Handle file upload
-    if (!empty($_FILES['berkas']['name'])) {
-        $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        $allowedExt = ['pdf', 'doc', 'docx'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
-
-        if ($_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
-            echo "<script>alert('Error uploading file.'); window.location.href='referensi.php';</script>";
-            exit;
-        }
-
-        // Validate extension
-        $ext = strtolower(pathinfo($_FILES['berkas']['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowedExt)) {
-            echo "<script>alert('Ekstensi file tidak diizinkan. Hanya PDF, DOC, DOCX.'); window.location.href='referensi.php';</script>";
-            exit;
-        }
-
-        // Use finfo for secure MIME type detection
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $_FILES['berkas']['tmp_name']);
-        finfo_close($finfo);
-
-        // Ensure MIME and extension match
-        $mimeMap = [
-            'pdf' => 'application/pdf',
-            'doc' => 'application/msword',
-            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        ];
-        if (!isset($mimeMap[$ext]) || $mimeMap[$ext] !== $mime) {
-            echo "<script>alert('File tidak valid (ekstensi dan tipe MIME tidak cocok).'); window.location.href='referensi.php';</script>";
-            exit;
-        }
-
-        if (!in_array($mime, $allowedTypes) || $_FILES['berkas']['size'] > $maxSize) {
-            echo "<script>alert('File tidak valid. Hanya PDF, DOC, DOCX dengan ukuran maksimal 5MB.'); window.location.href='referensi.php';</script>";
-            exit;
-        }
-
-        $uploadDir = '../uploads/referensi/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        $filename = time() . '_' . bin2hex(random_bytes(5)) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $_FILES['berkas']['name']);
-        $filename = substr($filename, 0, 100); // Limit filename length
-        $filePath = $uploadDir . $filename;
-        if (!move_uploaded_file($_FILES['berkas']['tmp_name'], $filePath)) {
-            echo "<script>alert('Gagal menyimpan file.'); window.location.href='referensi.php';</script>";
-            exit;
-        }
-        $berkas = $filename;
-    } else {
-        $link = trim($_POST['link'] ?? '');
-        if (!empty($link)) {
-            if (!filter_var($link, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//', $link)) {
-                echo "<script>alert('Link tidak valid. Harus dimulai dengan http:// atau https://.'); window.location.href='referensi.php';</script>";
-                exit;
-            }
-        }
-        $berkas = $link;
-    }
-
-    // Use prepared statement
-    $stmt = mysqli_prepare($conn, "INSERT INTO tb_referensi (judul, jenis, tahun, sumber, berkas) VALUES (?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, "ssiss", $judul, $jenis, $tahun, $sumber, $berkas);
-    if (mysqli_stmt_execute($stmt)) {
-        // Rotate CSRF token after successful submission
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        echo "<script>alert('Referensi berhasil disimpan!'); window.location.href='referensi.php';</script>";
-    } else {
-        error_log("Database error: " . mysqli_error($conn));
-        echo "<script>alert('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'); window.location.href='referensi.php';</script>";
-    }
-    mysqli_stmt_close($stmt);
+  // Validate input length
+  if (strlen($judul) > 255 || strlen($jenis) > 255 || strlen($sumber) > 255) {
+    echo "<script>alert('Beberapa field terlalu panjang.'); window.location.href='referensi.php';</script>";
     exit;
+  }
+
+  if (empty($judul) || empty($jenis) || $tahun < 1900 || $tahun > 2100 || empty($sumber)) {
+    echo "<script>alert('Data tidak valid. Pastikan semua field diisi dengan benar.'); window.location.href='referensi.php';</script>";
+    exit;
+  }
+
+  // Validate: must have either file or link
+  if (empty($_FILES['berkas']['name']) && empty($_POST['link'])) {
+    echo "<script>alert('Anda harus mengisi file atau link. Salah satu harus ada.'); window.location.href='referensi.php';</script>";
+    exit;
+  }
+
+  // Prevent both file and link being filled
+  if (!empty($_FILES['berkas']['name']) && !empty($_POST['link'])) {
+    echo "<script>alert('Pilih salah satu: upload file atau isi link. Tidak boleh keduanya.'); window.location.href='referensi.php';</script>";
+    exit;
+  }
+
+  // Handle file upload
+  if (!empty($_FILES['berkas']['name'])) {
+    $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    $allowedExt = ['pdf', 'doc', 'docx'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+
+    if ($_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
+      echo "<script>alert('Error uploading file.'); window.location.href='referensi.php';</script>";
+      exit;
+    }
+
+    // Validate extension
+    $ext = strtolower(pathinfo($_FILES['berkas']['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExt)) {
+      echo "<script>alert('Ekstensi file tidak diizinkan. Hanya PDF, DOC, DOCX.'); window.location.href='referensi.php';</script>";
+      exit;
+    }
+
+    // Use finfo for secure MIME type detection
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $_FILES['berkas']['tmp_name']);
+    finfo_close($finfo);
+
+    // Ensure MIME and extension match
+    $mimeMap = [
+      'pdf' => 'application/pdf',
+      'doc' => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    if (!isset($mimeMap[$ext]) || $mimeMap[$ext] !== $mime) {
+      echo "<script>alert('File tidak valid (ekstensi dan tipe MIME tidak cocok).'); window.location.href='referensi.php';</script>";
+      exit;
+    }
+
+    if (!in_array($mime, $allowedTypes) || $_FILES['berkas']['size'] > $maxSize) {
+      echo "<script>alert('File tidak valid. Hanya PDF, DOC, DOCX dengan ukuran maksimal 5MB.'); window.location.href='referensi.php';</script>";
+      exit;
+    }
+
+    $uploadDir = '../uploads/referensi/';
+    if (!file_exists($uploadDir)) {
+      mkdir($uploadDir, 0755, true);
+    }
+
+    $filename = time() . '_' . bin2hex(random_bytes(5)) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $_FILES['berkas']['name']);
+    $filename = substr($filename, 0, 100); // Limit filename length
+    $filePath = $uploadDir . $filename;
+    if (!move_uploaded_file($_FILES['berkas']['tmp_name'], $filePath)) {
+      echo "<script>alert('Gagal menyimpan file.'); window.location.href='referensi.php';</script>";
+      exit;
+    }
+    $berkas = $filename;
+  } else {
+    $link = trim($_POST['link'] ?? '');
+    if (!empty($link)) {
+      if (!filter_var($link, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//', $link)) {
+        echo "<script>alert('Link tidak valid. Harus dimulai dengan http:// atau https://.'); window.location.href='referensi.php';</script>";
+        exit;
+      }
+    }
+    $berkas = $link;
+  }
+
+  // Use prepared statement
+  $stmt = mysqli_prepare($conn, "INSERT INTO tb_referensi (judul, jenis, tahun, sumber, berkas) VALUES (?, ?, ?, ?, ?)");
+  mysqli_stmt_bind_param($stmt, "ssiss", $judul, $jenis, $tahun, $sumber, $berkas);
+  if (mysqli_stmt_execute($stmt)) {
+    // Rotate CSRF token after successful submission
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    echo "<script>alert('Referensi berhasil disimpan!'); window.location.href='referensi.php';</script>";
+  } else {
+    error_log("Database error: " . mysqli_error($conn));
+    echo "<script>alert('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'); window.location.href='referensi.php';</script>";
+  }
+  mysqli_stmt_close($stmt);
+  exit;
 }
 
 // ===============================
 // HAPUS DATA
 // ===============================
 if (isset($_POST['hapus'])) {
-    // CSRF check
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("CSRF token validation failed.");
-    }
+  // CSRF check
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("CSRF token validation failed.");
+  }
 
-    $id = intval($_POST['id']);
-    if ($id <= 0) {
-        echo "<script>alert('ID tidak valid.'); window.location.href='referensi.php';</script>";
-        exit;
-    }
-
-    // Use prepared statement
-    $stmt = mysqli_prepare($conn, "SELECT berkas FROM tb_referensi WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $data = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-
-    // Safely delete file with path traversal protection
-    if ($data && !preg_match('/^https?:\/\//', $data['berkas'])) {
-        $uploadBase = realpath("../uploads/referensi/");
-        $filePath = realpath($uploadBase . DIRECTORY_SEPARATOR . $data['berkas']);
-        
-        if ($filePath && strpos($filePath, $uploadBase) === 0 && file_exists($filePath)) {
-            unlink($filePath);
-        }
-    }
-
-    $stmt = mysqli_prepare($conn, "DELETE FROM tb_referensi WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    if (mysqli_stmt_execute($stmt)) {
-        // Rotate CSRF token after successful deletion
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        echo "<script>alert('Referensi berhasil dihapus!'); window.location.href='referensi.php';</script>";
-    } else {
-        error_log("Database error: " . mysqli_error($conn));
-        echo "<script>alert('Terjadi kesalahan saat menghapus data. Silakan coba lagi.'); window.location.href='referensi.php';</script>";
-    }
-    mysqli_stmt_close($stmt);
+  $id = intval($_POST['id']);
+  if ($id <= 0) {
+    echo "<script>alert('ID tidak valid.'); window.location.href='referensi.php';</script>";
     exit;
+  }
+
+  // Use prepared statement
+  $stmt = mysqli_prepare($conn, "SELECT berkas FROM tb_referensi WHERE id = ?");
+  mysqli_stmt_bind_param($stmt, "i", $id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  $data = mysqli_fetch_assoc($result);
+  mysqli_stmt_close($stmt);
+
+  // Safely delete file with path traversal protection
+  if ($data && !preg_match('/^https?:\/\//', $data['berkas'])) {
+    $uploadBase = realpath("../uploads/referensi/");
+    $filePath = realpath($uploadBase . DIRECTORY_SEPARATOR . $data['berkas']);
+
+    if ($filePath && strpos($filePath, $uploadBase) === 0 && file_exists($filePath)) {
+      unlink($filePath);
+    }
+  }
+
+  $stmt = mysqli_prepare($conn, "DELETE FROM tb_referensi WHERE id = ?");
+  mysqli_stmt_bind_param($stmt, "i", $id);
+  if (mysqli_stmt_execute($stmt)) {
+    // Rotate CSRF token after successful deletion
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    echo "<script>alert('Referensi berhasil dihapus!'); window.location.href='referensi.php';</script>";
+  } else {
+    error_log("Database error: " . mysqli_error($conn));
+    echo "<script>alert('Terjadi kesalahan saat menghapus data. Silakan coba lagi.'); window.location.href='referensi.php';</script>";
+  }
+  mysqli_stmt_close($stmt);
+  exit;
 }
 
 $jenisReferensiRows = [];
@@ -204,25 +204,26 @@ if ($sumberReferensi) {
 // PAGINATION
 // ===============================
 $limit = isset($_GET['limit']) ? $_GET['limit'] : 10;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
-if ($page < 1) $page = 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+if ($page < 1)
+  $page = 1;
 
 $totalQuery = mysqli_query($conn, "SELECT COUNT(*) as total FROM tb_referensi");
 $totalReferensi = mysqli_fetch_assoc($totalQuery)['total'];
 
 $isAll = ($limit === 'all');
 if ($isAll && $totalReferensi > 500) {
-    $limit = 500;
-    $limit_sql = "LIMIT 500";
+  $limit = 500;
+  $limit_sql = "LIMIT 500";
 } elseif ($isAll) {
-    $limit_sql = "";
+  $limit_sql = "";
 } else {
-    $limit = (int)$limit;
-    if ($limit <= 0) {
-        $limit = 10;
-    }
-    $offset = ($page - 1) * $limit;
-    $limit_sql = "LIMIT $offset, $limit";
+  $limit = (int) $limit;
+  if ($limit <= 0) {
+    $limit = 10;
+  }
+  $offset = ($page - 1) * $limit;
+  $limit_sql = "LIMIT $offset, $limit";
 }
 
 $totalPages = $isAll ? 1 : ceil($totalReferensi / $limit);
@@ -244,6 +245,7 @@ $pageTitle = "REFERENSI";
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -531,13 +533,33 @@ $pageTitle = "REFERENSI";
       border: none;
     }
 
-    thead th:nth-child(1) { width: 5%; }
-    thead th:nth-child(2) { width: 40%; }
-    thead th:nth-child(3) { width: 10%; }
-    thead th:nth-child(4) { width: 8%; }
-    thead th:nth-child(5) { width: 13%; }
-    thead th:nth-child(6) { width: 12%; }
-    thead th:nth-child(7) { width: 12%; }
+    thead th:nth-child(1) {
+      width: 5%;
+    }
+
+    thead th:nth-child(2) {
+      width: 40%;
+    }
+
+    thead th:nth-child(3) {
+      width: 10%;
+    }
+
+    thead th:nth-child(4) {
+      width: 8%;
+    }
+
+    thead th:nth-child(5) {
+      width: 13%;
+    }
+
+    thead th:nth-child(6) {
+      width: 12%;
+    }
+
+    thead th:nth-child(7) {
+      width: 12%;
+    }
 
     thead th:nth-child(3),
     thead th:nth-child(4),
@@ -606,6 +628,9 @@ $pageTitle = "REFERENSI";
     tbody td:nth-child(4),
     tbody td:nth-child(5) {
       text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .title-cell {
@@ -1137,7 +1162,8 @@ $pageTitle = "REFERENSI";
         <section class="table-card">
           <div class="table-card-header">
             <h3 class="table-card-title">Daftar Dokumen Referensi</h3>
-            <span class="table-card-note">Klik berkas untuk melihat dokumen, atau hapus jika data sudah tidak dipakai.</span>
+            <span class="table-card-note">Klik berkas untuk melihat dokumen, atau hapus jika data sudah tidak
+              dipakai.</span>
           </div>
 
           <div class="table-container">
@@ -1172,7 +1198,7 @@ $pageTitle = "REFERENSI";
                       // Prevent path traversal attacks
                       $namaFile = basename($row['berkas']);
                       $filePath = "../uploads/referensi/" . $namaFile;
-                      
+
                       // Check if file exists
                       if (file_exists($filePath)) {
                         echo "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link'>Lihat</a>";
@@ -1194,9 +1220,11 @@ $pageTitle = "REFERENSI";
             </table>
           </div>
 
-          <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; padding: 0 4px;">
+          <div
+            style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; padding: 0 4px;">
             <div style="font-size:13px; color: var(--muted); font-weight: 600;">
-              Menampilkan <strong style="color: var(--ink);"><?= $currentDisplayCount ?></strong> dari <strong style="color: var(--ink);"><?= $totalReferensi ?></strong> data
+              Menampilkan <strong style="color: var(--ink);"><?= $currentDisplayCount ?></strong> dari <strong
+                style="color: var(--ink);"><?= $totalReferensi ?></strong> data
             </div>
 
             <div style="font-size:14px; color: var(--muted);">
@@ -1210,19 +1238,22 @@ $pageTitle = "REFERENSI";
             <div style="font-size:14px;">
               <?php if (!$isAll): ?>
                 <?php if ($page > 1): ?>
-                  <a href="?page=<?= $page - 1 ?>&limit=<?= htmlspecialchars($limit) ?>" class="btn btn-secondary">&laquo; Sebelumnya</a>
+                  <a href="?page=<?= $page - 1 ?>&limit=<?= htmlspecialchars($limit) ?>" class="btn btn-secondary">&laquo;
+                    Sebelumnya</a>
                 <?php endif; ?>
 
                 <?php for ($p = 1; $p <= $totalPages; $p++): ?>
                   <?php if ($p == $page): ?>
                     <span style="font-weight:700; margin:0 6px;"><?= $p ?></span>
                   <?php else: ?>
-                    <a href="?page=<?= $p ?>&limit=<?= htmlspecialchars($limit) ?>" class="btn btn-secondary" style="margin:0 3px;"><?= $p ?></a>
+                    <a href="?page=<?= $p ?>&limit=<?= htmlspecialchars($limit) ?>" class="btn btn-secondary"
+                      style="margin:0 3px;"><?= $p ?></a>
                   <?php endif; ?>
                 <?php endfor; ?>
 
                 <?php if ($page < $totalPages): ?>
-                  <a href="?page=<?= $page + 1 ?>&limit=<?= htmlspecialchars($limit) ?>" class="btn btn-secondary">Berikutnya &raquo;</a>
+                  <a href="?page=<?= $page + 1 ?>&limit=<?= htmlspecialchars($limit) ?>"
+                    class="btn btn-secondary">Berikutnya &raquo;</a>
                 <?php endif; ?>
               <?php endif; ?>
             </div>
@@ -1282,7 +1313,7 @@ $pageTitle = "REFERENSI";
         border-top:1px solid #e2e8f0;
         background:#f8fafc;
       ">
-        � <?= date('Y') ?> PPI RS Primaya Bhaktiwara Pangkalpinang  
+        � <?= date('Y') ?> PPI RS Primaya Bhaktiwara Pangkalpinang
         <br>
         Sistem Manajemen Dokumen & Regulasi
       </footer>
@@ -1345,4 +1376,5 @@ $pageTitle = "REFERENSI";
     });
   </script>
 </body>
+
 </html>

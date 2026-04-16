@@ -7,325 +7,325 @@ $conn = $koneksi;
 
 // Generate CSRF token if not exists
 if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+  $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // ===============================
 // SIMPAN DATA
 // ===============================
 if (isset($_POST['submit'])) {
-    // CSRF check
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("CSRF token validation failed.");
-    }
+  // CSRF check
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("CSRF token validation failed.");
+  }
 
-    // Validate and sanitize inputs
-    $jenis = trim($_POST['jenis'] ?? '');
-    $nomor_dokumen = trim($_POST['nomor_dokumen'] ?? '');
-    $judul = trim($_POST['judul'] ?? '');
-    $tanggal_terbit = trim($_POST['tanggal_terbit'] ?? '');
-    $klasifikasi = trim($_POST['klasifikasi'] ?? '');
-    $berkas = '';
+  // Validate and sanitize inputs
+  $jenis = trim($_POST['jenis'] ?? '');
+  $nomor_dokumen = trim($_POST['nomor_dokumen'] ?? '');
+  $judul = trim($_POST['judul'] ?? '');
+  $tanggal_terbit = trim($_POST['tanggal_terbit'] ?? '');
+  $klasifikasi = trim($_POST['klasifikasi'] ?? '');
+  $berkas = '';
 
-    // Validate input length
-    if (strlen($jenis) > 255 || strlen($nomor_dokumen) > 100 || strlen($judul) > 255 || strlen($klasifikasi) > 255) {
-        echo "<script>alert('Beberapa field terlalu panjang.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    if (empty($jenis) || empty($nomor_dokumen) || empty($judul) || empty($tanggal_terbit) || empty($klasifikasi)) {
-        echo "<script>alert('Data tidak valid. Pastikan semua field diisi dengan benar.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    // Validate: must have either file or link
-    if (empty($_FILES['berkas']['name']) && empty($_POST['link'])) {
-        echo "<script>alert('Anda harus mengisi file atau link. Salah satu harus ada.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    // Prevent both file and link being filled
-    if (!empty($_FILES['berkas']['name']) && !empty($_POST['link'])) {
-        echo "<script>alert('Pilih salah satu: upload file atau isi link. Tidak boleh keduanya.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    // Handle file upload
-    if (!empty($_FILES['berkas']['name'])) {
-        $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        $allowedExt = ['pdf', 'doc', 'docx'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
-
-        if ($_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
-            echo "<script>alert('Error uploading file.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        // Validate extension
-        $ext = strtolower(pathinfo($_FILES['berkas']['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowedExt)) {
-            echo "<script>alert('Ekstensi file tidak diizinkan. Hanya PDF, DOC, DOCX.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        // Use finfo for secure MIME type detection
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $_FILES['berkas']['tmp_name']);
-        finfo_close($finfo);
-
-        // Ensure MIME and extension match
-        $mimeMap = [
-            'pdf' => 'application/pdf',
-            'doc' => 'application/msword',
-            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        ];
-        if (!isset($mimeMap[$ext]) || $mimeMap[$ext] !== $mime) {
-            echo "<script>alert('File tidak valid (ekstensi dan tipe MIME tidak cocok).'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        if (!in_array($mime, $allowedTypes) || $_FILES['berkas']['size'] > $maxSize) {
-            echo "<script>alert('File tidak valid. Hanya PDF, DOC, DOCX dengan ukuran maksimal 5MB.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        $uploadDir = '../uploads/regulasi/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        $filename = time() . '_' . bin2hex(random_bytes(5)) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $_FILES['berkas']['name']);
-        $filename = substr($filename, 0, 100); // Limit filename length
-        $filePath = $uploadDir . $filename;
-        if (!move_uploaded_file($_FILES['berkas']['tmp_name'], $filePath)) {
-            echo "<script>alert('Gagal menyimpan file.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-        $berkas = $filename;
-    } else {
-        $link = trim($_POST['link'] ?? '');
-        if (!empty($link)) {
-            if (!filter_var($link, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//', $link)) {
-                echo "<script>alert('Link tidak valid. Harus dimulai dengan http:// atau https://.'); window.location.href='regulasi.php';</script>";
-                exit;
-            }
-        }
-        $berkas = $link;
-    }
-
-    // Use prepared statement
-    $stmt = mysqli_prepare($conn, "INSERT INTO tb_regulasi (jenis, nomor_dokumen, judul, tanggal_terbit, klasifikasi, berkas) VALUES (?, ?, ?, ?, ?, ?)");
-    mysqli_stmt_bind_param($stmt, "ssssss", $jenis, $nomor_dokumen, $judul, $tanggal_terbit, $klasifikasi, $berkas);
-    if (mysqli_stmt_execute($stmt)) {
-        // Rotate CSRF token after successful submission
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        echo "<script>alert('Regulasi berhasil disimpan!'); window.location.href='regulasi.php';</script>";
-    } else {
-        error_log("Database error: " . mysqli_error($conn));
-        echo "<script>alert('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'); window.location.href='regulasi.php';</script>";
-    }
-    mysqli_stmt_close($stmt);
+  // Validate input length
+  if (strlen($jenis) > 255 || strlen($nomor_dokumen) > 100 || strlen($judul) > 255 || strlen($klasifikasi) > 255) {
+    echo "<script>alert('Beberapa field terlalu panjang.'); window.location.href='regulasi.php';</script>";
     exit;
+  }
+
+  if (empty($jenis) || empty($nomor_dokumen) || empty($judul) || empty($tanggal_terbit) || empty($klasifikasi)) {
+    echo "<script>alert('Data tidak valid. Pastikan semua field diisi dengan benar.'); window.location.href='regulasi.php';</script>";
+    exit;
+  }
+
+  // Validate: must have either file or link
+  if (empty($_FILES['berkas']['name']) && empty($_POST['link'])) {
+    echo "<script>alert('Anda harus mengisi file atau link. Salah satu harus ada.'); window.location.href='regulasi.php';</script>";
+    exit;
+  }
+
+  // Prevent both file and link being filled
+  if (!empty($_FILES['berkas']['name']) && !empty($_POST['link'])) {
+    echo "<script>alert('Pilih salah satu: upload file atau isi link. Tidak boleh keduanya.'); window.location.href='regulasi.php';</script>";
+    exit;
+  }
+
+  // Handle file upload
+  if (!empty($_FILES['berkas']['name'])) {
+    $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    $allowedExt = ['pdf', 'doc', 'docx'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+
+    if ($_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
+      echo "<script>alert('Error uploading file.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    // Validate extension
+    $ext = strtolower(pathinfo($_FILES['berkas']['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExt)) {
+      echo "<script>alert('Ekstensi file tidak diizinkan. Hanya PDF, DOC, DOCX.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    // Use finfo for secure MIME type detection
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $_FILES['berkas']['tmp_name']);
+    finfo_close($finfo);
+
+    // Ensure MIME and extension match
+    $mimeMap = [
+      'pdf' => 'application/pdf',
+      'doc' => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    if (!isset($mimeMap[$ext]) || $mimeMap[$ext] !== $mime) {
+      echo "<script>alert('File tidak valid (ekstensi dan tipe MIME tidak cocok).'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    if (!in_array($mime, $allowedTypes) || $_FILES['berkas']['size'] > $maxSize) {
+      echo "<script>alert('File tidak valid. Hanya PDF, DOC, DOCX dengan ukuran maksimal 5MB.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    $uploadDir = '../uploads/regulasi/';
+    if (!file_exists($uploadDir)) {
+      mkdir($uploadDir, 0755, true);
+    }
+
+    $filename = time() . '_' . bin2hex(random_bytes(5)) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $_FILES['berkas']['name']);
+    $filename = substr($filename, 0, 100); // Limit filename length
+    $filePath = $uploadDir . $filename;
+    if (!move_uploaded_file($_FILES['berkas']['tmp_name'], $filePath)) {
+      echo "<script>alert('Gagal menyimpan file.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+    $berkas = $filename;
+  } else {
+    $link = trim($_POST['link'] ?? '');
+    if (!empty($link)) {
+      if (!filter_var($link, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//', $link)) {
+        echo "<script>alert('Link tidak valid. Harus dimulai dengan http:// atau https://.'); window.location.href='regulasi.php';</script>";
+        exit;
+      }
+    }
+    $berkas = $link;
+  }
+
+  // Use prepared statement
+  $stmt = mysqli_prepare($conn, "INSERT INTO tb_regulasi (jenis, nomor_dokumen, judul, tanggal_terbit, klasifikasi, berkas) VALUES (?, ?, ?, ?, ?, ?)");
+  mysqli_stmt_bind_param($stmt, "ssssss", $jenis, $nomor_dokumen, $judul, $tanggal_terbit, $klasifikasi, $berkas);
+  if (mysqli_stmt_execute($stmt)) {
+    // Rotate CSRF token after successful submission
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    echo "<script>alert('Regulasi berhasil disimpan!'); window.location.href='regulasi.php';</script>";
+  } else {
+    error_log("Database error: " . mysqli_error($conn));
+    echo "<script>alert('Terjadi kesalahan saat menyimpan data. Silakan coba lagi.'); window.location.href='regulasi.php';</script>";
+  }
+  mysqli_stmt_close($stmt);
+  exit;
 }
 
 // ===============================
 // HAPUS DATA
 // ===============================
 if (isset($_POST['hapus'])) {
-    // CSRF check
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("CSRF token validation failed.");
-    }
+  // CSRF check
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("CSRF token validation failed.");
+  }
 
-    $id = intval($_POST['id']);
-    if ($id <= 0) {
-        echo "<script>alert('ID tidak valid.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    // Use prepared statement
-    $stmt = mysqli_prepare($conn, "SELECT berkas FROM tb_regulasi WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $data = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-
-    // Safely delete file with path traversal protection
-    if ($data && !preg_match('/^https?:\/\//', $data['berkas'])) {
-        $uploadBase = realpath("../uploads/regulasi/");
-        $filePath = realpath($uploadBase . DIRECTORY_SEPARATOR . $data['berkas']);
-        
-        if ($filePath && strpos($filePath, $uploadBase) === 0 && is_file($filePath)) {
-            unlink($filePath);
-        }
-    }
-
-    $stmt = mysqli_prepare($conn, "DELETE FROM tb_regulasi WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    if (mysqli_stmt_execute($stmt)) {
-        // Rotate CSRF token after successful deletion
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        echo "<script>alert('Regulasi berhasil dihapus!'); window.location.href='regulasi.php';</script>";
-    } else {
-        error_log("Database error: " . mysqli_error($conn));
-        echo "<script>alert('Terjadi kesalahan saat menghapus data. Silakan coba lagi.'); window.location.href='regulasi.php';</script>";
-    }
-    mysqli_stmt_close($stmt);
+  $id = intval($_POST['id']);
+  if ($id <= 0) {
+    echo "<script>alert('ID tidak valid.'); window.location.href='regulasi.php';</script>";
     exit;
+  }
+
+  // Use prepared statement
+  $stmt = mysqli_prepare($conn, "SELECT berkas FROM tb_regulasi WHERE id = ?");
+  mysqli_stmt_bind_param($stmt, "i", $id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  $data = mysqli_fetch_assoc($result);
+  mysqli_stmt_close($stmt);
+
+  // Safely delete file with path traversal protection
+  if ($data && !preg_match('/^https?:\/\//', $data['berkas'])) {
+    $uploadBase = realpath("../uploads/regulasi/");
+    $filePath = realpath($uploadBase . DIRECTORY_SEPARATOR . $data['berkas']);
+
+    if ($filePath && strpos($filePath, $uploadBase) === 0 && is_file($filePath)) {
+      unlink($filePath);
+    }
+  }
+
+  $stmt = mysqli_prepare($conn, "DELETE FROM tb_regulasi WHERE id = ?");
+  mysqli_stmt_bind_param($stmt, "i", $id);
+  if (mysqli_stmt_execute($stmt)) {
+    // Rotate CSRF token after successful deletion
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    echo "<script>alert('Regulasi berhasil dihapus!'); window.location.href='regulasi.php';</script>";
+  } else {
+    error_log("Database error: " . mysqli_error($conn));
+    echo "<script>alert('Terjadi kesalahan saat menghapus data. Silakan coba lagi.'); window.location.href='regulasi.php';</script>";
+  }
+  mysqli_stmt_close($stmt);
+  exit;
 }
 
 // ===============================
 // EDIT DATA (AJAX endpoint)
 // ===============================
 if (isset($_GET['get_data'])) {
-    $id = intval($_GET['get_data']);
-    if ($id <= 0) {
-        echo json_encode(['error' => 'ID tidak valid']);
-        exit;
-    }
-
-    $stmt = mysqli_prepare($conn, "SELECT * FROM tb_regulasi WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "i", $id);
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    $data = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt);
-
-    if ($data) {
-        echo json_encode($data);
-    } else {
-        echo json_encode(['error' => 'Data tidak ditemukan']);
-    }
+  $id = intval($_GET['get_data']);
+  if ($id <= 0) {
+    echo json_encode(['error' => 'ID tidak valid']);
     exit;
+  }
+
+  $stmt = mysqli_prepare($conn, "SELECT * FROM tb_regulasi WHERE id = ?");
+  mysqli_stmt_bind_param($stmt, "i", $id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  $data = mysqli_fetch_assoc($result);
+  mysqli_stmt_close($stmt);
+
+  if ($data) {
+    echo json_encode($data);
+  } else {
+    echo json_encode(['error' => 'Data tidak ditemukan']);
+  }
+  exit;
 }
 
 // ===============================
 // UPDATE DATA
 // ===============================
 if (isset($_POST['update'])) {
-    // CSRF check
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
-        die("CSRF token validation failed.");
-    }
+  // CSRF check
+  if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("CSRF token validation failed.");
+  }
 
-    $id = intval($_POST['id']);
-    if ($id <= 0) {
-        echo "<script>alert('ID tidak valid.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    // Validate and sanitize inputs
-    $jenis = trim($_POST['jenis'] ?? '');
-    $nomor_dokumen = trim($_POST['nomor_dokumen'] ?? '');
-    $judul = trim($_POST['judul'] ?? '');
-    $tanggal_terbit = trim($_POST['tanggal_terbit'] ?? '');
-    $klasifikasi = trim($_POST['klasifikasi'] ?? '');
-    $berkas = trim($_POST['berkas_existing'] ?? '');
-
-    // Validate input length
-    if (strlen($jenis) > 255 || strlen($nomor_dokumen) > 100 || strlen($judul) > 255 || strlen($klasifikasi) > 255) {
-        echo "<script>alert('Beberapa field terlalu panjang.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    if (empty($jenis) || empty($nomor_dokumen) || empty($judul) || empty($tanggal_terbit) || empty($klasifikasi)) {
-        echo "<script>alert('Data tidak valid. Pastikan semua field diisi dengan benar.'); window.location.href='regulasi.php';</script>";
-        exit;
-    }
-
-    // Handle file upload if new file is provided
-    if (!empty($_FILES['berkas']['name'])) {
-        $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        $allowedExt = ['pdf', 'doc', 'docx'];
-        $maxSize = 5 * 1024 * 1024; // 5MB
-
-        if ($_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
-            echo "<script>alert('Error uploading file.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        // Validate extension
-        $ext = strtolower(pathinfo($_FILES['berkas']['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, $allowedExt)) {
-            echo "<script>alert('Ekstensi file tidak diizinkan. Hanya PDF, DOC, DOCX.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        // Use finfo for secure MIME type detection
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $mime = finfo_file($finfo, $_FILES['berkas']['tmp_name']);
-        finfo_close($finfo);
-
-        // Ensure MIME and extension match
-        $mimeMap = [
-            'pdf' => 'application/pdf',
-            'doc' => 'application/msword',
-            'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-        ];
-        if (!isset($mimeMap[$ext]) || $mimeMap[$ext] !== $mime) {
-            echo "<script>alert('File tidak valid (ekstensi dan tipe MIME tidak cocok).'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        if (!in_array($mime, $allowedTypes) || $_FILES['berkas']['size'] > $maxSize) {
-            echo "<script>alert('File tidak valid. Hanya PDF, DOC, DOCX dengan ukuran maksimal 5MB.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-
-        $uploadDir = '../uploads/regulasi/';
-        if (!file_exists($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
-
-        // Delete old file if it's a file (not link)
-        if (!preg_match('/^https?:\/\//', $berkas) && !empty($berkas)) {
-            $oldFilePath = realpath($uploadDir . DIRECTORY_SEPARATOR . basename($berkas));
-            if ($oldFilePath && strpos($oldFilePath, realpath($uploadDir)) === 0 && file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-        }
-
-        $filename = time() . '_' . bin2hex(random_bytes(5)) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $_FILES['berkas']['name']);
-        $filename = substr($filename, 0, 100); // Limit filename length
-        $filePath = $uploadDir . $filename;
-        if (!move_uploaded_file($_FILES['berkas']['tmp_name'], $filePath)) {
-            echo "<script>alert('Gagal menyimpan file.'); window.location.href='regulasi.php';</script>";
-            exit;
-        }
-        $berkas = $filename;
-    } elseif (!empty($_POST['link'])) {
-        $link = trim($_POST['link'] ?? '');
-        if (!empty($link)) {
-            if (!filter_var($link, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//', $link)) {
-                echo "<script>alert('Link tidak valid. Harus dimulai dengan http:// atau https://.'); window.location.href='regulasi.php';</script>";
-                exit;
-            }
-        }
-        // Delete old file if changing to link
-        if (!preg_match('/^https?:\/\//', $berkas) && !empty($berkas)) {
-            $uploadDir = '../uploads/regulasi/';
-            $oldFilePath = realpath($uploadDir . DIRECTORY_SEPARATOR . basename($berkas));
-            if ($oldFilePath && strpos($oldFilePath, realpath($uploadDir)) === 0 && file_exists($oldFilePath)) {
-                unlink($oldFilePath);
-            }
-        }
-        $berkas = $link;
-    }
-
-    // Use prepared statement for update
-    $stmt = mysqli_prepare($conn, "UPDATE tb_regulasi SET jenis = ?, nomor_dokumen = ?, judul = ?, tanggal_terbit = ?, klasifikasi = ?, berkas = ? WHERE id = ?");
-    mysqli_stmt_bind_param($stmt, "ssssssi", $jenis, $nomor_dokumen, $judul, $tanggal_terbit, $klasifikasi, $berkas, $id);
-    if (mysqli_stmt_execute($stmt)) {
-        // Rotate CSRF token after successful update
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-        echo "<script>alert('Regulasi berhasil diperbarui!'); window.location.href='regulasi.php';</script>";
-    } else {
-        error_log("Database error: " . mysqli_error($conn));
-        echo "<script>alert('Terjadi kesalahan saat memperbarui data. Silakan coba lagi.'); window.location.href='regulasi.php';</script>";
-    }
-    mysqli_stmt_close($stmt);
+  $id = intval($_POST['id']);
+  if ($id <= 0) {
+    echo "<script>alert('ID tidak valid.'); window.location.href='regulasi.php';</script>";
     exit;
+  }
+
+  // Validate and sanitize inputs
+  $jenis = trim($_POST['jenis'] ?? '');
+  $nomor_dokumen = trim($_POST['nomor_dokumen'] ?? '');
+  $judul = trim($_POST['judul'] ?? '');
+  $tanggal_terbit = trim($_POST['tanggal_terbit'] ?? '');
+  $klasifikasi = trim($_POST['klasifikasi'] ?? '');
+  $berkas = trim($_POST['berkas_existing'] ?? '');
+
+  // Validate input length
+  if (strlen($jenis) > 255 || strlen($nomor_dokumen) > 100 || strlen($judul) > 255 || strlen($klasifikasi) > 255) {
+    echo "<script>alert('Beberapa field terlalu panjang.'); window.location.href='regulasi.php';</script>";
+    exit;
+  }
+
+  if (empty($jenis) || empty($nomor_dokumen) || empty($judul) || empty($tanggal_terbit) || empty($klasifikasi)) {
+    echo "<script>alert('Data tidak valid. Pastikan semua field diisi dengan benar.'); window.location.href='regulasi.php';</script>";
+    exit;
+  }
+
+  // Handle file upload if new file is provided
+  if (!empty($_FILES['berkas']['name'])) {
+    $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+    $allowedExt = ['pdf', 'doc', 'docx'];
+    $maxSize = 5 * 1024 * 1024; // 5MB
+
+    if ($_FILES['berkas']['error'] !== UPLOAD_ERR_OK) {
+      echo "<script>alert('Error uploading file.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    // Validate extension
+    $ext = strtolower(pathinfo($_FILES['berkas']['name'], PATHINFO_EXTENSION));
+    if (!in_array($ext, $allowedExt)) {
+      echo "<script>alert('Ekstensi file tidak diizinkan. Hanya PDF, DOC, DOCX.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    // Use finfo for secure MIME type detection
+    $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    $mime = finfo_file($finfo, $_FILES['berkas']['tmp_name']);
+    finfo_close($finfo);
+
+    // Ensure MIME and extension match
+    $mimeMap = [
+      'pdf' => 'application/pdf',
+      'doc' => 'application/msword',
+      'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    if (!isset($mimeMap[$ext]) || $mimeMap[$ext] !== $mime) {
+      echo "<script>alert('File tidak valid (ekstensi dan tipe MIME tidak cocok).'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    if (!in_array($mime, $allowedTypes) || $_FILES['berkas']['size'] > $maxSize) {
+      echo "<script>alert('File tidak valid. Hanya PDF, DOC, DOCX dengan ukuran maksimal 5MB.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+
+    $uploadDir = '../uploads/regulasi/';
+    if (!file_exists($uploadDir)) {
+      mkdir($uploadDir, 0755, true);
+    }
+
+    // Delete old file if it's a file (not link)
+    if (!preg_match('/^https?:\/\//', $berkas) && !empty($berkas)) {
+      $oldFilePath = realpath($uploadDir . DIRECTORY_SEPARATOR . basename($berkas));
+      if ($oldFilePath && strpos($oldFilePath, realpath($uploadDir)) === 0 && file_exists($oldFilePath)) {
+        unlink($oldFilePath);
+      }
+    }
+
+    $filename = time() . '_' . bin2hex(random_bytes(5)) . '_' . preg_replace("/[^a-zA-Z0-9_\.-]/", "_", $_FILES['berkas']['name']);
+    $filename = substr($filename, 0, 100); // Limit filename length
+    $filePath = $uploadDir . $filename;
+    if (!move_uploaded_file($_FILES['berkas']['tmp_name'], $filePath)) {
+      echo "<script>alert('Gagal menyimpan file.'); window.location.href='regulasi.php';</script>";
+      exit;
+    }
+    $berkas = $filename;
+  } elseif (!empty($_POST['link'])) {
+    $link = trim($_POST['link'] ?? '');
+    if (!empty($link)) {
+      if (!filter_var($link, FILTER_VALIDATE_URL) || !preg_match('/^https?:\/\//', $link)) {
+        echo "<script>alert('Link tidak valid. Harus dimulai dengan http:// atau https://.'); window.location.href='regulasi.php';</script>";
+        exit;
+      }
+    }
+    // Delete old file if changing to link
+    if (!preg_match('/^https?:\/\//', $berkas) && !empty($berkas)) {
+      $uploadDir = '../uploads/regulasi/';
+      $oldFilePath = realpath($uploadDir . DIRECTORY_SEPARATOR . basename($berkas));
+      if ($oldFilePath && strpos($oldFilePath, realpath($uploadDir)) === 0 && file_exists($oldFilePath)) {
+        unlink($oldFilePath);
+      }
+    }
+    $berkas = $link;
+  }
+
+  // Use prepared statement for update
+  $stmt = mysqli_prepare($conn, "UPDATE tb_regulasi SET jenis = ?, nomor_dokumen = ?, judul = ?, tanggal_terbit = ?, klasifikasi = ?, berkas = ? WHERE id = ?");
+  mysqli_stmt_bind_param($stmt, "ssssssi", $jenis, $nomor_dokumen, $judul, $tanggal_terbit, $klasifikasi, $berkas, $id);
+  if (mysqli_stmt_execute($stmt)) {
+    // Rotate CSRF token after successful update
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    echo "<script>alert('Regulasi berhasil diperbarui!'); window.location.href='regulasi.php';</script>";
+  } else {
+    error_log("Database error: " . mysqli_error($conn));
+    echo "<script>alert('Terjadi kesalahan saat memperbarui data. Silakan coba lagi.'); window.location.href='regulasi.php';</script>";
+  }
+  mysqli_stmt_close($stmt);
+  exit;
 }
 ?>
 
@@ -334,9 +334,10 @@ if (isset($_POST['update'])) {
 // PAGINATION
 // ===============================
 $limit = isset($_GET['limit']) ? $_GET['limit'] : 15;
-$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 
-if ($page < 1) $page = 1;
+if ($page < 1)
+  $page = 1;
 
 // Hitung total data (HARUS DI ATAS sebelum logika pagination)
 $totalQuery = mysqli_query($conn, "SELECT COUNT(*) as total FROM tb_regulasi");
@@ -346,14 +347,14 @@ $totalData = mysqli_fetch_assoc($totalQuery)['total'];
 $isAll = ($limit === 'all');
 
 if ($isAll && $totalData > 500) {
-    $limit = 500;
-    $limit_sql = "LIMIT 500";
+  $limit = 500;
+  $limit_sql = "LIMIT 500";
 } elseif ($isAll) {
-    $limit_sql = "";
+  $limit_sql = "";
 } else {
-    $limit = (int)$limit;
-    $offset = ($page - 1) * $limit;
-    $limit_sql = "LIMIT $offset, $limit";
+  $limit = (int) $limit;
+  $offset = ($page - 1) * $limit;
+  $limit_sql = "LIMIT $offset, $limit";
 }
 
 $totalPages = $isAll ? 1 : ceil($totalData / $limit);
@@ -370,17 +371,42 @@ if ($regulasiQuery) {
 $totalRegulasi = $totalData;
 $currentDisplayCount = count($regulasiRows);
 
-function getStatusTanggal($tanggal) {
-    $today = new DateTime();
-    $tgl = new DateTime($tanggal);
+$totalRegulasi = $totalData;
+$currentDisplayCount = count($regulasiRows);
 
-    $diff = $tgl->diff($today);
-    $totalBulan = ($diff->y * 12) + $diff->m;
+// ===============================
+// DROPDOWN JENIS DOKUMEN & KLASIFIKASI
+// ===============================
+$jenisDokumenOptions = [];
+$qJenis = mysqli_query($conn, "SELECT nama_dokumen FROM tb_jenis_dokumen WHERE status = 'aktif' ORDER BY nama_dokumen ASC");
+if ($qJenis) {
+  while ($row = mysqli_fetch_assoc($qJenis)) {
+    $jenisDokumenOptions[] = $row['nama_dokumen'];
+  }
+}
 
-    if ($totalBulan >= 36) return 'expired';
-    if ($totalBulan >= 30) return 'warning';
+$klasifikasiOptions = [];
+$qKlasifikasi = mysqli_query($conn, "SELECT nama_regulasi FROM tb_jenis_regulasi WHERE status = 'aktif' ORDER BY nama_regulasi ASC");
+if ($qKlasifikasi) {
+  while ($row = mysqli_fetch_assoc($qKlasifikasi)) {
+    $klasifikasiOptions[] = $row['nama_regulasi'];
+  }
+}
 
-    return 'normal';
+function getStatusTanggal($tanggal)
+{
+  $today = new DateTime();
+  $tgl = new DateTime($tanggal);
+
+  $diff = $tgl->diff($today);
+  $totalBulan = ($diff->y * 12) + $diff->m;
+
+  if ($totalBulan >= 36)
+    return 'expired';
+  if ($totalBulan >= 30)
+    return 'warning';
+
+  return 'normal';
 }
 
 $pageTitle = "REGULASI";
@@ -388,6 +414,7 @@ $pageTitle = "REGULASI";
 
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -611,35 +638,39 @@ $pageTitle = "REGULASI";
     .btn-primary:hover {
       box-shadow: 0 16px 32px rgba(37, 99, 235, 0.34);
     }
-    
-/* NORMAL */
-.tgl-normal {
-  background: transparent;
-}
 
-/* BASE STYLE (biar konsisten semua status) */
-.tgl-warning,
-.tgl-expired {
-  display: inline-block;      /* WAJIB biar tidak full td */
-  padding: 4px 10px;          /* lebih rapat ke teks */
-  border-radius: 999px;       /* FULL BULAT (pill) */
-  font-weight: 700;
-  font-size: 13px;
-  line-height: 1.2;
-  white-space: nowrap;
-}
+    /* NORMAL */
+    .tgl-normal {
+      background: transparent;
+    }
 
-/* WARNING (2.5 tahun) */
-.tgl-warning {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #fff;
-}
+    /* BASE STYLE (biar konsisten semua status) */
+    .tgl-warning,
+    .tgl-expired {
+      display: inline-block;
+      /* WAJIB biar tidak full td */
+      padding: 4px 10px;
+      /* lebih rapat ke teks */
+      border-radius: 999px;
+      /* FULL BULAT (pill) */
+      font-weight: 700;
+      font-size: 13px;
+      line-height: 1.2;
+      white-space: nowrap;
+    }
 
-/* EXPIRED (3 tahun) */
-.tgl-expired {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: #fff;
-}
+    /* WARNING (2.5 tahun) */
+    .tgl-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #fff;
+    }
+
+    /* EXPIRED (3 tahun) */
+    .tgl-expired {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: #fff;
+    }
+
     .table-card {
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.92));
       border: 1px solid rgba(191, 211, 232, 0.85);
@@ -695,12 +726,13 @@ $pageTitle = "REGULASI";
       border: none;
     }
 
-    thead th:nth-child(1) { width: 4%; }
-    thead th:nth-child(2) { width: 10%; }
-    thead th:nth-child(3) { width: 35%; }
-    thead th:nth-child(4) { width: 16%; }
-    thead th:nth-child(5) { width: 11%; }
-    thead th:nth-child(6) { width: 24%; }
+    thead th:nth-child(1) { width: 3%; }
+    thead th:nth-child(2) { width: 8%; } /* jenis */
+    thead th:nth-child(3) { width: 12%; } /* klasifikasi */
+    thead th:nth-child(4) { width: 30%; } /* judul */
+    thead th:nth-child(5) { width: 16%; }
+    thead th:nth-child(6) { width: 11%; }
+    thead th:nth-child(7) { width: 20%; }
 
     table th,
     table td {
@@ -726,7 +758,8 @@ $pageTitle = "REGULASI";
       flex-wrap: nowrap;
       white-space: nowrap;
       overflow-wrap: normal;
-      padding: 8px 10px; /* memberi sedikit ruang kiri/kanan tanpa margin kanan berlebih */
+      padding: 8px 10px;
+      /* memberi sedikit ruang kiri/kanan tanpa margin kanan berlebih */
     }
 
     td[data-label="Aksi"] .file-link,
@@ -1430,7 +1463,8 @@ $pageTitle = "REGULASI";
         <section class="table-card">
           <div class="table-card-header">
             <h3 class="table-card-title">Daftar Dokumen Regulasi</h3>
-            <span class="table-card-note">Klik berkas untuk melihat dokumen, atau hapus jika data sudah tidak dipakai.</span>
+            <span class="table-card-note">Klik berkas untuk melihat dokumen, atau hapus jika data sudah tidak
+              dipakai.</span>
           </div>
 
           <div class="table-container">
@@ -1439,6 +1473,7 @@ $pageTitle = "REGULASI";
                 <tr>
                   <th>No</th>
                   <th>Jenis</th>
+                  <th>Klasifikasi</th>
                   <th>Judul</th>
                   <th>Nomor</th>
                   <th>Tanggal Terbit</th>
@@ -1449,21 +1484,27 @@ $pageTitle = "REGULASI";
                 <?php
                 // Calculate starting number based on current page (pagination-aware)
                 $no = ($limit === 'all' || $limit === 500) ? 1 : (($page - 1) * $limit) + 1;
-                
+
 
                 if (!empty($regulasiRows)) {
 
-foreach ($regulasiRows as $row) {
+                  foreach ($regulasiRows as $row) {
 
-    // HITUNG STATUS TANGGAL (WAJIB DI ATAS)
-    $status = getStatusTanggal($row['tanggal_terbit']);
+                    // HITUNG STATUS TANGGAL (WAJIB DI ATAS)
+                    $status = getStatusTanggal($row['tanggal_terbit']);
 
-    echo "<tr>
+                    echo "<tr>
         <td data-label='No'>{$no}</td>
         <td data-label='Jenis'>
-            <span class='meta-pill'>" . htmlspecialchars($row['jenis']) . "</span>
+          <span class='meta-pill'>" . htmlspecialchars($row['jenis']) . "</span>
         </td>
+
+        <td data-label='Klasifikasi'>
+          <span class='meta-pill'>" . htmlspecialchars($row['klasifikasi']) . "</span>
+        </td>
+
         <td data-label='Judul' class='title-cell'>" . htmlspecialchars($row['judul']) . "</td>
+       
         <td data-label='Nomor'>" . htmlspecialchars($row['nomor_dokumen']) . "</td>
         <td data-label='Tanggal Terbit'>
           <span class='tgl-$status'>
@@ -1474,15 +1515,15 @@ foreach ($regulasiRows as $row) {
 
                     $lihatBtn = '';
                     if (preg_match('/^https?:\/\//', $row['berkas']) && filter_var($row['berkas'], FILTER_VALIDATE_URL)) {
-                        $lihatBtn = "<a href='" . htmlspecialchars($row['berkas']) . "' target='_blank' class='file-link'>Lihat</a>";
+                      $lihatBtn = "<a href='" . htmlspecialchars($row['berkas']) . "' target='_blank' class='file-link'>Lihat</a>";
                     } elseif (!preg_match('/^https?:\/\//', $row['berkas'])) {
-                        $namaFile = basename($row['berkas']);
-                        $filePath = "../uploads/regulasi/" . $namaFile;
-                        if (file_exists($filePath)) {
-                            $lihatBtn = "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link'>Lihat</a>";
-                        } else {
-                            $lihatBtn = "<span style='color:#dc2626; font-weight:700;'>File tidak ditemukan</span>";
-                        }
+                      $namaFile = basename($row['berkas']);
+                      $filePath = "../uploads/regulasi/" . $namaFile;
+                      if (file_exists($filePath)) {
+                        $lihatBtn = "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link'>Lihat</a>";
+                      } else {
+                        $lihatBtn = "<span style='color:#dc2626; font-weight:700;'>File tidak ditemukan</span>";
+                      }
                     }
 
                     echo "
@@ -1503,46 +1544,56 @@ foreach ($regulasiRows as $row) {
           </div>
 
           <!-- PAGINATION -->
-          <div style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; padding: 0 4px;">
+          <div
+            style="margin-top:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; padding: 0 4px;">
             <!-- DATA INFO -->
             <div style="font-size:13px; color: var(--muted); font-weight: 600;">
-              Menampilkan <strong style="color: var(--ink);"><?= $currentDisplayCount ?></strong> dari <strong style="color: var(--ink);"><?= $totalRegulasi ?></strong> data
+              Menampilkan <strong style="color: var(--ink);"><?= $currentDisplayCount ?></strong> dari <strong
+                style="color: var(--ink);"><?= $totalRegulasi ?></strong> data
             </div>
-            
+
             <!-- LIMIT OPTION -->
             <div style="font-size:14px; color: var(--muted);">
               <span style="font-weight: 700;">Tampilkan:</span>
-              <a href="?page=1&limit=15" style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit == 15 ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit == 15 ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit == 15 ? '700' : '600' ?>;">15</a>
-              <a href="?page=1&limit=25" style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit == 25 ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit == 25 ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit == 25 ? '700' : '600' ?>;">25</a>
-              <a href="?page=1&limit=50" style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit == 50 ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit == 50 ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit == 50 ? '700' : '600' ?>;">50</a>
-              <a href="?page=1&limit=all" style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit === 'all' ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit === 'all' ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit === 'all' ? '700' : '600' ?>;">Semua</a>
+              <a href="?page=1&limit=15"
+                style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit == 15 ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit == 15 ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit == 15 ? '700' : '600' ?>;">15</a>
+              <a href="?page=1&limit=25"
+                style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit == 25 ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit == 25 ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit == 25 ? '700' : '600' ?>;">25</a>
+              <a href="?page=1&limit=50"
+                style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit == 50 ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit == 50 ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit == 50 ? '700' : '600' ?>;">50</a>
+              <a href="?page=1&limit=all"
+                style="margin:0 5px; padding:6px 10px; border-radius:8px; background: <?= $limit === 'all' ? '#2563eb' : '#e2e8f0' ?>; color: <?= $limit === 'all' ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $limit === 'all' ? '700' : '600' ?>;">Semua</a>
             </div>
 
             <!-- PAGE NUMBER -->
             <div style="font-size:14px;">
-              <?php 
+              <?php
               // TODO: Future enhancement - persist search/filter parameters in pagination links
               // if (!empty($_GET['search'])) { add search param to all pagination URLs }
               // if (!empty($_GET['filter'])) { add filter param to all pagination URLs }
               if ($limit !== 'all' && $limit !== 500 && $totalPages > 1): ?>
 
                 <?php if ($page > 1): ?>
-                  <a href="?page=<?= $page-1 ?>&limit=<?= $limit ?>" style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--brand); text-decoration:none; font-weight:600;">Â« Prev</a>
+                  <a href="?page=<?= $page - 1 ?>&limit=<?= $limit ?>"
+                    style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--brand); text-decoration:none; font-weight:600;">Â«
+                    Prev</a>
                 <?php endif; ?>
 
-                <?php 
+                <?php
                 $start = max(1, $page - 2);
                 $end = min($totalPages, $page + 2);
-                
+
                 if ($start > 1): ?>
-                  <a href="?page=1&limit=<?= $limit ?>" style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--ink); text-decoration:none; font-weight:600;">1</a>
+                  <a href="?page=1&limit=<?= $limit ?>"
+                    style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--ink); text-decoration:none; font-weight:600;">1</a>
                   <?php if ($start > 2): ?>
                     <span style="margin:0 3px; color:var(--muted);">...</span>
                   <?php endif; ?>
                 <?php endif; ?>
 
                 <?php for ($i = $start; $i <= $end; $i++): ?>
-                  <a href="?page=<?= $i ?>&limit=<?= $limit ?>" style="margin:0 3px; padding:6px 10px; border-radius:8px; background: <?= $i == $page ? 'var(--brand)' : '#f1f5f9' ?>; color: <?= $i == $page ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $i == $page ? '700' : '600' ?>;">
+                  <a href="?page=<?= $i ?>&limit=<?= $limit ?>"
+                    style="margin:0 3px; padding:6px 10px; border-radius:8px; background: <?= $i == $page ? 'var(--brand)' : '#f1f5f9' ?>; color: <?= $i == $page ? '#fff' : 'var(--ink)' ?>; text-decoration:none; font-weight: <?= $i == $page ? '700' : '600' ?>;">
                     <?= $i ?>
                   </a>
                 <?php endfor; ?>
@@ -1551,11 +1602,14 @@ foreach ($regulasiRows as $row) {
                   <?php if ($end < $totalPages - 1): ?>
                     <span style="margin:0 3px; color:var(--muted);">...</span>
                   <?php endif; ?>
-                  <a href="?page=<?= $totalPages ?>&limit=<?= $limit ?>" style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--ink); text-decoration:none; font-weight:600;"><?= $totalPages ?></a>
+                  <a href="?page=<?= $totalPages ?>&limit=<?= $limit ?>"
+                    style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--ink); text-decoration:none; font-weight:600;"><?= $totalPages ?></a>
                 <?php endif; ?>
 
                 <?php if ($page < $totalPages): ?>
-                  <a href="?page=<?= $page+1 ?>&limit=<?= $limit ?>" style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--brand); text-decoration:none; font-weight:600;">Next Â»</a>
+                  <a href="?page=<?= $page + 1 ?>&limit=<?= $limit ?>"
+                    style="margin:0 3px; padding:6px 10px; border-radius:8px; background:#f1f5f9; color:var(--brand); text-decoration:none; font-weight:600;">Next
+                    Â»</a>
                 <?php endif; ?>
 
               <?php endif; ?>
@@ -1571,16 +1625,15 @@ foreach ($regulasiRows as $row) {
             <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
             <input type="hidden" name="id" id="editId">
             <input type="hidden" name="berkas_existing" id="berkasExisting">
-            
+
             <label>Jenis Dokumen</label>
             <select name="jenis" id="jenis" required>
               <option value="">Pilih Jenis...</option>
-              <option value="SK (Surat Keputusan)">SK (Surat Keputusan)</option>
-              <option value="SOP (Standar Operasional Prosedur)">SOP (Standar Operasional Prosedur)</option>
-              <option value="Peraturan Menteri">Peraturan Menteri</option>
-              <option value="Keputusan Direktur">Keputusan Direktur</option>
-              <option value="Panduan Teknis">Panduan Teknis</option>
-              <option value="Memo">Memo</option>
+              <?php foreach ($jenisDokumenOptions as $item): ?>
+                <option value="<?= htmlspecialchars($item) ?>">
+                  <?= htmlspecialchars($item) ?>
+                </option>
+              <?php endforeach; ?>
             </select>
 
             <label>Nomor Dokumen</label>
@@ -1595,11 +1648,11 @@ foreach ($regulasiRows as $row) {
             <label>Klasifikasi</label>
             <select name="klasifikasi" id="klasifikasi" required>
               <option value="">Pilih Klasifikasi...</option>
-              <option value="PPI">PPI</option>
-              <option value="Keuangan">Keuangan</option>
-              <option value="SDM">SDM</option>
-              <option value="Operasional">Operasional</option>
-              <option value="Umum">Umum</option>
+              <?php foreach ($klasifikasiOptions as $item): ?>
+                <option value="<?= htmlspecialchars($item) ?>">
+                  <?= htmlspecialchars($item) ?>
+                </option>
+              <?php endforeach; ?>
             </select>
 
             <label>Berkas (PDF) atau Link</label>
@@ -1623,7 +1676,7 @@ foreach ($regulasiRows as $row) {
         border-top:1px solid #e2e8f0;
         background:#f8fafc;
       ">
-        Â© <?= date('Y') ?> PPI RS Primaya Bhaktiwara Pangkalpinang  
+        Â© <?= date('Y') ?> PPI RS Primaya Bhaktiwara Pangkalpinang
         <br>
         Sistem Manajemen Dokumen & Regulasi
       </footer>
@@ -1733,4 +1786,5 @@ foreach ($regulasiRows as $row) {
     });
   </script>
 </body>
+
 </html>
