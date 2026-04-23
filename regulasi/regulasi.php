@@ -770,6 +770,53 @@ $pageTitle = "REGULASI";
       margin: 0;
       max-width: 120px;
     }
+    
+    .aksi-cell {
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.aksi-cell .action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.aksi-cell .btn-text {
+  display: inline;
+}
+
+/* Saat tabel mulai sempit */
+@media (max-width: 1400px) {
+  .aksi-cell .action-btn {
+    min-width: 36px !important;
+    width: 36px;
+    height: 36px;
+    padding: 0  !important;
+    border-radius: 10px;
+    gap: 0;
+    font-size: 16px;
+  }
+
+  .aksi-cell .action-btn .btn-text {
+    display: none;
+  }
+}
+
+/* Kalau mau lebih rapat lagi */
+@media (max-width: 1200px) {
+  td[data-label="Aksi"] .file-link,
+  td[data-label="Aksi"] .edit,
+  td[data-label="Aksi"] .delete {
+    min-width: 32px !important;
+    width: 32px;
+    height: 32px;
+    padding: 0 !important;
+    font-size: 15px;
+  }
+}
 
     @media (max-width: 1100px) {
       td[data-label="Aksi"] {
@@ -1067,10 +1114,7 @@ $pageTitle = "REGULASI";
         0 0 0 7px rgba(245, 158, 11, 0.2);
     }
 
-    /*td[data-label="Aksi"] {*/
-    /*  text-align: center;*/
-    /*  vertical-align: middle;*/
-    /*}*/
+
 
     td[data-label="Aksi"] .file-link,
     td[data-label="Aksi"] .delete,
@@ -1515,22 +1559,22 @@ $pageTitle = "REGULASI";
 
                     $lihatBtn = '';
                     if (preg_match('/^https?:\/\//', $row['berkas']) && filter_var($row['berkas'], FILTER_VALIDATE_URL)) {
-                      $lihatBtn = "<a href='" . htmlspecialchars($row['berkas']) . "' target='_blank' class='file-link'>Lihat</a>";
+                      $lihatBtn = "<a href='" . htmlspecialchars($row['berkas']) . "' target='_blank' class='file-link action-btn' title='Lihat'>🔗 <span class='btn-text'>Lihat</span></a>";
                     } elseif (!preg_match('/^https?:\/\//', $row['berkas'])) {
                       $namaFile = basename($row['berkas']);
                       $filePath = "../uploads/regulasi/" . $namaFile;
                       if (file_exists($filePath)) {
-                        $lihatBtn = "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link'>Lihat</a>";
+                        $lihatBtn = "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link action-btn' title='Lihat'>🔗 <span class='btn-text'>Lihat</span></a>";
                       } else {
                         $lihatBtn = "<span style='color:#dc2626; font-weight:700;'>File tidak ditemukan</span>";
                       }
                     }
 
                     echo "
-                      <td data-label='Aksi'>
+                      <td data-label='Aksi' class='aksi-cell'>
                         " . $lihatBtn . "
-                        <button class='edit' onclick=\"editData({$row['id']})\">Edit</button>
-                        <button class='delete' onclick=\"hapusData({$row['id']})\">Hapus</button>
+                        <button class='edit action-btn' onclick=\"editData({$row['id']})\" title='Edit'>✏️ <span class='btn-text'>Edit</span></button>
+                        <button class='delete action-btn' onclick=\"hapusData({$row['id']})\" title='Hapus'>🗑️ <span class='btn-text'>Hapus</span></button>
                       </td>
                     </tr>";
                     $no++;
