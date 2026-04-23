@@ -27,36 +27,30 @@
 
         <div class="form-group full">
           <label class="form-label">Profesi <span class="required">*</span></label>
-          <div class="radio-list">
+          <select name="profesi" class="form-control" required>
+            <option value="">Pilih Profesi</option>
             <?php foreach ($profesiList as $profesi): ?>
-              <label class="radio-item">
-                <input
-                  type="radio"
-                  name="profesi"
-                  value="<?= htmlspecialchars($profesi) ?>"
-                  <?= (($_POST['profesi'] ?? '') === $profesi) ? 'checked' : '' ?>
-                  required>
-                <span><?= htmlspecialchars($profesi) ?></span>
-              </label>
+              <option
+                value="<?= htmlspecialchars($profesi) ?>"
+                <?= (($_POST['profesi'] ?? '') === $profesi) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($profesi) ?>
+              </option>
             <?php endforeach; ?>
-          </div>
+          </select>
         </div>
 
         <div class="form-group full">
           <label class="form-label">Ruangan yang diaudit <span class="required">*</span></label>
-          <div class="radio-list">
+          <select name="ruangan" class="form-control" required>
+            <option value="">Pilih Unit/Ruangan</option>
             <?php foreach ($ruanganList as $ruangan): ?>
-              <label class="radio-item">
-                <input
-                  type="radio"
-                  name="ruangan"
-                  value="<?= htmlspecialchars($ruangan) ?>"
-                  <?= (($_POST['ruangan'] ?? '') === $ruangan) ? 'checked' : '' ?>
-                  required>
-                <span><?= htmlspecialchars($ruangan) ?></span>
-              </label>
+              <option
+                value="<?= htmlspecialchars($ruangan) ?>"
+                <?= (($_POST['ruangan'] ?? '') === $ruangan) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($ruangan) ?>
+              </option>
             <?php endforeach; ?>
-          </div>
+          </select>
         </div>
       </div>
     </div>

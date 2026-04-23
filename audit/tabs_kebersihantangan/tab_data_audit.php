@@ -110,7 +110,7 @@
         </div>
 
         <?php if (($totalPages ?? 1) > 1): ?>
-            <div class="button-row" style="justify-content: space-between; align-items: center;">
+            <div class="button-row pagination-row">
                 <div class="small-note">
                     Halaman <?= (int) $page ?> dari <?= (int) $totalPages ?>
                 </div>

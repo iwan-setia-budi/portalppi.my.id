@@ -66,7 +66,7 @@
 
   <div class="section-card">
     <div class="section-title">Angka Kepatuhan Rumah Sakit</div>
-    <div class="table-responsive">
+    <div class="table-scroll-x">
       <table class="summary-table">
         <thead>
           <tr>
@@ -90,7 +90,7 @@
 
   <div class="section-card">
     <div class="section-title">Rekap Per Moment</div>
-    <div class="table-responsive">
+    <div class="table-scroll-x">
       <table class="summary-table">
         <thead>
           <tr>
@@ -134,7 +134,7 @@
 
   <div class="section-card">
     <div class="section-title">Rekap Per Profesi</div>
-    <div class="table-responsive">
+    <div class="table-scroll-x">
       <table class="summary-table">
         <thead>
           <tr>
@@ -178,7 +178,7 @@
 
   <div class="section-card">
     <div class="section-title">Rekap Per Unit</div>
-    <div class="table-responsive">
+    <div class="table-scroll-x">
       <table class="summary-table">
         <thead>
           <tr>
@@ -222,7 +222,7 @@
 
   <div class="section-card">
     <div class="section-title">Rekap Berdasarkan Penggunaan Antiseptik</div>
-    <div class="table-responsive">
+    <div class="table-scroll-x">
       <table class="summary-table">
         <thead>
           <tr>
@@ -253,7 +253,7 @@
 
   <div class="section-card">
     <div class="section-title">Rekap Berdasarkan Cara Melakukan HH</div>
-    <div class="table-responsive">
+    <div class="table-scroll-x">
       <table class="summary-table">
         <thead>
           <tr>
