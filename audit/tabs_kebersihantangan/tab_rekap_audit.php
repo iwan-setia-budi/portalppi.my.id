@@ -1,3 +1,62 @@
+<style>
+  #tab-rekap .summary-table th:first-child,
+  #tab-rekap .summary-table td:first-child {
+    text-align: left;
+  }
+
+  #tab-rekap .summary-table th:not(:first-child),
+  #tab-rekap .summary-table td:not(:first-child) {
+    text-align: center;
+  }
+
+  #tab-rekap .summary-table td {
+    vertical-align: middle;
+  }
+
+  /* bikin kolom angka rapi sejajar */
+  #tab-rekap .summary-table td:nth-child(2),
+  #tab-rekap .summary-table td:nth-child(3),
+  #tab-rekap .summary-table td:nth-child(4) {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+  }
+
+  /* footer biar jelas beda */
+  #tab-rekap .summary-table tfoot td {
+    background: #e0f2fe !important;
+    font-weight: 900;
+    border-top: 2px solid #1e40af;
+    font-size: 15px;
+  }
+
+  /* hover halus */
+  #tab-rekap .summary-table tbody tr:hover td {
+    background: #eff6ff !important;
+  }
+
+#tab-rekap .summary-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* kolom 1 (label) */
+#tab-rekap .summary-table th:first-child,
+#tab-rekap .summary-table td:first-child {
+  width: 55%;
+}
+
+/* kolom angka dibuat FIX semua */
+#tab-rekap .summary-table th:nth-child(2),
+#tab-rekap .summary-table td:nth-child(2),
+#tab-rekap .summary-table th:nth-child(3),
+#tab-rekap .summary-table td:nth-child(3),
+#tab-rekap .summary-table th:nth-child(4),
+#tab-rekap .summary-table td:nth-child(4) {
+  width: 15%;
+}
+
+</style>
+
 <div id="tab-rekap" class="tab-pane active">
   <div class="section-card">
     <div class="section-title">Filter Rekap</div>
@@ -44,23 +103,14 @@
             </option>
           <?php endforeach; ?>
         </select>
-      </div>
-
-      <div class="filter-row">
-        <select name="f_moment" class="form-control">
-          <option value="">Semua Moment</option>
-          <?php foreach ($moments as $key => $label): ?>
-            <option value="<?= htmlspecialchars($key) ?>" <?= $filter_moment === $key ? 'selected' : '' ?>>
-              <?= htmlspecialchars($label) ?>
-            </option>
-          <?php endforeach; ?>
-        </select>
-
         <div class="button-row">
           <button type="submit" class="btn btn-primary">Filter</button>
           <a href="?tab=tab-rekap" class="btn btn-secondary">Reset</a>
         </div>
+
       </div>
+
+
     </form>
   </div>
 
@@ -101,16 +151,16 @@
           </tr>
         </thead>
         <?php
-          $total_num_moment = 0;
-          $total_denum_moment = 0;
+        $total_num_moment = 0;
+        $total_denum_moment = 0;
         ?>
         <tbody>
           <?php while ($row = mysqli_fetch_assoc($qRekapMoment)): ?>
             <?php
-              $num = (int) $row['num'];
-              $denum = (int) $row['denum'];
-              $total_num_moment += $num;
-              $total_denum_moment += $denum;
+            $num = (int) $row['num'];
+            $denum = (int) $row['denum'];
+            $total_num_moment += $num;
+            $total_denum_moment += $denum;
             ?>
             <tr>
               <td><?= htmlspecialchars($moments[$row['label_rekap']] ?? strtoupper($row['label_rekap'])) ?></td>
@@ -145,16 +195,16 @@
           </tr>
         </thead>
         <?php
-          $total_num_profesi = 0;
-          $total_denum_profesi = 0;
+        $total_num_profesi = 0;
+        $total_denum_profesi = 0;
         ?>
         <tbody>
           <?php while ($row = mysqli_fetch_assoc($qRekapProfesi)): ?>
             <?php
-              $num = (int) $row['num'];
-              $denum = (int) $row['denum'];
-              $total_num_profesi += $num;
-              $total_denum_profesi += $denum;
+            $num = (int) $row['num'];
+            $denum = (int) $row['denum'];
+            $total_num_profesi += $num;
+            $total_denum_profesi += $denum;
             ?>
             <tr>
               <td><?= htmlspecialchars($row['label_rekap']) ?></td>
@@ -189,16 +239,16 @@
           </tr>
         </thead>
         <?php
-          $total_num_unit = 0;
-          $total_denum_unit = 0;
+        $total_num_unit = 0;
+        $total_denum_unit = 0;
         ?>
         <tbody>
           <?php while ($row = mysqli_fetch_assoc($qRekapUnit)): ?>
             <?php
-              $num = (int) $row['num'];
-              $denum = (int) $row['denum'];
-              $total_num_unit += $num;
-              $total_denum_unit += $denum;
+            $num = (int) $row['num'];
+            $denum = (int) $row['denum'];
+            $total_num_unit += $num;
+            $total_denum_unit += $denum;
             ?>
             <tr>
               <td><?= htmlspecialchars($row['label_rekap']) ?></td>
@@ -235,9 +285,9 @@
         <tbody>
           <?php foreach ($rekapAntiseptikRows as $row): ?>
             <?php
-              $persen = $denumAntiseptik > 0
-                ? round(($row['num'] / $denumAntiseptik) * 100, 2)
-                : 0;
+            $persen = $denumAntiseptik > 0
+              ? round(($row['num'] / $denumAntiseptik) * 100, 2)
+              : 0;
             ?>
             <tr>
               <td><?= htmlspecialchars($row['label_rekap']) ?></td>
@@ -266,9 +316,9 @@
         <tbody>
           <?php foreach ($rekapCaraHHRows as $row): ?>
             <?php
-              $persen = $denumCaraHH > 0
-                ? round(($row['num'] / $denumCaraHH) * 100, 2)
-                : 0;
+            $persen = $denumCaraHH > 0
+              ? round(($row['num'] / $denumCaraHH) * 100, 2)
+              : 0;
             ?>
             <tr>
               <td><?= htmlspecialchars($row['label_rekap']) ?></td>

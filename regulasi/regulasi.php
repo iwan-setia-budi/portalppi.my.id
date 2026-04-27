@@ -729,10 +729,10 @@ $pageTitle = "REGULASI";
     thead th:nth-child(1) { width: 3%; }
     thead th:nth-child(2) { width: 8%; } /* jenis */
     thead th:nth-child(3) { width: 12%; } /* klasifikasi */
-    thead th:nth-child(4) { width: 30%; } /* judul */
+    thead th:nth-child(4) { width: 34%; } /* judul */
     thead th:nth-child(5) { width: 16%; }
     thead th:nth-child(6) { width: 11%; }
-    thead th:nth-child(7) { width: 20%; }
+    thead th:nth-child(7) { width: 16%; }
 
     table th,
     table td {
@@ -748,94 +748,49 @@ $pageTitle = "REGULASI";
       overflow-wrap: normal;
     }
 
-    td[data-label="Aksi"] {
-      min-width: 170px;
-      text-align: left;
-      /*display: flex;*/
-      /*gap: 6px;*/
-      /*justify-content: flex-start;*/
-      /*align-items: center;*/
-      flex-wrap: nowrap;
-      white-space: nowrap;
-      overflow-wrap: normal;
-      padding: 8px 10px;
-      /* memberi sedikit ruang kiri/kanan tanpa margin kanan berlebih */
-    }
+td[data-label="Aksi"] {
+  min-width: 156px;
+  width: 156px;
+  padding: 6px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
 
-    td[data-label="Aksi"] .file-link,
-    td[data-label="Aksi"] .edit,
-    td[data-label="Aksi"] .delete {
-      flex: 0 1 auto;
-      min-width: 76px;
-      margin: 0;
-      max-width: 120px;
-    }
-    
-    .aksi-cell {
+.aksi-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+    gap: 8px;
+  width: 100%;
   white-space: nowrap;
-  overflow: hidden;
+}
+
+
+
+.aksi-cell .file-link,
+.aksi-cell .edit,
+.aksi-cell .delete {
+  flex: 0 0 auto;
+  margin: 0;
 }
 
 .aksi-cell .action-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  vertical-align: middle;
+  width: 36px;
+  min-width: 36px !important;
+  height: 36px;
+  padding: 0 !important;
+  border-radius: 10px;
+  gap: 0;
+  font-size: 15px;
 }
 
 .aksi-cell .btn-text {
-  display: inline;
+  display: none;
 }
 
-/* Saat tabel mulai sempit */
-@media (max-width: 1400px) {
-  .aksi-cell .action-btn {
-    min-width: 36px !important;
-    width: 36px;
-    height: 36px;
-    padding: 0  !important;
-    border-radius: 10px;
-    gap: 0;
-    font-size: 16px;
-  }
-
-  .aksi-cell .action-btn .btn-text {
-    display: none;
-  }
-}
-
-/* Kalau mau lebih rapat lagi */
-@media (max-width: 1200px) {
-  td[data-label="Aksi"] .file-link,
-  td[data-label="Aksi"] .edit,
-  td[data-label="Aksi"] .delete {
-    min-width: 32px !important;
-    width: 32px;
-    height: 32px;
-    padding: 0 !important;
-    font-size: 15px;
-  }
-}
-
-    @media (max-width: 1100px) {
-      td[data-label="Aksi"] {
-        flex-wrap: wrap;
-        white-space: normal;
-      }
-    }
-
-    @media (max-width: 768px) {
-      td[data-label="Aksi"] {
-        justify-content: center;
-      }
-
-      td[data-label="Aksi"] .file-link,
-      td[data-label="Aksi"] .edit,
-      td[data-label="Aksi"] .delete {
-        min-width: 90px;
-      }
-    }
 
     thead th:nth-child(4),
     thead th:nth-child(5),
@@ -1326,6 +1281,20 @@ $pageTitle = "REGULASI";
       border-top-color: #1e293b !important;
       background: #0b1220 !important;
     }
+    
+    @media (max-width: 768px) {
+  .aksi-cell {
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  .aksi-cell .action-btn {
+    width: 36px;
+    min-width: 36px !important;
+    height: 36px;
+    padding: 0 !important;
+  }
+}
 
     @media (max-width: 992px) {
       .container {
@@ -1559,23 +1528,25 @@ $pageTitle = "REGULASI";
 
                     $lihatBtn = '';
                     if (preg_match('/^https?:\/\//', $row['berkas']) && filter_var($row['berkas'], FILTER_VALIDATE_URL)) {
-                      $lihatBtn = "<a href='" . htmlspecialchars($row['berkas']) . "' target='_blank' class='file-link action-btn' title='Lihat'>🔗 <span class='btn-text'>Lihat</span></a>";
+                      $lihatBtn = "<a href='" . htmlspecialchars($row['berkas']) . "' target='_blank' class='file-link action-btn' title='Lihat'><span class='btn-text'>Lihat</span></a>";
                     } elseif (!preg_match('/^https?:\/\//', $row['berkas'])) {
                       $namaFile = basename($row['berkas']);
                       $filePath = "../uploads/regulasi/" . $namaFile;
                       if (file_exists($filePath)) {
-                        $lihatBtn = "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link action-btn' title='Lihat'>🔗 <span class='btn-text'>Lihat</span></a>";
+                        $lihatBtn = "<a href='" . htmlspecialchars($filePath) . "' target='_blank' class='file-link action-btn' title='Lihat'><span class='btn-text'>Lihat</span></a>";
                       } else {
                         $lihatBtn = "<span style='color:#dc2626; font-weight:700;'>File tidak ditemukan</span>";
                       }
                     }
 
                     echo "
-                      <td data-label='Aksi' class='aksi-cell'>
+                    <td data-label='Aksi'>
+                      <div class='aksi-cell'>
                         " . $lihatBtn . "
-                        <button class='edit action-btn' onclick=\"editData({$row['id']})\" title='Edit'>✏️ <span class='btn-text'>Edit</span></button>
-                        <button class='delete action-btn' onclick=\"hapusData({$row['id']})\" title='Hapus'>🗑️ <span class='btn-text'>Hapus</span></button>
-                      </td>
+                        <button class='edit action-btn' onclick=\"editData({$row['id']})\" title='Edit'><span class='btn-text'>Edit</span></button>
+                        <button class='delete action-btn' onclick=\"hapusData({$row['id']})\" title='Hapus'><span class='btn-text'>Hapus</span></button>
+                      </div>
+                    </td>
                     </tr>";
                     $no++;
                   }

@@ -165,9 +165,49 @@ $qData = mysqli_query($conn, "
   LEFT JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
   $whereDataSql
   GROUP BY a.id
-  ORDER BY a.id DESC
+  ORDER BY a.tanggal_audit DESC, a.id DESC
   LIMIT $limit OFFSET $offset
 ");
+
+$namaBulanLengkap = [
+  1 => 'Januari',
+  2 => 'Februari',
+  3 => 'Maret',
+  4 => 'April',
+  5 => 'Mei',
+  6 => 'Juni',
+  7 => 'Juli',
+  8 => 'Agustus',
+  9 => 'September',
+  10 => 'Oktober',
+  11 => 'November',
+  12 => 'Desember'
+];
+
+$qPeriodeTerkini = mysqli_query($conn, "
+  SELECT 
+    MONTH(MAX(tanggal_audit)) AS bulan,
+    YEAR(MAX(tanggal_audit)) AS tahun
+  FROM audit_hand_hygiene
+");
+
+$periodeTerkini = mysqli_fetch_assoc($qPeriodeTerkini);
+
+$bulanOpportunity = (int) ($periodeTerkini['bulan'] ?? date('n'));
+$tahunOpportunity = (int) ($periodeTerkini['tahun'] ?? date('Y'));
+
+$qOpportunityBulanBerjalan = mysqli_query($conn, "
+  SELECT COUNT(d.id) AS total_opportunity
+  FROM audit_hand_hygiene a
+  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
+  WHERE MONTH(a.tanggal_audit) = '$bulanOpportunity'
+    AND YEAR(a.tanggal_audit) = '$tahunOpportunity'
+");
+
+$opportunityBulanBerjalan = mysqli_fetch_assoc($qOpportunityBulanBerjalan);
+
+$totalOpportunityBulanBerjalan = (int) ($opportunityBulanBerjalan['total_opportunity'] ?? 0);
+$labelOpportunityBulanBerjalan = 'Opportunity ' . ($namaBulanLengkap[$bulanOpportunity] ?? '') . ' ' . $tahunOpportunity;
 
 /* =========================
    QUERY UMUM REKAP/GRAFIK
@@ -1079,6 +1119,22 @@ while ($row = mysqli_fetch_assoc($qGrafikMoment)) {
       word-break: break-word;
     }
 
+    /* KHUSUS TAB DATA */
+    #tab-data .summary-table th:nth-child(5),
+    #tab-data .summary-table th:nth-child(6),
+    #tab-data .summary-table th:nth-child(7),
+    #tab-data .summary-table td:nth-child(5),
+    #tab-data .summary-table td:nth-child(6),
+    #tab-data .summary-table td:nth-child(7) {
+      text-align: center;
+    }
+
+    /* tombol aksi biar di tengah */
+    #tab-data .aksi-group {
+      justify-content: center;
+    }
+
+
     .chart-box {
       position: relative;
       height: 340px;
@@ -1194,7 +1250,7 @@ while ($row = mysqli_fetch_assoc($qGrafikMoment)) {
         overflow-x: auto;
         overflow-y: hidden;
         -webkit-overflow-scrolling: touch;
-        touch-action: pan-x;
+        touch-action: pan-x pan-y;
       }
 
       .summary-table {
@@ -1257,8 +1313,8 @@ while ($row = mysqli_fetch_assoc($qGrafikMoment)) {
 
           <div class="hero-actions">
             <div class="hero-stat">
-              <strong><?= (int) ($totalData ?? 0) ?></strong>
-              <span>Data audit (sesuai filter)</span>
+              <strong><?= $totalOpportunityBulanBerjalan ?></strong>
+              <span><?= htmlspecialchars($labelOpportunityBulanBerjalan) ?></span>
             </div>
           </div>
         </section>
