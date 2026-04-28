@@ -97,31 +97,43 @@
 
   @media (max-width: 768px) {
     #tab-form-apd .apd-table {
-      min-width: 560px;
+      min-width: 0;
+      width: 100%;
+      table-layout: fixed;
     }
 
     #tab-form-apd .apd-table th,
     #tab-form-apd .apd-table td {
-      padding: 10px 8px;
-      font-size: 12px;
+      padding: 7px 4px;
+      font-size: 11px;
     }
 
     #tab-form-apd .apd-table td:first-child {
-      min-width: 180px;
+      min-width: 0;
       line-height: 1.3;
+      width: 52%;
+      white-space: normal;
+      word-break: break-word;
     }
 
     #tab-form-apd .apd-table input[type="radio"] {
-      width: 18px;
-      height: 18px;
+      width: 16px;
+      height: 16px;
     }
 
     #tab-form-apd .apd-table input[type="radio"]:checked {
-      border-width: 5px;
+      border-width: 4px;
+    }
+
+    #tab-form-apd .apd-table th:not(:first-child),
+    #tab-form-apd .apd-table td:not(:first-child) {
+      width: 16%;
+      text-align: center;
+      white-space: nowrap;
     }
 
     #tab-form-apd .table-responsive::after {
-      display: block;
+      display: none;
     }
   }
 </style>

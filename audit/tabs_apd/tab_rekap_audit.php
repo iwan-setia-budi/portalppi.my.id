@@ -64,6 +64,62 @@
     color: #475569;
     border: 1px solid #cbd5e1;
   }
+
+  @media (max-width: 768px) {
+    #tab-rekap-apd .table-scroll-x {
+      overflow-x: hidden;
+    }
+
+    #tab-rekap-apd .summary-table {
+      min-width: 0;
+      width: 100%;
+      table-layout: fixed;
+    }
+
+    #tab-rekap-apd .summary-table th,
+    #tab-rekap-apd .summary-table td {
+      padding: 6px 4px;
+      font-size: 11px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    #tab-rekap-apd .summary-table th:first-child,
+    #tab-rekap-apd .summary-table td:first-child {
+      width: 52%;
+    }
+
+    #tab-rekap-apd .summary-table th:nth-child(2),
+    #tab-rekap-apd .summary-table td:nth-child(2),
+    #tab-rekap-apd .summary-table th:nth-child(3),
+    #tab-rekap-apd .summary-table td:nth-child(3),
+    #tab-rekap-apd .summary-table th:nth-child(6),
+    #tab-rekap-apd .summary-table td:nth-child(6) {
+      width: 16%;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    #tab-rekap-apd .summary-table th:nth-child(4),
+    #tab-rekap-apd .summary-table td:nth-child(4),
+    #tab-rekap-apd .summary-table th:nth-child(5),
+    #tab-rekap-apd .summary-table td:nth-child(5) {
+      display: none;
+    }
+
+    #tab-rekap-apd .badge-ya,
+    #tab-rekap-apd .badge-tidak,
+    #tab-rekap-apd .badge-na {
+      min-width: 34px;
+      padding: 3px 6px;
+      font-size: 10px;
+    }
+
+    #tab-rekap-apd .summary-table tfoot td {
+      font-size: 12px;
+      padding: 7px 4px;
+    }
+  }
 </style>
 
 <div id="tab-rekap-apd" class="tab-pane active">

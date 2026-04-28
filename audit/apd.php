@@ -222,7 +222,7 @@ $kepatuhanAPD = mysqli_fetch_assoc($qKepatuhanAPD) ?: ['ya' => 0, 'tidak' => 0, 
 
 $qRekapIndikator = mysqli_query($conn, "
   SELECT
-    d.indikator_key,
+    MIN(d.indikator_key) AS indikator_key,
     d.indikator_label,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS ya,
     SUM(CASE WHEN d.jawaban = 'tidak' THEN 1 ELSE 0 END) AS tidak,
@@ -230,13 +230,13 @@ $qRekapIndikator = mysqli_query($conn, "
   FROM audit_apd a
   JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereRekapSql " . ($whereRekapSql ? "AND" : "WHERE") . " d.kategori = 'indikator_penilaian'
-  GROUP BY d.indikator_key, d.indikator_label
+  GROUP BY d.indikator_label
   ORDER BY d.indikator_label ASC
 ");
 
 $qRekapAPD = mysqli_query($conn, "
   SELECT
-    d.indikator_key,
+    MIN(d.indikator_key) AS indikator_key,
     d.indikator_label,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS ya,
     SUM(CASE WHEN d.jawaban = 'tidak' THEN 1 ELSE 0 END) AS tidak,
@@ -244,7 +244,7 @@ $qRekapAPD = mysqli_query($conn, "
   FROM audit_apd a
   JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereRekapSql " . ($whereRekapSql ? "AND" : "WHERE") . " d.kategori = 'apd_digunakan'
-  GROUP BY d.indikator_key, d.indikator_label
+  GROUP BY d.indikator_label
   ORDER BY d.indikator_label ASC
 ");
 
@@ -681,45 +681,75 @@ $qRekapUnit = mysqli_query($conn, "
 
     @media (max-width: 768px) {
       .audit-wrapper {
-        padding: 0 8px;
-        margin: 16px auto 28px;
+        padding: 0 6px;
+        margin: 12px auto 20px;
       }
 
       .hero-header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 18px 16px;
+        padding: 14px 12px;
+        gap: 10px;
       }
 
       .hero-content h1 {
-        font-size: 22px;
+        font-size: 19px;
       }
 
       .hero-content .subtitle {
-        font-size: 13px;
+        font-size: 12px;
+        margin-top: 6px;
       }
 
       .section-card {
-        padding: 14px;
-        border-radius: 12px;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 12px;
       }
 
       .form-grid {
         grid-template-columns: 1fr;
-        gap: 14px;
+        gap: 10px;
       }
 
       .section-title {
-        font-size: 16px;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+
+      .form-label {
+        font-size: 12px;
+      }
+
+      .form-control,
+      .form-textarea {
+        min-height: 40px;
+        padding: 9px 10px;
+        font-size: 13px;
+      }
+
+      .tab-menu {
+        gap: 6px;
+        margin-bottom: 12px;
+      }
+
+      .tab-btn {
+        padding: 8px 12px;
+        font-size: 12px;
       }
 
       .button-row {
         flex-direction: column;
         align-items: stretch;
+        gap: 8px;
+        margin-top: 12px;
       }
 
       .button-row .btn {
         width: 100%;
+        min-height: 38px;
+        padding: 9px 12px;
+        font-size: 12px;
       }
 
       .tab-menu {
@@ -741,6 +771,21 @@ $qRekapUnit = mysqli_query($conn, "
       .filter-row + .filter-row {
         grid-template-columns: 1fr !important;
         align-items: stretch;
+      }
+
+      .summary-table {
+        min-width: 680px;
+      }
+
+      .summary-table thead th,
+      .summary-table tbody td {
+        padding: 8px 8px;
+        font-size: 12px;
+      }
+
+      .small-note {
+        font-size: 11px;
+        margin-top: 6px;
       }
     }
   </style>

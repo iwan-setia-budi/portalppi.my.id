@@ -512,7 +512,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Kebersihan Tangan</h4>
                             </a>
 
-                            <a href="https://linktr.ee/fasilitas1234" class="internal-card">
+                            <a href="./apd.php" class="internal-card">
                                 <div class="internal-icon">🧤</div>
                                 <h4>Audit APD</h4>
                             </a>

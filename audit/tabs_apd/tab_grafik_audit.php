@@ -77,7 +77,7 @@ $qGrafikIndikator = mysqli_query($conn, "
   FROM audit_apd a
   JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereIndikatorSql
-  GROUP BY d.indikator_key, d.indikator_label
+  GROUP BY d.indikator_label
   ORDER BY d.indikator_label ASC
 ");
 
@@ -110,7 +110,7 @@ $qGrafikAPD = mysqli_query($conn, "
   FROM audit_apd a
   JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereApdSql
-  GROUP BY d.indikator_key, d.indikator_label
+  GROUP BY d.indikator_label
   ORDER BY d.indikator_label ASC
 ");
 
@@ -516,7 +516,7 @@ $judulGrafikTren = 'Grafik Tren Kepatuhan APD ' . $periodeJudul . ' di Rumah Sak
 
         if (!yScale) return;
 
-        const y = yScale.getPixelForValue(90);
+        const y = yScale.getPixelForValue(100);
         const leftX = chart.chartArea.left;
         const rightX = chart.chartArea.right;
 
@@ -534,7 +534,7 @@ $judulGrafikTren = 'Grafik Tren Kepatuhan APD ' . $periodeJudul . ' di Rumah Sak
         ctx.fillStyle = '#dc2626';
         ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'right';
-        ctx.fillText('Standar Minimal 90%', rightX - 6, y - 8);
+        ctx.fillText('Target 100%', rightX - 6, y - 8);
 
         ctx.restore();
       }
@@ -648,13 +648,13 @@ $judulGrafikTren = 'Grafik Tren Kepatuhan APD ' . $periodeJudul . ' di Rumah Sak
 
     function warnaBar(values) {
       return values.map(function (value) {
-        return value >= 90 ? 'rgba(22, 163, 74, 0.82)' : 'rgba(220, 38, 38, 0.82)';
+        return value >= 100 ? 'rgba(22, 163, 74, 0.82)' : 'rgba(220, 38, 38, 0.82)';
       });
     }
 
     function warnaBorder(values) {
       return values.map(function (value) {
-        return value >= 90 ? 'rgba(21, 128, 61, 1)' : 'rgba(185, 28, 28, 1)';
+        return value >= 100 ? 'rgba(21, 128, 61, 1)' : 'rgba(185, 28, 28, 1)';
       });
     }
 
