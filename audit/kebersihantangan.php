@@ -361,77 +361,8 @@ while ($row = mysqli_fetch_assoc($qRekapCaraHH)) {
   $denumCaraHH += $row['num'];
   $rekapCaraHHRows[] = $row;
 }
-
-/* =========================
-   DATA GRAFIK
-========================= */
-
-$grafikProfesiLabel = [];
-$grafikProfesiValue = [];
-
-$qGrafikProfesi = mysqli_query($conn, "
-  SELECT 
-    a.profesi,
-    ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
-      2
-    ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
-  $whereSql
-  GROUP BY a.profesi
-  ORDER BY a.profesi ASC
-");
-
-while ($row = mysqli_fetch_assoc($qGrafikProfesi)) {
-  $grafikProfesiLabel[] = $row['profesi'];
-  $grafikProfesiValue[] = (float) $row['persen'];
-}
-
-$grafikUnitLabel = [];
-$grafikUnitValue = [];
-
-$qGrafikUnit = mysqli_query($conn, "
-  SELECT 
-    a.ruangan,
-    ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
-      2
-    ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
-  $whereSql
-  GROUP BY a.ruangan
-  ORDER BY a.ruangan ASC
-");
-
-while ($row = mysqli_fetch_assoc($qGrafikUnit)) {
-  $grafikUnitLabel[] = $row['ruangan'];
-  $grafikUnitValue[] = (float) $row['persen'];
-}
-
-$grafikMomentLabel = [];
-$grafikMomentValue = [];
-
-$qGrafikMoment = mysqli_query($conn, "
-  SELECT 
-    d.moment_key,
-    ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
-      2
-    ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
-  $whereSql
-  GROUP BY d.moment_key
-  ORDER BY d.moment_key ASC
-");
-
-while ($row = mysqli_fetch_assoc($qGrafikMoment)) {
-  $grafikMomentLabel[] = strtoupper($row['moment_key']);
-  $grafikMomentValue[] = (float) $row['persen'];
-}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

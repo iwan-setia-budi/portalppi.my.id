@@ -1,6 +1,6 @@
 <?php
 /* =========================
-   FILTER KHUSUS TAB GRAFIK
+   FILTER KHUSUS TAB GRAFIK APD
 ========================= */
 
 $filter_periode = $_GET['periode'] ?? '';
@@ -9,7 +9,7 @@ $filter_triwulan = $_GET['triwulan'] ?? '';
 $filter_tahun = $_GET['tahun'] ?? '';
 $filter_profesi = $_GET['f_profesi'] ?? '';
 $filter_ruangan = $_GET['f_ruangan'] ?? '';
-$filter_moment = $_GET['f_moment'] ?? '';
+$filter_kategori = $_GET['f_kategori'] ?? '';
 
 $whereGrafik = [];
 
@@ -21,8 +21,8 @@ if ($filter_ruangan !== '') {
   $whereGrafik[] = "a.ruangan = '" . mysqli_real_escape_string($conn, $filter_ruangan) . "'";
 }
 
-if ($filter_moment !== '') {
-  $whereGrafik[] = "d.moment_key = '" . mysqli_real_escape_string($conn, $filter_moment) . "'";
+if ($filter_kategori !== '') {
+  $whereGrafik[] = "d.kategori = '" . mysqli_real_escape_string($conn, $filter_kategori) . "'";
 }
 
 if ($filter_periode === 'bulan' && $filter_bulan !== '' && $filter_tahun !== '') {
@@ -53,6 +53,73 @@ if ($filter_periode === 'tahun' && $filter_tahun !== '') {
 $whereGrafikSql = count($whereGrafik) ? 'WHERE ' . implode(' AND ', $whereGrafik) : '';
 
 /* =========================
+   GRAFIK INDIKATOR PENILAIAN
+   % = Ya / (Ya + Tidak), NA tidak dihitung
+========================= */
+
+$grafikIndikatorLabel = [];
+$grafikIndikatorValue = [];
+
+$whereIndikatorSql = $whereGrafikSql
+  ? $whereGrafikSql . " AND d.kategori = 'indikator_penilaian'"
+  : "WHERE d.kategori = 'indikator_penilaian'";
+
+$qGrafikIndikator = mysqli_query($conn, "
+  SELECT
+    d.indikator_label,
+    SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS ya,
+    SUM(CASE WHEN d.jawaban = 'tidak' THEN 1 ELSE 0 END) AS tidak,
+    ROUND(
+      (SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) /
+      NULLIF(SUM(CASE WHEN d.jawaban IN ('ya','tidak') THEN 1 ELSE 0 END), 0)) * 100,
+      2
+    ) AS persen
+  FROM audit_apd a
+  JOIN audit_apd_detail d ON a.id = d.audit_id
+  $whereIndikatorSql
+  GROUP BY d.indikator_key, d.indikator_label
+  ORDER BY d.indikator_label ASC
+");
+
+while ($row = mysqli_fetch_assoc($qGrafikIndikator)) {
+  $grafikIndikatorLabel[] = $row['indikator_label'];
+  $grafikIndikatorValue[] = (float) ($row['persen'] ?? 0);
+}
+
+/* =========================
+   GRAFIK APD DIGUNAKAN
+========================= */
+
+$grafikApdLabel = [];
+$grafikApdValue = [];
+
+$whereApdSql = $whereGrafikSql
+  ? $whereGrafikSql . " AND d.kategori = 'apd_digunakan'"
+  : "WHERE d.kategori = 'apd_digunakan'";
+
+$qGrafikAPD = mysqli_query($conn, "
+  SELECT
+    d.indikator_label,
+    SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS ya,
+    SUM(CASE WHEN d.jawaban = 'tidak' THEN 1 ELSE 0 END) AS tidak,
+    ROUND(
+      (SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) /
+      NULLIF(SUM(CASE WHEN d.jawaban IN ('ya','tidak') THEN 1 ELSE 0 END), 0)) * 100,
+      2
+    ) AS persen
+  FROM audit_apd a
+  JOIN audit_apd_detail d ON a.id = d.audit_id
+  $whereApdSql
+  GROUP BY d.indikator_key, d.indikator_label
+  ORDER BY d.indikator_label ASC
+");
+
+while ($row = mysqli_fetch_assoc($qGrafikAPD)) {
+  $grafikApdLabel[] = $row['indikator_label'];
+  $grafikApdValue[] = (float) ($row['persen'] ?? 0);
+}
+
+/* =========================
    GRAFIK PROFESI
 ========================= */
 
@@ -60,14 +127,15 @@ $grafikProfesiLabel = [];
 $grafikProfesiValue = [];
 
 $qGrafikProfesi = mysqli_query($conn, "
-  SELECT 
+  SELECT
     a.profesi,
     ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
+      (SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) /
+      NULLIF(SUM(CASE WHEN d.jawaban IN ('ya','tidak') THEN 1 ELSE 0 END), 0)) * 100,
       2
     ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
+  FROM audit_apd a
+  JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereGrafikSql
   GROUP BY a.profesi
   ORDER BY a.profesi ASC
@@ -75,7 +143,7 @@ $qGrafikProfesi = mysqli_query($conn, "
 
 while ($row = mysqli_fetch_assoc($qGrafikProfesi)) {
   $grafikProfesiLabel[] = $row['profesi'];
-  $grafikProfesiValue[] = (float) $row['persen'];
+  $grafikProfesiValue[] = (float) ($row['persen'] ?? 0);
 }
 
 /* =========================
@@ -86,14 +154,15 @@ $grafikUnitLabel = [];
 $grafikUnitValue = [];
 
 $qGrafikUnit = mysqli_query($conn, "
-  SELECT 
+  SELECT
     a.ruangan,
     ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
+      (SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) /
+      NULLIF(SUM(CASE WHEN d.jawaban IN ('ya','tidak') THEN 1 ELSE 0 END), 0)) * 100,
       2
     ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
+  FROM audit_apd a
+  JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereGrafikSql
   GROUP BY a.ruangan
   ORDER BY a.ruangan ASC
@@ -101,38 +170,9 @@ $qGrafikUnit = mysqli_query($conn, "
 
 while ($row = mysqli_fetch_assoc($qGrafikUnit)) {
   $grafikUnitLabel[] = $row['ruangan'];
-  $grafikUnitValue[] = (float) $row['persen'];
+  $grafikUnitValue[] = (float) ($row['persen'] ?? 0);
 }
 
-/* =========================
-   GRAFIK MOMENT
-========================= */
-
-$grafikMomentLabel = [];
-$grafikMomentValue = [];
-
-$qGrafikMoment = mysqli_query($conn, "
-  SELECT 
-    d.moment_key,
-    ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
-      2
-    ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
-  $whereGrafikSql
-  GROUP BY d.moment_key
-  ORDER BY d.moment_key ASC
-");
-
-while ($row = mysqli_fetch_assoc($qGrafikMoment)) {
-  $grafikMomentLabel[] = $moments[$row['moment_key']] ?? strtoupper($row['moment_key']);
-  $grafikMomentValue[] = (float) $row['persen'];
-}
-
-/* =========================
-   GRAFIK TREN BULANAN
-========================= */
 /* =========================
    GRAFIK TREN BULANAN
 ========================= */
@@ -190,8 +230,8 @@ if ($filter_ruangan !== '') {
   $whereTren[] = "a.ruangan = '" . mysqli_real_escape_string($conn, $filter_ruangan) . "'";
 }
 
-if ($filter_moment !== '') {
-  $whereTren[] = "d.moment_key = '" . mysqli_real_escape_string($conn, $filter_moment) . "'";
+if ($filter_kategori !== '') {
+  $whereTren[] = "d.kategori = '" . mysqli_real_escape_string($conn, $filter_kategori) . "'";
 }
 
 if ($filter_tahun !== '') {
@@ -206,14 +246,15 @@ $whereTren[] = "MONTH(a.tanggal_audit) IN ($bulanIn)";
 $whereTrenSql = count($whereTren) ? 'WHERE ' . implode(' AND ', $whereTren) : '';
 
 $qGrafikTren = mysqli_query($conn, "
-  SELECT 
+  SELECT
     MONTH(a.tanggal_audit) AS bulan,
     ROUND(
-      (SUM(CASE WHEN d.hasil_observasi <> 'missed' THEN 1 ELSE 0 END) / COUNT(*)) * 100,
+      (SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) /
+      NULLIF(SUM(CASE WHEN d.jawaban IN ('ya','tidak') THEN 1 ELSE 0 END), 0)) * 100,
       2
     ) AS persen
-  FROM audit_hand_hygiene a
-  JOIN audit_hand_hygiene_detail d ON a.id = d.audit_id
+  FROM audit_apd a
+  JOIN audit_apd_detail d ON a.id = d.audit_id
   $whereTrenSql
   GROUP BY MONTH(a.tanggal_audit)
   ORDER BY MONTH(a.tanggal_audit) ASC
@@ -221,7 +262,7 @@ $qGrafikTren = mysqli_query($conn, "
 
 while ($row = mysqli_fetch_assoc($qGrafikTren)) {
   $bulan = (int) $row['bulan'];
-  $grafikTrenValue[$bulan] = (float) $row['persen'];
+  $grafikTrenValue[$bulan] = (float) ($row['persen'] ?? 0);
 }
 
 $grafikTrenValue = array_values($grafikTrenValue);
@@ -253,13 +294,11 @@ if ($filter_periode === 'bulan' && $filter_bulan !== '' && $filter_tahun !== '')
   $periodeJudul = 'Tahun ' . $filter_tahun;
 }
 
-$judulGrafikProfesi = 'Grafik Kepatuhan Kebersihan Tangan Berdasarkan Profesi ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
-$judulGrafikUnit = 'Grafik Kepatuhan Kebersihan Tangan Berdasarkan Unit ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
-$judulGrafikMoment = 'Grafik Kepatuhan Kebersihan Tangan Berdasarkan Moment ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
-$judulGrafikTren = 'Grafik Tren Kepatuhan Kebersihan Tangan ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
-
-$namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
-
+$judulGrafikIndikator = 'Grafik Kepatuhan APD Berdasarkan Indikator Penilaian ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
+$judulGrafikAPD = 'Grafik APD yang Digunakan ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
+$judulGrafikProfesi = 'Grafik Kepatuhan APD Berdasarkan Profesi ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
+$judulGrafikUnit = 'Grafik Kepatuhan APD Berdasarkan Unit ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
+$judulGrafikTren = 'Grafik Tren Kepatuhan APD ' . $periodeJudul . ' di Rumah Sakit Primaya Bhakti Wara';
 ?>
 
 <style>
@@ -287,7 +326,7 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
     box-shadow: 0 14px 28px rgba(15, 23, 42, 0.22);
   }
 
-  .chart-box {
+  #tab-grafik-apd .chart-box {
     position: relative;
     height: 560px !important;
     min-height: 560px !important;
@@ -300,10 +339,9 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
   }
 </style>
 
-<div id="tab-grafik" class="tab-pane active">
-
+<div id="tab-grafik-apd" class="tab-pane active">
   <div class="section-card">
-    <div class="section-title">Filter Grafik</div>
+    <div class="section-title">Filter Grafik Audit APD</div>
 
     <form method="get">
       <input type="hidden" name="tab" value="tab-grafik">
@@ -362,13 +400,10 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
           <?php endforeach; ?>
         </select>
 
-        <select name="f_moment" class="form-control">
-          <option value="">Semua Moment</option>
-          <?php foreach ($moments as $key => $label): ?>
-            <option value="<?= htmlspecialchars($key) ?>" <?= $filter_moment === $key ? 'selected' : '' ?>>
-              <?= htmlspecialchars($label) ?>
-            </option>
-          <?php endforeach; ?>
+        <select name="f_kategori" class="form-control">
+          <option value="">Semua Kategori</option>
+          <option value="indikator_penilaian" <?= $filter_kategori === 'indikator_penilaian' ? 'selected' : '' ?>>Indikator Penilaian</option>
+          <option value="apd_digunakan" <?= $filter_kategori === 'apd_digunakan' ? 'selected' : '' ?>>APD yang Digunakan</option>
         </select>
 
         <div class="button-row" style="margin-top:0;">
@@ -380,10 +415,33 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
   </div>
 
   <div class="section-card">
+    <div class="section-title">Grafik Kepatuhan Per Indikator Penilaian</div>
+    <div class="chart-toolbar">
+      <button type="button" class="chart-download-btn" onclick="downloadChart('chartIndikator', 'grafik-apd-indikator')">
+        Download Gambar
+      </button>
+    </div>
+    <div class="chart-box">
+      <canvas id="chartIndikator"></canvas>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-title">Grafik APD yang Digunakan</div>
+    <div class="chart-toolbar">
+      <button type="button" class="chart-download-btn" onclick="downloadChart('chartAPD', 'grafik-apd-digunakan')">
+        Download Gambar
+      </button>
+    </div>
+    <div class="chart-box">
+      <canvas id="chartAPD"></canvas>
+    </div>
+  </div>
+
+  <div class="section-card">
     <div class="section-title">Grafik Kepatuhan Per Profesi</div>
     <div class="chart-toolbar">
-      <button type="button" class="chart-download-btn"
-        onclick="downloadChart('chartProfesi', 'grafik-kepatuhan-profesi')">
+      <button type="button" class="chart-download-btn" onclick="downloadChart('chartProfesi', 'grafik-apd-profesi')">
         Download Gambar
       </button>
     </div>
@@ -395,7 +453,7 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
   <div class="section-card">
     <div class="section-title">Grafik Kepatuhan Per Unit</div>
     <div class="chart-toolbar">
-      <button type="button" class="chart-download-btn" onclick="downloadChart('chartUnit', 'grafik-kepatuhan-unit')">
+      <button type="button" class="chart-download-btn" onclick="downloadChart('chartUnit', 'grafik-apd-unit')">
         Download Gambar
       </button>
     </div>
@@ -405,22 +463,9 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
   </div>
 
   <div class="section-card">
-    <div class="section-title">Grafik Kepatuhan Per Moment</div>
-    <div class="chart-toolbar">
-      <button type="button" class="chart-download-btn"
-        onclick="downloadChart('chartMoment', 'grafik-kepatuhan-moment')">
-        Download Gambar
-      </button>
-    </div>
-    <div class="chart-box">
-      <canvas id="chartMoment"></canvas>
-    </div>
-  </div>
-
-  <div class="section-card">
     <div class="section-title">Grafik Tren Kepatuhan Januari - Desember</div>
     <div class="chart-toolbar">
-      <button type="button" class="chart-download-btn" onclick="downloadChart('chartTren', 'grafik-tren-kepatuhan')">
+      <button type="button" class="chart-download-btn" onclick="downloadChart('chartTren', 'grafik-apd-tren')">
         Download Gambar
       </button>
     </div>
@@ -509,7 +554,6 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
             if (value === null || value === undefined) return;
 
             const position = element.tooltipPosition();
-
             let yPos = position.y - 10;
 
             if (value >= 95) {
@@ -553,29 +597,21 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
           x: {
             ticks: {
               color: '#0f172a',
-              font: {
-                weight: 'bold'
-              }
+              font: { weight: 'bold' }
             },
-            grid: {
-              color: 'rgba(148, 163, 184, 0.22)'
-            }
+            grid: { color: 'rgba(148, 163, 184, 0.22)' }
           },
           y: {
             beginAtZero: true,
             max: 100,
             ticks: {
               color: '#0f172a',
-              font: {
-                weight: 'bold'
-              },
+              font: { weight: 'bold' },
               callback: function (value) {
                 return value + '%';
               }
             },
-            grid: {
-              color: 'rgba(100, 116, 139, 0.24)'
-            }
+            grid: { color: 'rgba(100, 116, 139, 0.24)' }
           }
         },
         plugins: {
@@ -583,14 +619,8 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
             display: true,
             text: chartTitle,
             color: '#0f172a',
-            font: {
-              size: 16,
-              weight: 'bold'
-            },
-            padding: {
-              top: 6,
-              bottom: 18
-            }
+            font: { size: 16, weight: 'bold' },
+            padding: { top: 6, bottom: 18 }
           },
           legend: {
             position: 'top',
@@ -599,23 +629,7 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
               color: '#0f172a',
               boxWidth: 36,
               padding: 22,
-              font: {
-                weight: 'bold'
-              },
-              generateLabels: function (chart) {
-                const datasets = chart.data.datasets;
-
-                return datasets.map(function (dataset, i) {
-                  return {
-                    text: dataset.label,
-                    fillStyle: 'rgba(0,0,0,0)', // ⬅️ isi transparan
-                    strokeStyle: '#0f6f57',     // ⬅️ border tetap terlihat
-                    lineWidth: 2,
-                    hidden: !chart.isDatasetVisible(i),
-                    index: i
-                  };
-                });
-              }
+              font: { weight: 'bold' }
             }
           },
           tooltip: {
@@ -644,10 +658,49 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
       });
     }
 
+    const dataIndikator = <?= json_encode($grafikIndikatorValue) ?>;
+    const dataAPD = <?= json_encode($grafikApdValue) ?>;
     const dataProfesi = <?= json_encode($grafikProfesiValue) ?>;
     const dataUnit = <?= json_encode($grafikUnitValue) ?>;
-    const dataMoment = <?= json_encode($grafikMomentValue) ?>;
     const dataTren = <?= json_encode($grafikTrenValue) ?>;
+
+    const chartIndikator = document.getElementById('chartIndikator');
+    if (chartIndikator) {
+      new Chart(chartIndikator, {
+        type: 'bar',
+        data: {
+          labels: <?= json_encode($grafikIndikatorLabel) ?>,
+          datasets: [{
+            label: 'Kepatuhan (%)',
+            data: dataIndikator,
+            backgroundColor: warnaBar(dataIndikator),
+            borderColor: warnaBorder(dataIndikator),
+            borderWidth: 1.5,
+            borderRadius: 8
+          }]
+        },
+        options: getChartOptions(<?= json_encode($judulGrafikIndikator) ?>)
+      });
+    }
+
+    const chartAPD = document.getElementById('chartAPD');
+    if (chartAPD) {
+      new Chart(chartAPD, {
+        type: 'bar',
+        data: {
+          labels: <?= json_encode($grafikApdLabel) ?>,
+          datasets: [{
+            label: 'Ya (%)',
+            data: dataAPD,
+            backgroundColor: warnaBar(dataAPD),
+            borderColor: warnaBorder(dataAPD),
+            borderWidth: 1.5,
+            borderRadius: 8
+          }]
+        },
+        options: getChartOptions(<?= json_encode($judulGrafikAPD) ?>)
+      });
+    }
 
     const chartProfesi = document.getElementById('chartProfesi');
     if (chartProfesi) {
@@ -687,25 +740,6 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
       });
     }
 
-    const chartMoment = document.getElementById('chartMoment');
-    if (chartMoment) {
-      new Chart(chartMoment, {
-        type: 'bar',
-        data: {
-          labels: <?= json_encode($grafikMomentLabel) ?>,
-          datasets: [{
-            label: 'Kepatuhan (%)',
-            data: dataMoment,
-            backgroundColor: warnaBar(dataMoment),
-            borderColor: warnaBorder(dataMoment),
-            borderWidth: 1.5,
-            borderRadius: 8
-          }]
-        },
-        options: getChartOptions(<?= json_encode($judulGrafikMoment) ?>)
-      });
-    }
-
     const chartTren = document.getElementById('chartTren');
     if (chartTren) {
       new Chart(chartTren, {
@@ -735,7 +769,6 @@ $namaFilePeriode = strtolower(str_replace(' ', '-', $periodeJudul));
       if (!canvas) return;
 
       const imageUrl = canvas.toDataURL('image/png', 1.0);
-
       const link = document.createElement('a');
       link.href = imageUrl;
       link.download = fileName + '.png';
