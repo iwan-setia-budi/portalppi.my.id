@@ -70,42 +70,60 @@ if (isset($_POST['update'])) {
   <title>Edit Audit Gizi</title>
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
+    :root {
+      --bg: #eef3f7;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #dbe3ee;
+      --line-strong: #cbd5e1;
+    }
+    body.dark-mode {
+      --bg: #0b1220;
+      --card: #111827;
+      --card-2: #0f172a;
+      --ink: #e5e7eb;
+      --muted: #94a3b8;
+      --line: #334155;
+      --line-strong: #475569;
+    }
     .audit-page {
-      background: radial-gradient(900px 420px at 18% -10%, rgba(37, 99, 235, 0.12), transparent 62%), #eef3f7;
+      background: radial-gradient(900px 420px at 18% -10%, rgba(37, 99, 235, 0.12), transparent 62%), var(--bg);
       min-height: 100vh;
-      color: #0f172a;
+      color: var(--ink);
     }
     .page-wrap { padding: 16px; }
     .hero-card, .section-card {
-      background: #fff;
-      border: 1px solid rgba(148, 163, 184, .35);
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 18px;
       padding: 18px;
       box-shadow: 0 10px 24px rgba(15, 23, 42, .07);
       margin-bottom: 14px;
     }
     .hero-card h1 { margin: 0; font-size: 28px; }
-    .subtitle { color: #64748b; margin: 8px 0 0; font-weight: 600; }
+    .subtitle { color: var(--muted); margin: 8px 0 0; font-weight: 600; }
     .form-grid { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .full { grid-column: 1 / -1; }
     .field-label { display:block; margin-bottom: 8px; font-size: 14px; font-weight: 800; }
     .required { color:#e11d48; }
     .form-control {
-      width: 100%; border: 1.5px solid rgba(148,163,184,.62); border-radius: 12px; padding: 12px 14px;
-      font-size: 15px; color:#0f172a; outline:none; transition: .2s ease; box-sizing: border-box;
+      width: 100%; border: 1.5px solid var(--line-strong); border-radius: 12px; padding: 12px 14px;
+      font-size: 15px; color:var(--ink); outline:none; transition: .2s ease; box-sizing: border-box; background: var(--card);
     }
     .form-control:focus { border-color:#1e40af; box-shadow: 0 0 0 4px rgba(30, 64, 175, .15); }
     .btn-row { display:flex; gap:10px; flex-wrap: wrap; margin-top: 16px; }
     .btn { display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:12px; text-decoration:none; font-weight:700; border:1px solid transparent; cursor:pointer; }
     .btn-primary { background: linear-gradient(135deg,#1e40af,#1e3a8a); color:#fff; }
-    .btn-secondary { background:#fff; color:#0f172a; border-color:#cbd5e1; }
+    .btn-secondary { background:var(--card); color:var(--ink); border-color:var(--line-strong); }
     .alert { border-radius:12px; padding:10px 12px; margin-bottom:10px; border:1px solid #fecaca; color:#991b1b; background:#fef2f2; font-weight:700; }
-    .help { margin-top: 10px; padding: 12px; border-radius: 12px; border:1px solid #dbe3ee; background:#f8fafc; color:#475569; font-size: 13px; line-height: 1.6; }
-    .signature-pad-wrap { border: 1.5px dashed #94a3b8; border-radius: 14px; padding: 10px; background: #f8fafc; }
-    .signature-canvas { width:100%; height:170px; background:#fff; border:1px solid #dbe3ee; border-radius:10px; touch-action:none; cursor: crosshair; display:block; }
+    .help { margin-top: 10px; padding: 12px; border-radius: 12px; border:1px solid var(--line); background:var(--card-2); color:var(--muted); font-size: 13px; line-height: 1.6; }
+    .signature-pad-wrap { border: 1.5px dashed var(--line-strong); border-radius: 14px; padding: 10px; background: var(--card-2); }
+    .signature-canvas { width:100%; height:170px; background:var(--card); border:1px solid var(--line); border-radius:10px; touch-action:none; cursor: crosshair; display:block; }
     .signature-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
     .signature-preview { margin-top: 10px; }
-    .signature-preview img { max-width: 100%; height: 70px; object-fit: contain; border:1px solid #dbe3ee; border-radius:8px; background:#fff; padding:4px; }
+    .signature-preview img { max-width: 100%; height: 70px; object-fit: contain; border:1px solid var(--line); border-radius:8px; background:var(--card); padding:4px; }
     @media (max-width: 768px) {
       .page-wrap { padding: 8px; }
       .hero-card h1 { font-size: 22px; }

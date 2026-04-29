@@ -235,6 +235,17 @@ $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $limit = 10;
 $offset = ($page - 1) * $limit;
 
+$sortBy = $_GET['sort_by'] ?? 'tanggal';
+$sortDir = strtolower($_GET['sort_dir'] ?? 'desc');
+$allowedSortBy = [
+  'tanggal' => 'a.tanggal_audit',
+  'petugas' => 'a.nama_petugas_unit',
+  'num' => 'num',
+  'denum' => 'denum'
+];
+$sortColumn = $allowedSortBy[$sortBy] ?? 'a.tanggal_audit';
+$sortDirSql = $sortDir === 'asc' ? 'ASC' : 'DESC';
+
 $qTotalData = mysqli_query($conn, "SELECT COUNT(*) AS total FROM audit_gizi a $whereDataSql");
 $totalData = mysqli_fetch_assoc($qTotalData)['total'] ?? 0;
 $totalPages = max(1, ceil($totalData / $limit));
@@ -248,9 +259,32 @@ $qData = mysqli_query($conn, "
   LEFT JOIN audit_gizi_detail d ON a.id = d.audit_id
   $whereDataSql
   GROUP BY a.id
-  ORDER BY a.tanggal_audit DESC, a.id DESC
+  ORDER BY $sortColumn $sortDirSql, a.id DESC
   LIMIT $limit OFFSET $offset
 ");
+
+$rekapPeriode = $_GET['rekap_periode'] ?? 'tahunan';
+$rekapBulan = isset($_GET['rekap_bulan']) ? (int) $_GET['rekap_bulan'] : (int) date('n');
+$rekapTriwulan = isset($_GET['rekap_triwulan']) ? (int) $_GET['rekap_triwulan'] : (int) ceil(((int) date('n')) / 3);
+$rekapTahun = isset($_GET['rekap_tahun']) ? (int) $_GET['rekap_tahun'] : (int) date('Y');
+$rekapPeriode = in_array($rekapPeriode, ['bulanan', 'triwulan', 'tahunan'], true) ? $rekapPeriode : 'tahunan';
+$rekapBulan = max(1, min(12, $rekapBulan));
+$rekapTriwulan = max(1, min(4, $rekapTriwulan));
+$rekapTahun = max(2020, min(2100, $rekapTahun));
+
+$rekapWhere = [];
+if ($rekapPeriode === 'bulanan') {
+  $rekapWhere[] = "MONTH(a.tanggal_audit) = $rekapBulan";
+  $rekapWhere[] = "YEAR(a.tanggal_audit) = $rekapTahun";
+} elseif ($rekapPeriode === 'triwulan') {
+  $startMonth = (($rekapTriwulan - 1) * 3) + 1;
+  $endMonth = $startMonth + 2;
+  $rekapWhere[] = "MONTH(a.tanggal_audit) BETWEEN $startMonth AND $endMonth";
+  $rekapWhere[] = "YEAR(a.tanggal_audit) = $rekapTahun";
+} else {
+  $rekapWhere[] = "YEAR(a.tanggal_audit) = $rekapTahun";
+}
+$rekapWhereSql = count($rekapWhere) ? 'WHERE ' . implode(' AND ', $rekapWhere) : '';
 
 $qRekapBagian = mysqli_query($conn, "
   SELECT
@@ -259,6 +293,7 @@ $qRekapBagian = mysqli_query($conn, "
     COUNT(*) AS denum
   FROM audit_gizi a
   JOIN audit_gizi_detail d ON a.id = d.audit_id
+  $rekapWhereSql
   GROUP BY d.kode_bagian
   ORDER BY d.kode_bagian ASC
 ");
@@ -284,6 +319,17 @@ $qRekapBagian = mysqli_query($conn, "
       --shadow-md: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
 
+    body.dark-mode {
+      --bg: #0b1220;
+      --card: #111827;
+      --ink: #e5e7eb;
+      --line: #334155;
+      --primary: #3b82f6;
+      --primary-2: #1d4ed8;
+      --ring: rgba(59, 130, 246, 0.2);
+      --shadow-md: 0 12px 28px rgba(2, 6, 23, 0.55);
+    }
+
     .audit-page {
       background: radial-gradient(900px 420px at 18% -10%, rgba(37, 99, 235, 0.12), transparent 62%), var(--bg);
       min-height: 100vh;
@@ -307,15 +353,24 @@ $qRekapBagian = mysqli_query($conn, "
       margin-bottom: 14px;
     }
 
+    .hero-header {
+      background:
+        radial-gradient(700px 220px at -8% -45%, rgba(255, 255, 255, 0.22), transparent 62%),
+        linear-gradient(135deg, #0f2f78 0%, #1e40af 52%, #60a5fa 100%);
+      border: 1px solid rgba(37, 99, 235, 0.52);
+      box-shadow: 0 12px 26px rgba(30, 64, 175, 0.28);
+    }
+
     .hero-header h1 {
       margin: 0;
-      font-size: 30px;
+      font-size: 26px;
       line-height: 1.15;
       letter-spacing: -0.3px;
+      color: #ffffff;
     }
 
     .subtitle {
-      color: #64748b;
+      color: rgba(226, 232, 240, 0.95);
       margin: 10px 0 0;
       font-size: 14px;
       line-height: 1.5;
@@ -333,9 +388,9 @@ $qRekapBagian = mysqli_query($conn, "
       padding: 10px 16px;
       border-radius: 999px;
       text-decoration: none;
-      background: #fff;
-      border: 1px solid #cbd5e1;
-      color: #0f172a;
+      background: var(--card);
+      border: 1px solid var(--line);
+      color: var(--ink);
       font-weight: 800;
       transition: all .2s ease;
     }
@@ -350,21 +405,21 @@ $qRekapBagian = mysqli_query($conn, "
     .form-control,
     textarea.form-control {
       width: 100%;
-      border: 1.5px solid rgba(148, 163, 184, 0.62);
+      border: 1.7px solid rgba(100, 116, 139, 0.58);
       border-radius: var(--radius-md);
       padding: 12px 14px;
       font-size: 15px;
       color: var(--ink);
       outline: none;
       transition: .2s ease;
-      background: #fff;
+      background: var(--card);
       box-sizing: border-box;
     }
 
     .form-control:focus,
     textarea.form-control:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px var(--ring);
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px var(--ring);
     }
 
     .btn {
@@ -396,9 +451,9 @@ $qRekapBagian = mysqli_query($conn, "
     }
 
     .btn-secondary {
-      background: #fff;
-      border-color: #cbd5e1;
-      color: #0f172a;
+      background: var(--card);
+      border-color: var(--line);
+      color: var(--ink);
     }
 
     .info-box {
@@ -420,6 +475,65 @@ $qRekapBagian = mysqli_query($conn, "
       border-color: #fecaca;
     }
 
+    body.dark-mode .hero-header {
+      background:
+        radial-gradient(700px 220px at -8% -45%, rgba(255, 255, 255, 0.16), transparent 62%),
+        linear-gradient(135deg, #102451 0%, #1d4ed8 50%, #3b82f6 100%);
+      border-color: rgba(59, 130, 246, 0.42);
+      box-shadow: 0 14px 30px rgba(2, 6, 23, 0.5);
+    }
+
+    body.dark-mode .subtitle {
+      color: rgba(219, 234, 254, 0.94);
+    }
+
+    body.dark-mode .tab-btn {
+      color: #e2e8f0;
+    }
+
+    body.dark-mode .tab-btn.active {
+      color: #fff;
+    }
+
+    body.dark-mode .form-control,
+    body.dark-mode textarea.form-control {
+      border-color: #5b6b80;
+      color: #e5e7eb;
+      background: #0f172a;
+    }
+
+    body.dark-mode .form-control::placeholder,
+    body.dark-mode textarea.form-control::placeholder {
+      color: #94a3b8;
+    }
+
+    body.dark-mode #tab-data h3,
+    body.dark-mode #tab-rekap h3,
+    body.dark-mode #tab-grafik h3 {
+      color: #e5e7eb;
+    }
+
+    body.dark-mode #tab-data table,
+    body.dark-mode #tab-rekap table {
+      border-color: #334155 !important;
+      background: #111827;
+    }
+
+    body.dark-mode #tab-data th,
+    body.dark-mode #tab-rekap th {
+      border-bottom-color: #475569 !important;
+      color: #e5e7eb;
+    }
+
+    body.dark-mode #tab-data td,
+    body.dark-mode #tab-rekap td,
+    body.dark-mode #tab-data tr,
+    body.dark-mode #tab-rekap tr {
+      background: #111827 !important;
+      color: #e5e7eb;
+      border-bottom-color: #334155 !important;
+    }
+
     @media (max-width: 768px) {
       .audit-wrapper {
         padding: 0 8px;
@@ -433,7 +547,7 @@ $qRekapBagian = mysqli_query($conn, "
       }
 
       .hero-header h1 {
-        font-size: 24px;
+        font-size: 21px;
       }
 
       .tab-menu {

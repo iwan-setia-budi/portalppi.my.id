@@ -33,45 +33,63 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated') {
   <title>Detail Audit Gizi</title>
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
+    :root {
+      --bg: #eef3f7;
+      --card: #ffffff;
+      --card-2: #f8fafc;
+      --ink: #0f172a;
+      --muted: #64748b;
+      --line: #dbe3ee;
+      --line-strong: #cbd5e1;
+    }
+    body.dark-mode {
+      --bg: #0b1220;
+      --card: #111827;
+      --card-2: #0f172a;
+      --ink: #e5e7eb;
+      --muted: #94a3b8;
+      --line: #334155;
+      --line-strong: #475569;
+    }
     .audit-page {
-      background: radial-gradient(900px 420px at 18% -10%, rgba(37, 99, 235, 0.12), transparent 62%), #eef3f7;
+      background: radial-gradient(900px 420px at 18% -10%, rgba(37, 99, 235, 0.12), transparent 62%), var(--bg);
       min-height: 100vh;
-      color: #0f172a;
+      color: var(--ink);
     }
     .page-wrap { padding: 16px; }
     .hero-card, .section-card {
-      background: #fff;
-      border: 1px solid rgba(148, 163, 184, .35);
+      background: var(--card);
+      border: 1px solid var(--line);
       border-radius: 18px;
       padding: 18px;
       box-shadow: 0 10px 24px rgba(15, 23, 42, .07);
       margin-bottom: 14px;
     }
     .hero-card h1 { margin: 0; font-size: 28px; }
-    .subtitle { color: #64748b; margin: 8px 0 0; font-weight: 600; }
+    .subtitle { color: var(--muted); margin: 8px 0 0; font-weight: 600; }
     .stat-grid {
       display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px;
     }
-    .stat-item { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; text-align: center; }
+    .stat-item { background: var(--card-2); border: 1px solid var(--line); border-radius: 12px; padding: 10px; text-align: center; }
     .stat-item strong { display: block; font-size: 24px; color: #1e40af; line-height: 1; }
-    .label { color: #64748b; font-size: 12px; font-weight: 700; }
+    .label { color: var(--muted); font-size: 12px; font-weight: 700; }
     .action-row { display:flex; gap:8px; flex-wrap: wrap; margin-top: 12px; }
     .btn { display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:12px; text-decoration:none; font-weight:700; border:1px solid transparent; }
     .btn-primary { background: linear-gradient(135deg,#1e40af,#1e3a8a); color:#fff; }
     .btn-warning { background: linear-gradient(135deg,#d97706,#b45309); color:#fff; }
-    .btn-secondary { background:#fff; color:#0f172a; border-color:#cbd5e1; }
-    .table-wrap { overflow-x:auto; border-radius: 12px; border: 1px solid #dbe3ee; }
+    .btn-secondary { background:var(--card); color:var(--ink); border-color:var(--line-strong); }
+    .table-wrap { overflow-x:auto; border-radius: 12px; border: 1px solid var(--line); }
     table { width:100%; min-width:760px; border-collapse: collapse; }
     th { background: linear-gradient(135deg,#1e40af,#1e3a8a); color:#fff; font-size:13px; font-weight:800; padding:10px; text-align:left; }
-    td { padding:10px; border-bottom:1px solid #eef2f7; font-size:13px; }
-    tr:nth-child(odd) td { background:#f9fbfc; }
+    td { padding:10px; border-bottom:1px solid var(--line); font-size:13px; background: var(--card); }
+    tr:nth-child(odd) td { background:var(--card-2); }
     .center { text-align:center; }
     .pill { display:inline-flex; padding:6px 10px; border-radius:999px; font-size:12px; font-weight:800; text-transform:uppercase; }
     .pill.ya { background:#dcfce7; color:#166534; }
     .pill.tidak { background:#fee2e2; color:#991b1b; }
     .pill.na { background:#e2e8f0; color:#334155; }
     .foto-grid { display:flex; flex-wrap:wrap; gap:10px; }
-    .foto-grid img { width:180px; height:120px; object-fit:cover; border-radius:10px; border:1px solid #dbe3ee; }
+    .foto-grid img { width:180px; height:120px; object-fit:cover; border-radius:10px; border:1px solid var(--line); }
     .info-ok { background:#f0fdf4; color:#166534; border:1px solid #bbf7d0; border-radius:12px; padding:10px 12px; margin-bottom:10px; font-weight:700; }
     @media (max-width: 768px) {
       .page-wrap { padding: 8px; }
@@ -117,20 +135,21 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated') {
         </div>
 
         <div class="section-card">
-          <h3>Daftar Tilik</h3>
+          <h3>Item Indikator</h3>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
-                  <th style="width:80px;">Kode</th>
+                  <th class="center" style="width:90px;">Kode</th>
                   <th>Item</th>
                   <th class="center" style="width:110px;">Jawaban</th>
                 </tr>
               </thead>
               <tbody>
                 <?php while ($d = mysqli_fetch_assoc($qDetail)): ?>
+                  <?php $kodeItem = ($d['kode_bagian'] ?? '') . str_pad((string) ((int) ($d['urutan_item'] ?? 0)), 2, '0', STR_PAD_LEFT); ?>
                   <tr>
-                    <td><?= htmlspecialchars($d['kode_bagian']) ?></td>
+                    <td class="center"><?= htmlspecialchars($kodeItem) ?></td>
                     <td><?= htmlspecialchars($d['item_text']) ?></td>
                     <td class="center"><span class="pill <?= htmlspecialchars($d['jawaban']) ?>"><?= htmlspecialchars($d['jawaban']) ?></span></td>
                   </tr>
