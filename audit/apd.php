@@ -436,7 +436,7 @@ $qRekapUnit = mysqli_query($conn, "
       border: 1.5px solid rgba(148, 163, 184, 0.60);
       border-radius: var(--radius-md);
       padding: 14px 16px;
-      font-size: 16px;
+      font-size: 14px;
       font-weight: 500;
       color: var(--ink);
       outline: none;
@@ -681,75 +681,54 @@ $qRekapUnit = mysqli_query($conn, "
 
     @media (max-width: 768px) {
       .audit-wrapper {
-        padding: 0 6px;
-        margin: 12px auto 20px;
+        padding: 0 8px;
+        margin: 16px auto 28px;
       }
 
       .hero-header {
         flex-direction: column;
         align-items: flex-start;
-        padding: 14px 12px;
-        gap: 10px;
+        padding: 18px 16px;
       }
 
       .hero-content h1 {
-        font-size: 19px;
+        font-size: 22px;
       }
 
       .hero-content .subtitle {
-        font-size: 12px;
-        margin-top: 6px;
+        font-size: 13px;
       }
 
       .section-card {
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 12px;
+        padding: 14px;
+        border-radius: 12px;
       }
 
       .form-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
+        gap: 14px;
       }
 
       .section-title {
-        font-size: 14px;
-        margin-bottom: 12px;
-      }
-
-      .form-label {
-        font-size: 12px;
-      }
-
-      .form-control,
-      .form-textarea {
-        min-height: 40px;
-        padding: 9px 10px;
-        font-size: 13px;
+        font-size: 16px;
       }
 
       .tab-menu {
-        gap: 6px;
-        margin-bottom: 12px;
+        gap: 10px;
+        margin-bottom: 18px;
       }
 
       .tab-btn {
-        padding: 8px 12px;
-        font-size: 12px;
+        padding: 12px 18px;
       }
 
       .button-row {
         flex-direction: column;
         align-items: stretch;
-        gap: 8px;
-        margin-top: 12px;
       }
 
       .button-row .btn {
         width: 100%;
-        min-height: 38px;
-        padding: 9px 12px;
-        font-size: 12px;
       }
 
       .tab-menu {

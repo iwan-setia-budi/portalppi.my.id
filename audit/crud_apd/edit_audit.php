@@ -246,31 +246,94 @@ if (isset($_POST['update'])) {
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
     .audit-page { background: #eef3f7; min-height: 100vh; }
-    .page { width: 100%; padding: 20px; }
+    .page { width: 100%; padding: 22px 20px 30px; }
     .container { width: 100%; max-width: none; margin: 0; }
     .card {
       background: #fff; border: 1px solid #d9e5f4; border-radius: 20px;
-      box-shadow: 0 10px 24px rgba(30, 64, 128, .08); margin-bottom: 16px; padding: 18px;
+      box-shadow: 0 10px 24px rgba(30, 64, 128, .08); margin-bottom: 16px; padding: 20px;
     }
     .title { font-size: 24px; font-weight: 800; color: #173f79; margin-bottom: 8px; }
     .subtitle { color: #5b7499; margin-bottom: 14px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #173f79;
+      margin: 0 0 12px;
+    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     .group { display: flex; flex-direction: column; gap: 8px; }
     .group.full { grid-column: 1 / -1; }
     .label { font-size: 13px; font-weight: 800; color: #23406d; }
     .required { color: #e54848; }
     .control {
-      width: 100%; border: 1.5px solid #cbdcf0; border-radius: 12px; padding: 10px 12px;
+      width: 100%; border: 1.5px solid #cbdcf0; border-radius: 12px; padding: 11px 12px;
       font-size: 14px; color: #173f79; background: #fff; outline: none;
+      min-height: 46px;
     }
     .control:focus { border-color: #4d8dff; box-shadow: 0 0 0 3px rgba(77,141,255,.12); }
     .textarea { min-height: 110px; resize: vertical; }
-    .table-wrap { overflow-x: auto; border: 1px solid #dbe7f5; border-radius: 14px; }
-    .table { width: 100%; border-collapse: collapse; min-width: 640px; }
-    .table th { background: #2b55c6; color: #fff; padding: 10px; font-size: 13px; text-align: center; }
-    .table th:first-child { text-align: left; }
-    .table td { border-bottom: 1px solid #e4ebf5; padding: 8px 10px; font-size: 13px; color: #173f79; text-align: center; }
-    .table td:first-child { text-align: left; font-weight: 700; }
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: #fff;
+    }
+    .table {
+      width: 100%;
+      min-width: 640px;
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    .table thead th {
+      background: linear-gradient(135deg, #1e40af, #1e3a8a);
+      color: #fff;
+      font-weight: 800;
+      padding: 14px;
+      font-size: 14px;
+      text-align: center;
+      white-space: nowrap;
+    }
+    .table thead th:first-child { text-align: left; }
+    .table tbody td {
+      padding: 13px 14px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.30);
+      border-right: 1px solid rgba(226, 232, 240, 0.9);
+      font-size: 14px;
+      background: #fff;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .table tbody td:last-child { border-right: none; }
+    .table tbody tr:nth-child(odd) td { background: #f8fafc; }
+    .table tbody tr:nth-child(even) td { background: #eef6ff; }
+    .table tbody tr:hover td { background: #dbeafe !important; }
+    .table td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: #1f2937;
+      min-width: 260px;
+    }
+    .table input[type="radio"] {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border: 2px solid #64748b;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.08);
+    }
+    .table input[type="radio"]:checked {
+      border: 6px solid #1e40af;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(30, 64, 175, 0.16);
+    }
+    .table input[type="radio"]:hover {
+      border-color: #1e40af;
+    }
     .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
     .btn {
       display: inline-flex; align-items: center; justify-content: center; text-decoration: none;
@@ -278,15 +341,66 @@ if (isset($_POST['update'])) {
       color: #24436c; background: #fff; cursor: pointer;
     }
     .btn-primary { color: #fff; border: none; background: linear-gradient(135deg, #2459cc, #4d8dff); }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(25, 56, 112, .10); }
     .thumb { margin-top: 8px; max-width: 220px; border-radius: 12px; border: 1px solid #dbe7f5; display: block; }
     .alert { padding: 12px 14px; border-radius: 12px; margin-bottom: 12px; font-weight: 700; }
     .alert-danger { background: #fff1f1; color: #c93535; border: 1px solid #f2b8b8; }
     @media (max-width: 768px) {
-      .page { padding: 12px; }
-      .card { padding: 12px; border-radius: 14px; }
-      .title { font-size: 19px; }
-      .grid { grid-template-columns: 1fr; gap: 10px; }
-      .table { min-width: 560px; }
+      .layout,
+      main {
+        width: 100%;
+        min-width: 0;
+      }
+      .page { padding: 12px 8px 22px; }
+      .container {
+        width: 100%;
+        max-width: 100%;
+      }
+      .card {
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        margin-bottom: 12px;
+      }
+      .title { font-size: 20px; }
+      .subtitle { font-size: 13px; margin-bottom: 12px; }
+      .section-title { font-size: 16px; margin-bottom: 10px; }
+      .grid { grid-template-columns: 1fr; gap: 12px; }
+      .label { font-size: 12px; }
+      .control { min-height: 42px; font-size: 13px; padding: 9px 10px; }
+      .textarea { min-height: 96px; }
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 12px;
+        background: #fff;
+        width: 100%;
+        max-width: 100%;
+      }
+      .table {
+        min-width: 0;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .table th,
+      .table td { font-size: 11px; padding: 7px 4px; }
+      .table td:first-child {
+        text-align: left;
+        white-space: normal;
+        min-width: 0;
+        width: 52%;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+      .table th:not(:first-child),
+      .table td:not(:first-child) {
+        width: 16%;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .table input[type="radio"] { width: 16px; height: 16px; }
+      .table input[type="radio"]:checked { border-width: 4px; }
       .actions { flex-direction: column; }
       .btn { width: 100%; }
     }
@@ -353,7 +467,7 @@ if (isset($_POST['update'])) {
               </div>
 
               <div class="card" style="margin-top:16px;">
-                <div class="title" style="font-size:20px;">Indikator Penilaian APD</div>
+                <div class="section-title">Indikator Penilaian APD</div>
                 <div class="table-wrap">
                   <table class="table">
                     <thead>
@@ -385,7 +499,7 @@ if (isset($_POST['update'])) {
               </div>
 
               <div class="card" style="margin-top:16px;">
-                <div class="title" style="font-size:20px;">APD yang Digunakan</div>
+                <div class="section-title">APD yang Digunakan</div>
                 <div class="table-wrap">
                   <table class="table">
                     <thead>
