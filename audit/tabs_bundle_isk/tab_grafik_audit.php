@@ -45,8 +45,8 @@ $qGrafik = mysqli_query($conn, "
     MAX(d.item_text) AS item_text,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_isk a
+  JOIN detail_audit_bundle_isk d ON a.id = d.audit_id
   $grafikWhereSql
   GROUP BY d.kode_bagian, d.urutan_item
   ORDER BY d.kode_bagian ASC, d.urutan_item ASC
@@ -66,11 +66,13 @@ while ($row = mysqli_fetch_assoc($qGrafik)) {
   $dataGrafik[] = $den > 0 ? round(($num / $den) * 100, 2) : 0;
 }
 $ikonKodeMap = [
-  'W0001' => '🛏',
-  'W0002' => '🪥',
-  'W0003' => '🫁',
-  'W0004' => '🧼',
-  'W0005' => '💤',
+  'X0001' => '🧼',
+  'X0002' => '🧴',
+  'X0003' => '⬇',
+  'X0004' => '🚫',
+  'X0005' => '🔗',
+  'X0006' => '🧷',
+  'X0007' => '🧾',
 ];
 $targetGrafik = array_fill(0, count($labelGrafik), $grafikTarget);
 $namaBulan = [
@@ -86,8 +88,8 @@ if ($grafikPeriode === 'bulanan') {
 } else {
   $periodeLabel = 'Tahun ' . $grafikTahun;
 }
-$judulGrafik = 'Grafik Kepatuhan Audit Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
-$judulTren = 'Grafik Tren Kepatuhan Audit Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulGrafik = 'Grafik Kepatuhan Audit Bundle ISK di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulTren = 'Grafik Tren Kepatuhan Audit Bundle ISK di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
 $subJudulGrafik = 'Kepatuhan per Item (' . $periodeLabel . ')';
 $subJudulTren = 'Tren Kepatuhan (' . $periodeLabel . ')';
 
@@ -117,8 +119,8 @@ $qTrend = mysqli_query($conn, "
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_isk a
+  JOIN detail_audit_bundle_isk d ON a.id = d.audit_id
   $trendWhereSql
   GROUP BY MONTH(a.tanggal_audit)
   ORDER BY MONTH(a.tanggal_audit) ASC
@@ -520,7 +522,7 @@ foreach ($dataGrafik as $val) {
       btnDownload.addEventListener('click', function () {
         const link = document.createElement('a');
         link.href = chart.toBase64Image('image/png', 1);
-        link.download = 'grafik-kepatuhan-bundle-vap.png';
+        link.download = 'grafik-kepatuhan-bundle-isk.png';
         link.click();
       });
     }
@@ -634,7 +636,7 @@ foreach ($dataGrafik as $val) {
       btnDownloadTren.addEventListener('click', function () {
         const link = document.createElement('a');
         link.href = trendChart.toBase64Image('image/png', 1);
-        link.download = 'grafik-tren-kepatuhan-bundle-vap.png';
+        link.download = 'grafik-tren-kepatuhan-bundle-isk.png';
         link.click();
       });
     }

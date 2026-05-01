@@ -120,7 +120,7 @@ if (isset($checklistSections) && is_array($checklistSections)) {
   foreach ($checklistSections as $kode => $section) {
     $items = $section['items'] ?? [];
     foreach ($items as $idx => $itemText) {
-      $indikatorKode = sprintf('%s%04d', (string) $kode, $idx + 1);
+      $indikatorKode = sprintf('%s%02d', (string) $kode, $idx + 1);
       $bagianLabels[$indikatorKode] = (string) $itemText;
     }
   }
@@ -173,13 +173,13 @@ $matrixWhereSql = 'WHERE ' . implode(' AND ', $matrixWhere);
 
 $qMatrix = mysqli_query($conn, "
   SELECT
-    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 2, '0')) AS kode_bagian,
     MAX(d.item_text) AS item_text,
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_ido a
+  JOIN detail_audit_bundle_ido d ON a.id = d.audit_id
   $matrixWhereSql
   GROUP BY d.kode_bagian, d.urutan_item, MONTH(a.tanggal_audit)
 ");
@@ -296,7 +296,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
   <div class="section-card" id="rekap-bagian-card">
     <h3 class="card-title">Rekap Kepatuhan per Bagian</h3>
     <div class="download-toolbar">
-      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-bagian-card" data-file-prefix="rekap_bagian_bundle_vap">Download Gambar Rekap Bagian</a>
+      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-bagian-card" data-file-prefix="rekap_bagian_bundle_ido">Download Gambar Rekap Bagian</a>
     </div>
     <?php if (count($rekapRows) > 0): ?>
       <div class="table-shell">
@@ -358,7 +358,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
   <div class="section-card" id="rekap-periode-card">
     <h3 class="card-title">Rekap per Periode (Skor per Bulan)</h3>
     <div class="download-toolbar">
-      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-periode-card" data-file-prefix="rekap_periode_bundle_vap">Download Gambar Rekap Periode</a>
+      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-periode-card" data-file-prefix="rekap_periode_bundle_ido">Download Gambar Rekap Periode</a>
     </div>
     <p class="subheading-note">
       <?php if ($rekapPeriode === 'tahunan'): ?>
@@ -693,7 +693,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
     function renderTableDataToCanvas(target) {
       const titleEl = target.querySelector('.card-title');
       const tableEl = target.querySelector('.desktop-table table') || target.querySelector('table');
-      const title = titleEl ? titleEl.textContent.trim() : 'Rekap Audit Bundle VAP';
+      const title = titleEl ? titleEl.textContent.trim() : 'Rekap Audit Bundle IDO';
       if (!tableEl) {
         throw new Error('table-not-found');
       }
@@ -909,7 +909,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
       btn.addEventListener('click', function (e) {
         e.preventDefault();
         const targetId = btn.getAttribute('data-target-id') || '';
-        const filePrefix = btn.getAttribute('data-file-prefix') || 'rekap_bundle_vap';
+        const filePrefix = btn.getAttribute('data-file-prefix') || 'rekap_bundle_ido';
         downloadSectionAsImage(targetId, filePrefix);
       });
     });

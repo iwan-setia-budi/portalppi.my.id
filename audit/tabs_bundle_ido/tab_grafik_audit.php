@@ -34,19 +34,19 @@ if (isset($checklistSections) && is_array($checklistSections)) {
   foreach ($checklistSections as $kode => $section) {
     $items = $section['items'] ?? [];
     foreach ($items as $idx => $itemText) {
-      $indikatorKode = sprintf('%s%04d', (string) $kode, $idx + 1);
+      $indikatorKode = sprintf('%s%02d', (string) $kode, $idx + 1);
       $itemLabelMap[$indikatorKode] = (string) $itemText;
     }
   }
 }
 $qGrafik = mysqli_query($conn, "
   SELECT
-    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 2, '0')) AS kode_bagian,
     MAX(d.item_text) AS item_text,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_ido a
+  JOIN detail_audit_bundle_ido d ON a.id = d.audit_id
   $grafikWhereSql
   GROUP BY d.kode_bagian, d.urutan_item
   ORDER BY d.kode_bagian ASC, d.urutan_item ASC
@@ -66,11 +66,15 @@ while ($row = mysqli_fetch_assoc($qGrafik)) {
   $dataGrafik[] = $den > 0 ? round(($num / $den) * 100, 2) : 0;
 }
 $ikonKodeMap = [
-  'W0001' => '🛏',
-  'W0002' => '🪥',
-  'W0003' => '🫁',
-  'W0004' => '🧼',
-  'W0005' => '💤',
+  'Y0101' => '🛁',
+  'Y0102' => '✂',
+  'Y0103' => '🛡',
+  'Y0104' => '💧',
+  'Y0201' => '🩹',
+  'Y0202' => '🧴',
+  'Y0203' => '🧤',
+  'Y0204' => '🍎',
+  'Y0205' => '👥',
 ];
 $targetGrafik = array_fill(0, count($labelGrafik), $grafikTarget);
 $namaBulan = [
@@ -86,8 +90,8 @@ if ($grafikPeriode === 'bulanan') {
 } else {
   $periodeLabel = 'Tahun ' . $grafikTahun;
 }
-$judulGrafik = 'Grafik Kepatuhan Audit Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
-$judulTren = 'Grafik Tren Kepatuhan Audit Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulGrafik = 'Grafik Kepatuhan Audit Bundle IDO di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulTren = 'Grafik Tren Kepatuhan Audit Bundle IDO di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
 $subJudulGrafik = 'Kepatuhan per Item (' . $periodeLabel . ')';
 $subJudulTren = 'Tren Kepatuhan (' . $periodeLabel . ')';
 
@@ -117,8 +121,8 @@ $qTrend = mysqli_query($conn, "
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_ido a
+  JOIN detail_audit_bundle_ido d ON a.id = d.audit_id
   $trendWhereSql
   GROUP BY MONTH(a.tanggal_audit)
   ORDER BY MONTH(a.tanggal_audit) ASC
@@ -471,7 +475,8 @@ foreach ($dataGrafik as $val) {
             formatter: function (value) {
               return Number(value).toFixed(1).replace('.0', '') + '%';
             }
-          },
+          }
+          ,
           tooltip: {
             callbacks: {
               title: function (items) {
@@ -520,7 +525,7 @@ foreach ($dataGrafik as $val) {
       btnDownload.addEventListener('click', function () {
         const link = document.createElement('a');
         link.href = chart.toBase64Image('image/png', 1);
-        link.download = 'grafik-kepatuhan-bundle-vap.png';
+        link.download = 'grafik-kepatuhan-bundle-ido.png';
         link.click();
       });
     }
@@ -634,7 +639,7 @@ foreach ($dataGrafik as $val) {
       btnDownloadTren.addEventListener('click', function () {
         const link = document.createElement('a');
         link.href = trendChart.toBase64Image('image/png', 1);
-        link.download = 'grafik-tren-kepatuhan-bundle-vap.png';
+        link.download = 'grafik-tren-kepatuhan-bundle-ido.png';
         link.click();
       });
     }

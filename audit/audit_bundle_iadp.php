@@ -7,12 +7,12 @@ include_once __DIR__ . '/../koneksi.php';
 include __DIR__ . '/../cek_akses.php';
 $conn = $koneksi;
 
-$pageTitle = "AUDIT BUNDLE VAP";
+$pageTitle = "AUDIT BUNDLE IADP";
 $activeTab = $_GET['tab'] ?? 'tab-form';
 $message = '';
-if (!empty($_SESSION['flash_audit_bundle_vap_ok'])) {
-  unset($_SESSION['flash_audit_bundle_vap_ok']);
-  $message = '<div class="info-box success">Data audit bundle VAP berhasil disimpan.</div>';
+if (!empty($_SESSION['flash_audit_bundle_iadp_ok'])) {
+  unset($_SESSION['flash_audit_bundle_iadp_ok']);
+  $message = '<div class="info-box success">Data audit bundle IADP berhasil disimpan.</div>';
 }
 
 $opsiJawaban = [
@@ -24,14 +24,14 @@ $opsiJawaban = [
 $ruanganDiauditOptions = require __DIR__ . '/inc_ruangan_kewaspadaan_transmisi.php';
 
 $checklistSections = [
-  'W' => [
-    'title' => 'BUNDLE VAP',
+  'Z' => [
+    'title' => 'BUNDLE IADP',
     'items' => [
-      'Elevasi bagian kepala',
-      'Oral hygiene dilakukan setiap 4-6 jam',
-      'Managemen oropharingealdan endotrakheal',
       'Melakukan kebersihan tangan',
-      'Sedation vacation',
+      'Port kateter selalu didisinfeksi menggunakan alcohol swab sebelum digunakan',
+      'Dressing terawat bersih',
+      'Ganti dresing secara aspetik',
+      'Review kebutuhan untuk dilepas',
     ]
   ],
 ];
@@ -61,7 +61,7 @@ if (isset($_POST['simpan'])) {
         throw new RuntimeException('Tanda tangan belum diisi.');
       }
 
-      $uploadDir = __DIR__ . '/../uploads/audit_bundle_vap/';
+      $uploadDir = __DIR__ . '/../uploads/audit_bundle_iadp/';
       if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
       }
@@ -78,9 +78,9 @@ if (isset($_POST['simpan'])) {
         throw new RuntimeException('Gagal menyimpan tanda tangan.');
       }
 
-      $tandaTanganPetugas = 'uploads/audit_bundle_vap/' . $signatureFileName;
+      $tandaTanganPetugas = 'uploads/audit_bundle_iadp/' . $signatureFileName;
 
-      $stmt = mysqli_prepare($conn, "INSERT INTO audit_bundle_vap (tanggal_audit, ruangan_diaudit, nama_pasien, catatan_audit, nama_petugas_unit, tanda_tangan_petugas) VALUES (?, ?, ?, ?, ?, ?)");
+      $stmt = mysqli_prepare($conn, "INSERT INTO audit_bundle_iadp (tanggal_audit, ruangan_diaudit, nama_pasien, catatan_audit, nama_petugas_unit, tanda_tangan_petugas) VALUES (?, ?, ?, ?, ?, ?)");
       mysqli_stmt_bind_param($stmt, "ssssss", $tanggalAudit, $ruanganDiaudit, $namaPasien, $catatanAudit, $namaPetugasUnit, $tandaTanganPetugas);
       if (!mysqli_stmt_execute($stmt)) {
         throw new RuntimeException(mysqli_stmt_error($stmt) ?: 'Gagal menyimpan header audit.');
@@ -90,7 +90,7 @@ if (isset($_POST['simpan'])) {
         throw new RuntimeException('ID audit tidak valid setelah simpan header.');
       }
 
-      $stmtDetail = mysqli_prepare($conn, "INSERT INTO detail_audit_bundle_vap (audit_id, kode_bagian, urutan_item, item_text, jawaban) VALUES (?, ?, ?, ?, ?)");
+      $stmtDetail = mysqli_prepare($conn, "INSERT INTO detail_audit_bundle_iadp (audit_id, kode_bagian, urutan_item, item_text, jawaban) VALUES (?, ?, ?, ?, ?)");
       foreach ($checklistSections as $kode => $section) {
         foreach ($section['items'] as $idx => $item) {
           $urutan = $idx + 1;
@@ -110,7 +110,7 @@ if (isset($_POST['simpan'])) {
         $maxFiles = 5;
         $maxSize = 10 * 1024 * 1024;
 
-        $stmtFoto = mysqli_prepare($conn, "INSERT INTO audit_bundle_vap_foto (audit_id, nama_file, path_file, ukuran_file) VALUES (?, ?, ?, ?)");
+        $stmtFoto = mysqli_prepare($conn, "INSERT INTO audit_bundle_iadp_foto (audit_id, nama_file, path_file, ukuran_file) VALUES (?, ?, ?, ?)");
         $jumlahFile = min(count($_FILES['dokumentasi_foto']['name']), $maxFiles);
 
         for ($i = 0; $i < $jumlahFile; $i++) {
@@ -125,10 +125,10 @@ if (isset($_POST['simpan'])) {
             continue;
           }
 
-          $newName = 'bvp_' . $auditId . '_' . time() . '_' . $i . '.' . $ext;
+          $newName = 'biadp_' . $auditId . '_' . time() . '_' . $i . '.' . $ext;
           $target = $uploadDir . $newName;
           if (move_uploaded_file($tmp, $target)) {
-            $relativePath = 'uploads/audit_bundle_vap/' . $newName;
+            $relativePath = 'uploads/audit_bundle_iadp/' . $newName;
             mysqli_stmt_bind_param($stmtFoto, "issi", $auditId, $original, $relativePath, $size);
             if (!mysqli_stmt_execute($stmtFoto)) {
               throw new RuntimeException(mysqli_stmt_error($stmtFoto) ?: 'Gagal menyimpan data foto dokumentasi.');
@@ -138,14 +138,14 @@ if (isset($_POST['simpan'])) {
       }
 
       mysqli_commit($conn);
-      $_SESSION['flash_audit_bundle_vap_ok'] = true;
-      header('Location: audit_bundle_vap.php?tab=tab-data');
+      $_SESSION['flash_audit_bundle_iadp_ok'] = true;
+      header('Location: audit_bundle_iadp.php?tab=tab-data');
       exit;
     } catch (Throwable $e) {
       mysqli_rollback($conn);
       $dbErr = mysqli_error($conn);
       $hint = trim($dbErr !== '' ? $dbErr : $e->getMessage());
-      $message = '<div class="info-box error">Gagal menyimpan data audit bundle VAP.'
+      $message = '<div class="info-box error">Gagal menyimpan data audit bundle IADP.'
         . ($hint !== '' ? ' <small style="display:block;margin-top:8px;font-weight:600;">' . htmlspecialchars($hint, ENT_QUOTES, 'UTF-8') . '</small>' : '')
         . '</div>';
     }
@@ -188,7 +188,7 @@ $allowedSortBy = [
 $sortColumn = $allowedSortBy[$sortBy] ?? 'a.tanggal_audit';
 $sortDirSql = $sortDir === 'asc' ? 'ASC' : 'DESC';
 
-$qTotalData = mysqli_query($conn, "SELECT COUNT(*) AS total FROM audit_bundle_vap a $whereDataSql");
+$qTotalData = mysqli_query($conn, "SELECT COUNT(*) AS total FROM audit_bundle_iadp a $whereDataSql");
 $totalData = mysqli_fetch_assoc($qTotalData)['total'] ?? 0;
 $totalPages = max(1, ceil($totalData / $limit));
 
@@ -197,8 +197,8 @@ $qData = mysqli_query($conn, "
     a.*,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(d.audit_id) AS denum
-  FROM audit_bundle_vap a
-  LEFT JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_iadp a
+  LEFT JOIN detail_audit_bundle_iadp d ON a.id = d.audit_id
   $whereDataSql
   GROUP BY a.id
   ORDER BY $sortColumn $sortDirSql, a.id DESC
@@ -234,15 +234,15 @@ $qRekapBagian = mysqli_query($conn, "
     MAX(d.item_text) AS item_text,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_iadp a
+  JOIN detail_audit_bundle_iadp d ON a.id = d.audit_id
   $rekapWhereSql
   GROUP BY d.kode_bagian, d.urutan_item
   ORDER BY d.kode_bagian ASC, d.urutan_item ASC
 ");
 
 $bagianLabelsExport = [
-  'W' => 'BUNDLE VAP',
+  'Z' => 'BUNDLE IADP',
 ];
 
 if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
@@ -260,7 +260,7 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
   $periodeLabel .= '_T' . $rekapTahun;
 
   header('Content-Type: text/csv; charset=utf-8');
-  header('Content-Disposition: attachment; filename="rekap_audit_bundle_vap_' . $downloadType . '_' . $periodeLabel . '.csv"');
+  header('Content-Disposition: attachment; filename="rekap_audit_bundle_iadp_' . $downloadType . '_' . $periodeLabel . '.csv"');
 
   $output = fopen('php://output', 'w');
   if ($output === false) {
@@ -277,8 +277,8 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         MAX(d.item_text) AS item_text,
         SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
         COUNT(*) AS denum
-      FROM audit_bundle_vap a
-      JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+      FROM audit_bundle_iadp a
+      JOIN detail_audit_bundle_iadp d ON a.id = d.audit_id
       $rekapWhereSql
       GROUP BY d.kode_bagian, d.urutan_item
       ORDER BY d.kode_bagian ASC, d.urutan_item ASC
@@ -319,8 +319,8 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         MONTH(a.tanggal_audit) AS bulan,
         SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
         COUNT(*) AS denum
-      FROM audit_bundle_vap a
-      JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+      FROM audit_bundle_iadp a
+      JOIN detail_audit_bundle_iadp d ON a.id = d.audit_id
       $matrixWhereSql
       GROUP BY d.kode_bagian, d.urutan_item, MONTH(a.tanggal_audit)
       ORDER BY d.kode_bagian ASC, d.urutan_item ASC, MONTH(a.tanggal_audit) ASC
@@ -356,7 +356,7 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Audit Bundle VAP | PPI PHBW</title>
+  <title>Audit Bundle IADP | PPI PHBW</title>
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
     :root {
@@ -623,8 +623,8 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
       <?php include_once '../topbar.php'; ?>
       <div class="audit-wrapper">
         <section class="hero-header">
-          <h1>Audit Bundle VAP</h1>
-          <p class="subtitle">Form checklist indikator W0001-W0005 bundle VAP, data audit, rekap, dan grafik.</p>
+          <h1>Audit Bundle IADP</h1>
+          <p class="subtitle">Form checklist indikator Z0001-Z0005 bundle IADP, data audit, rekap, dan grafik.</p>
         </section>
 
         <?= $message ?>
@@ -639,17 +639,17 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         <?php
         switch ($activeTab) {
           case 'tab-data':
-            include __DIR__ . '/tabs_bundle_vap/tab_data_audit.php';
+            include __DIR__ . '/tabs_bundle_iadp/tab_data_audit.php';
             break;
           case 'tab-rekap':
-            include __DIR__ . '/tabs_bundle_vap/tab_rekap_audit.php';
+            include __DIR__ . '/tabs_bundle_iadp/tab_rekap_audit.php';
             break;
           case 'tab-grafik':
-            include __DIR__ . '/tabs_bundle_vap/tab_grafik_audit.php';
+            include __DIR__ . '/tabs_bundle_iadp/tab_grafik_audit.php';
             break;
           case 'tab-form':
           default:
-            include __DIR__ . '/tabs_bundle_vap/tab_form_audit.php';
+            include __DIR__ . '/tabs_bundle_iadp/tab_form_audit.php';
             break;
         }
         ?>

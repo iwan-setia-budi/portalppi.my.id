@@ -178,8 +178,8 @@ $qMatrix = mysqli_query($conn, "
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_bundle_vap a
-  JOIN detail_audit_bundle_vap d ON a.id = d.audit_id
+  FROM audit_bundle_iadp a
+  JOIN detail_audit_bundle_iadp d ON a.id = d.audit_id
   $matrixWhereSql
   GROUP BY d.kode_bagian, d.urutan_item, MONTH(a.tanggal_audit)
 ");
@@ -296,7 +296,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
   <div class="section-card" id="rekap-bagian-card">
     <h3 class="card-title">Rekap Kepatuhan per Bagian</h3>
     <div class="download-toolbar">
-      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-bagian-card" data-file-prefix="rekap_bagian_bundle_vap">Download Gambar Rekap Bagian</a>
+      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-bagian-card" data-file-prefix="rekap_bagian_bundle_iadp">Download Gambar Rekap Bagian</a>
     </div>
     <?php if (count($rekapRows) > 0): ?>
       <div class="table-shell">
@@ -358,7 +358,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
   <div class="section-card" id="rekap-periode-card">
     <h3 class="card-title">Rekap per Periode (Skor per Bulan)</h3>
     <div class="download-toolbar">
-      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-periode-card" data-file-prefix="rekap_periode_bundle_vap">Download Gambar Rekap Periode</a>
+      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-periode-card" data-file-prefix="rekap_periode_bundle_iadp">Download Gambar Rekap Periode</a>
     </div>
     <p class="subheading-note">
       <?php if ($rekapPeriode === 'tahunan'): ?>
@@ -693,7 +693,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
     function renderTableDataToCanvas(target) {
       const titleEl = target.querySelector('.card-title');
       const tableEl = target.querySelector('.desktop-table table') || target.querySelector('table');
-      const title = titleEl ? titleEl.textContent.trim() : 'Rekap Audit Bundle VAP';
+      const title = titleEl ? titleEl.textContent.trim() : 'Rekap Audit Bundle IADP';
       if (!tableEl) {
         throw new Error('table-not-found');
       }
@@ -909,7 +909,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
       btn.addEventListener('click', function (e) {
         e.preventDefault();
         const targetId = btn.getAttribute('data-target-id') || '';
-        const filePrefix = btn.getAttribute('data-file-prefix') || 'rekap_bundle_vap';
+        const filePrefix = btn.getAttribute('data-file-prefix') || 'rekap_bundle_iadp';
         downloadSectionAsImage(targetId, filePrefix);
       });
     });
