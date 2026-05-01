@@ -542,27 +542,27 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Audit Gizi</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_kamar_jenazah.php" class="internal-card">
                                 <div class="internal-icon">⚰️</div>
                                 <h4>Kamar Jenazah</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_tps.php" class="internal-card">
                                 <div class="internal-icon">♻️</div>
                                 <h4>Audit TPS</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_ambulance.php" class="internal-card">
                                 <div class="internal-icon">🚑</div>
                                 <h4>Audit Ambulance</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_kewaspadaan_transmisi.php" class="internal-card">
                                 <div class="internal-icon">🦠</div>
                                 <h4>Kewaspadaan Transmisi</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_ruang_isolasi.php" class="internal-card">
                                 <div class="internal-icon">🏨</div>
                                 <h4>Ruang Isolasi</h4>
                             </a>
