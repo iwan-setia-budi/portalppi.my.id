@@ -138,7 +138,7 @@ while ($tmp = mysqli_fetch_assoc($qData)) {
   </div>
 
   <div class="section-card">
-    <h3 class="card-title">Data Audit Gizi</h3>
+    <h3 class="card-title">Data Audit CSSD</h3>
     <?php if (count($rowsData) > 0): ?>
       <div class="table-shell">
         <div class="table-scroll desktop-table">
@@ -178,9 +178,9 @@ while ($tmp = mysqli_fetch_assoc($qData)) {
                 </td>
                 <td class="center">
                   <div class="action-group">
-                    <a class="icon-btn view" href="crud_gizi/detail_audit.php?id=<?= (int) $row['id'] ?>" title="Lihat detail" aria-label="Lihat detail">👁</a>
-                    <a class="icon-btn edit" href="crud_gizi/edit_audit.php?id=<?= (int) $row['id'] ?>" title="Edit data" aria-label="Edit data">✏</a>
-                    <a class="icon-btn del" href="crud_gizi/hapus_audit.php?id=<?= (int) $row['id'] ?>" title="Hapus data" aria-label="Hapus data" onclick="return confirm('Yakin hapus data ini?')">🗑</a>
+                    <a class="icon-btn view" href="crud_cssd/detail_audit.php?id=<?= (int) $row['id'] ?>" title="Lihat detail" aria-label="Lihat detail">👁</a>
+                    <a class="icon-btn edit" href="crud_cssd/edit_audit.php?id=<?= (int) $row['id'] ?>" title="Edit data" aria-label="Edit data">✏</a>
+                    <a class="icon-btn del" href="crud_cssd/hapus_audit.php?id=<?= (int) $row['id'] ?>" title="Hapus data" aria-label="Hapus data" onclick="return confirm('Yakin hapus data ini?')">🗑</a>
                   </div>
                 </td>
               </tr>
@@ -212,9 +212,9 @@ while ($tmp = mysqli_fetch_assoc($qData)) {
                 </div>
               </div>
               <div class="mobile-actions">
-                <a class="icon-btn view" href="crud_gizi/detail_audit.php?id=<?= (int) $row['id'] ?>" title="Lihat detail">👁</a>
-                <a class="icon-btn edit" href="crud_gizi/edit_audit.php?id=<?= (int) $row['id'] ?>" title="Edit data">✏</a>
-                <a class="icon-btn del" href="crud_gizi/hapus_audit.php?id=<?= (int) $row['id'] ?>" title="Hapus data" onclick="return confirm('Yakin hapus data ini?')">🗑</a>
+                <a class="icon-btn view" href="crud_cssd/detail_audit.php?id=<?= (int) $row['id'] ?>" title="Lihat detail">👁</a>
+                <a class="icon-btn edit" href="crud_cssd/edit_audit.php?id=<?= (int) $row['id'] ?>" title="Edit data">✏</a>
+                <a class="icon-btn del" href="crud_cssd/hapus_audit.php?id=<?= (int) $row['id'] ?>" title="Hapus data" onclick="return confirm('Yakin hapus data ini?')">🗑</a>
               </div>
             </div>
           <?php endforeach; ?>
@@ -240,7 +240,7 @@ while ($tmp = mysqli_fetch_assoc($qData)) {
     <?php else: ?>
       <div class="empty-state">
         <span class="icon">📄</span>
-        <strong>Belum ada data audit gizi.</strong>
+        <strong>Belum ada data audit CSSD.</strong>
         <div style="margin-top:8px;">Mulai isi form audit untuk menampilkan data pada tabel ini.</div>
         <div style="margin-top:14px;">
           <a class="btn btn-primary" href="?tab=tab-form">Tambah Audit</a>

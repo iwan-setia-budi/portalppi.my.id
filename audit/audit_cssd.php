@@ -7,9 +7,13 @@ include_once __DIR__ . '/../koneksi.php';
 include __DIR__ . '/../cek_akses.php';
 $conn = $koneksi;
 
-$pageTitle = "AUDIT GIZI";
+$pageTitle = "AUDIT CSSD";
 $activeTab = $_GET['tab'] ?? 'tab-form';
 $message = '';
+if (!empty($_SESSION['flash_audit_cssd_ok'])) {
+  unset($_SESSION['flash_audit_cssd_ok']);
+  $message = '<div class="info-box success">Data audit CSSD berhasil disimpan.</div>';
+}
 
 $opsiJawaban = [
   'ya' => 'Ya',
@@ -18,106 +22,62 @@ $opsiJawaban = [
 ];
 
 $checklistSections = [
-  'D01' => [
-    'title' => 'Penerimaan Bahan Makanan Mentah',
+  'C01' => [
+    'title' => 'Penerimaan Alat',
     'items' => [
-      'Bahan makanan mentah dimasukkan ke tempat penyimpanan dalam keadaan bersih (sudah dicuci)',
-      'Penyimpanan bahan makanan mentah tidak menggunakan wadah dari luar',
-      'Kualitas bahan makanan mentah yang diantar dalam keadaan baik (tidak busuk/tidak bonyok)',
-      'Ada pencatatan suhu bahan makanan mentah protein hewani dari supplier (suhu < 7 derajat C)'
+      'Pengiriman barang kotor menggunakan kontainer khusus dan tertutup',
+      'Pintu keluar/masuk yang terpisah antara ruang bersih dan ruang kotor'
     ]
   ],
-  'D02' => [
-    'title' => 'Higiene dan Sanitasi Gudang',
-    'items' => [
-      'Ada rotasi penyimpanan barang lama dan baru (FIFO/FEFO)',
-      'Cantumkan tanggal buka kemasan',
-      'Tidak ada barang kadaluarsa',
-      'Penyimpanan barang rapi dan sesuai jenisnya',
-      'Bebas binatang/serangga (kucing, kecoa, semut, tikus)',
-      'Penempatan barang minimal 15 cm dari lantai, 60 cm dari langit-langit, 5 cm dari dinding',
-      'Tidak ada bahan kimia berbahaya di gudang penyimpanan',
-      'Kemasan bahan makanan selalu dalam keadaan tertutup'
-    ]
-  ],
-  'D03' => [
-    'title' => 'Kebersihan Dapur',
-    'items' => [
-      'Air memenuhi syarat air minum, tidak terkontaminasi',
-      'Pembuangan air kotor lancar, tertutup rapat',
-      'Tempat penyimpanan bahan makanan tertutup dan bersih',
-      'Tidak ada genangan air',
-      'Tempat sampah tertutup dan dioperasikan dengan pedal',
-      'Bebas serangga dan tikus, semut, kecoa, kucing',
-      'Lantai bersih dari debu dan sampah',
-      'Lawa-lawa tidak ada dan water intrusion',
-      'Lantai kering/tidak licin',
-      'Wastafel cuci tangan selalu bersih dan bebas dari peralatan',
-      'Rak penyimpanan bersih (tidak ada noda dan debu)',
-      'Ada checklist pembersihan rutin',
-      'Kain lap bersih',
-      'Ada jadwal pembersihan ruangan gizi'
-    ]
-  ],
-  'D04' => [
-    'title' => 'Tenaga Pengolah',
-    'items' => [
-      'Kebersihan perseorangan baik, berkuku pendek',
-      'Tidak memakai perhiasan tangan',
-      'Selalu mencuci tangan sebelum menjamah makanan',
-      'Memakai tutup kepala',
-      'Memakai masker dengan benar',
-      'Memakai celemek/apron',
-      'Menggunakan alas kaki bagian depan tertutup rapat',
-      'Menggunakan APD lengkap terutama saat menjamah makanan matang menggunakan alat (penjepit/garpu/sarung tangan plastik)'
-    ]
-  ],
-  'D05' => [
-    'title' => 'Proses Pengolahan',
+  'C02' => [
+    'title' => 'Perendaman',
     'items' => [
       'Petugas menggunakan APD',
-      'Cara pengolahan makanan bersih',
-      'Tempat persiapan dan meja peracikan bersih',
-      'Tempat persiapan dan meja peracikan bebas dari kecoa, semut, tikus, kucing',
-      'Peralatan pengolahan tidak dicampur aduk penggunaannya (talenan dan pisau)'
+      'Bersihkan semua kotoran dan dilakukan perendaman dengan menggunakan larutan enzymatic',
+      'Alat sudah di urai',
+      'Cairan enzymatic digunakan sesuai petunjuk pabrik'
     ]
   ],
-  'D06' => [
-    'title' => 'Cara Pengangkutan Makanan',
+  'C03' => [
+    'title' => 'Pembersihan',
     'items' => [
-      'Alat pengangkutan makanan/kereta makan bersih (tidak bau)',
-      'Makanan senantiasa dalam keadaan tertutup',
-      'Suhu trolley food warmer sesuai standar',
-      'Ada checklist pembersihan trolley harian dan mingguan'
+      'Petugas melakukan kebersihan tangan',
+      'Petugas menggunakan APD yang tepat (Apron, Sarung tangan, google, masker, sepatu/alas kaki)',
+      'Tidak ditemukan ada noda, sisa darah, sisa jaringan'
     ]
   ],
-  'D07' => [
-    'title' => 'Penyimpanan Dingin',
+  'C04' => [
+    'title' => 'Pengemasan',
     'items' => [
-      'Sesuai bahan makanan',
-      'Sampel makanan disimpan di lemari pendingin selama 3x24 jam pada suhu 2-10 C',
-      'Suhu freezer sesuai standar -5 C s.d -15 C',
-      'Suhu chiller sesuai standar 8 C s.d 10 C',
-      'Isi lemari pendingin tidak penuh sesak dan tidak sering buka tutup',
-      'Ada form pemantauan suhu',
-      'Diisi secara rutin'
+      'Alat dalam keadaan bersih dan kering sebelum di packing',
+      'Alat tidak berkarat',
+      'Pengepakan instrumen dengan 2 sisi dalam keadaan terbuka',
+      'Setiap alat dikemas sesuai kebutuhan, dan disusun dengan cara yang benar dalam tray sesuai jenis operasi',
+      'Pemberian indikator dalam dan luar kemasan',
+      'Pemberian tanggal sterilisasi dan kadaluarsa'
     ]
   ],
-  'D08' => [
-    'title' => 'Cara Penyajian Makanan',
+  'C05' => [
+    'title' => 'Intra Sterilisasi',
     'items' => [
-      'Kebersihan alat dan tempat di lokasi penyajian baik',
-      'Higiene perorangan baik',
-      'Teknik penyajian baik, makanan ditutup wrap'
+      'Peralatan yang dimasukan kedalam alat sterilisasi tidak over load',
+      'Mesin sterilisator dibersihkan secara rutin',
+      'Ada indikator eksternal dan internal',
+      'Test bowie dick dilakukan',
+      'Uji biological indicator'
     ]
   ],
-  'D09' => [
-    'title' => 'Alat Makan',
+  'C06' => [
+    'title' => 'Pasca Sterilisasi',
     'items' => [
-      'Alat makan dicuci dengan detergen/sabun lalu dibilas',
-      'Alat makan disimpan dalam keadaan tidak basah dan tidak ada jamur',
-      'Penyimpanan alat makan tertata rapi',
-      'Lakukan perendaman alat makan dengan air panas suhu 70 C'
+      'Kemasan packing tidak basah, tidak terbuka, tidak sobek',
+      'Indicator tip berubah warna',
+      'Suhu ruang penyimpanan instrumen steril sesuai (18°C-22°C)',
+      'Kelembaban ruang penyimpanan instrumen steril sesuai (35%-75%)',
+      'Ada pemantauan kontrol suhu dan kelembaban',
+      'Penyimpanan alat menggunakan sistem FIFO',
+      'Tidak ada yang expired date',
+      'Rak penyimpanan bersih'
     ]
   ]
 ];
@@ -139,7 +99,7 @@ if (isset($_POST['simpan'])) {
         throw new RuntimeException('Tanda tangan belum diisi.');
       }
 
-      $uploadDir = __DIR__ . '/../uploads/audit_gizi/';
+      $uploadDir = __DIR__ . '/../uploads/audit_cssd/';
       if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
       }
@@ -156,14 +116,19 @@ if (isset($_POST['simpan'])) {
         throw new RuntimeException('Gagal menyimpan tanda tangan.');
       }
 
-      $tandaTanganPetugas = 'uploads/audit_gizi/' . $signatureFileName;
+      $tandaTanganPetugas = 'uploads/audit_cssd/' . $signatureFileName;
 
-      $stmt = mysqli_prepare($conn, "INSERT INTO audit_gizi (tanggal_audit, catatan_audit, nama_petugas_unit, tanda_tangan_petugas) VALUES (?, ?, ?, ?)");
+      $stmt = mysqli_prepare($conn, "INSERT INTO audit_cssd (tanggal_audit, catatan_audit, nama_petugas_unit, tanda_tangan_petugas) VALUES (?, ?, ?, ?)");
       mysqli_stmt_bind_param($stmt, "ssss", $tanggalAudit, $catatanAudit, $namaPetugasUnit, $tandaTanganPetugas);
-      mysqli_stmt_execute($stmt);
-      $auditId = mysqli_insert_id($conn);
+      if (!mysqli_stmt_execute($stmt)) {
+        throw new RuntimeException(mysqli_stmt_error($stmt) ?: 'Gagal menyimpan header audit.');
+      }
+      $auditId = (int) mysqli_insert_id($conn);
+      if ($auditId <= 0) {
+        throw new RuntimeException('ID audit tidak valid setelah simpan header.');
+      }
 
-      $stmtDetail = mysqli_prepare($conn, "INSERT INTO audit_gizi_detail (audit_id, kode_bagian, urutan_item, item_text, jawaban) VALUES (?, ?, ?, ?, ?)");
+      $stmtDetail = mysqli_prepare($conn, "INSERT INTO detail_audit_cssd (audit_id, kode_bagian, urutan_item, item_text, jawaban) VALUES (?, ?, ?, ?, ?)");
       foreach ($checklistSections as $kode => $section) {
         foreach ($section['items'] as $idx => $item) {
           $urutan = $idx + 1;
@@ -172,7 +137,9 @@ if (isset($_POST['simpan'])) {
             $jawab = 'na';
           }
           mysqli_stmt_bind_param($stmtDetail, "isiss", $auditId, $kode, $urutan, $item, $jawab);
-          mysqli_stmt_execute($stmtDetail);
+          if (!mysqli_stmt_execute($stmtDetail)) {
+            throw new RuntimeException(mysqli_stmt_error($stmtDetail) ?: 'Gagal menyimpan baris checklist.');
+          }
         }
       }
 
@@ -181,7 +148,7 @@ if (isset($_POST['simpan'])) {
         $maxFiles = 5;
         $maxSize = 10 * 1024 * 1024;
 
-        $stmtFoto = mysqli_prepare($conn, "INSERT INTO audit_gizi_foto (audit_id, nama_file, path_file, ukuran_file) VALUES (?, ?, ?, ?)");
+        $stmtFoto = mysqli_prepare($conn, "INSERT INTO audit_cssd_foto (audit_id, nama_file, path_file, ukuran_file) VALUES (?, ?, ?, ?)");
         $jumlahFile = min(count($_FILES['dokumentasi_foto']['name']), $maxFiles);
 
         for ($i = 0; $i < $jumlahFile; $i++) {
@@ -196,21 +163,29 @@ if (isset($_POST['simpan'])) {
             continue;
           }
 
-          $newName = 'gizi_' . $auditId . '_' . time() . '_' . $i . '.' . $ext;
+          $newName = 'cssd_' . $auditId . '_' . time() . '_' . $i . '.' . $ext;
           $target = $uploadDir . $newName;
           if (move_uploaded_file($tmp, $target)) {
-            $relativePath = 'uploads/audit_gizi/' . $newName;
+            $relativePath = 'uploads/audit_cssd/' . $newName;
             mysqli_stmt_bind_param($stmtFoto, "issi", $auditId, $original, $relativePath, $size);
-            mysqli_stmt_execute($stmtFoto);
+            if (!mysqli_stmt_execute($stmtFoto)) {
+              throw new RuntimeException(mysqli_stmt_error($stmtFoto) ?: 'Gagal menyimpan data foto dokumentasi.');
+            }
           }
         }
       }
 
       mysqli_commit($conn);
-      $message = '<div class="info-box success">Data audit gizi berhasil disimpan.</div>';
+      $_SESSION['flash_audit_cssd_ok'] = true;
+      header('Location: audit_cssd.php?tab=tab-data');
+      exit;
     } catch (Throwable $e) {
       mysqli_rollback($conn);
-      $message = '<div class="info-box error">Gagal menyimpan data audit gizi.</div>';
+      $dbErr = mysqli_error($conn);
+      $hint = trim($dbErr !== '' ? $dbErr : $e->getMessage());
+      $message = '<div class="info-box error">Gagal menyimpan data audit CSSD.'
+        . ($hint !== '' ? ' <small style="display:block;margin-top:8px;font-weight:600;">' . htmlspecialchars($hint, ENT_QUOTES, 'UTF-8') . '</small>' : '')
+        . '</div>';
     }
   }
 }
@@ -246,7 +221,7 @@ $allowedSortBy = [
 $sortColumn = $allowedSortBy[$sortBy] ?? 'a.tanggal_audit';
 $sortDirSql = $sortDir === 'asc' ? 'ASC' : 'DESC';
 
-$qTotalData = mysqli_query($conn, "SELECT COUNT(*) AS total FROM audit_gizi a $whereDataSql");
+$qTotalData = mysqli_query($conn, "SELECT COUNT(*) AS total FROM audit_cssd a $whereDataSql");
 $totalData = mysqli_fetch_assoc($qTotalData)['total'] ?? 0;
 $totalPages = max(1, ceil($totalData / $limit));
 
@@ -254,9 +229,9 @@ $qData = mysqli_query($conn, "
   SELECT
     a.*,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
-    COUNT(d.id) AS denum
-  FROM audit_gizi a
-  LEFT JOIN audit_gizi_detail d ON a.id = d.audit_id
+    COUNT(d.audit_id) AS denum
+  FROM audit_cssd a
+  LEFT JOIN detail_audit_cssd d ON a.id = d.audit_id
   $whereDataSql
   GROUP BY a.id
   ORDER BY $sortColumn $sortDirSql, a.id DESC
@@ -291,23 +266,20 @@ $qRekapBagian = mysqli_query($conn, "
     d.kode_bagian,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_gizi a
-  JOIN audit_gizi_detail d ON a.id = d.audit_id
+  FROM audit_cssd a
+  JOIN detail_audit_cssd d ON a.id = d.audit_id
   $rekapWhereSql
   GROUP BY d.kode_bagian
   ORDER BY d.kode_bagian ASC
 ");
 
 $bagianLabelsExport = [
-  'D01' => 'Penerimaan Bahan Makanan Mentah',
-  'D02' => 'Higiene dan Sanitasi Gudang',
-  'D03' => 'Kebersihan Dapur',
-  'D04' => 'Tenaga Pengolah',
-  'D05' => 'Proses Pengolahan',
-  'D06' => 'Cara Pengangkutan Makanan',
-  'D07' => 'Penyimpanan Dingin',
-  'D08' => 'Cara Penyajian Makanan',
-  'D09' => 'Alat Makan'
+  'C01' => 'Penerimaan Alat',
+  'C02' => 'Perendaman',
+  'C03' => 'Pembersihan',
+  'C04' => 'Pengemasan',
+  'C05' => 'Intra Sterilisasi',
+  'C06' => 'Pasca Sterilisasi'
 ];
 
 if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
@@ -325,7 +297,7 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
   $periodeLabel .= '_T' . $rekapTahun;
 
   header('Content-Type: text/csv; charset=utf-8');
-  header('Content-Disposition: attachment; filename="rekap_audit_gizi_' . $downloadType . '_' . $periodeLabel . '.csv"');
+  header('Content-Disposition: attachment; filename="rekap_audit_cssd_' . $downloadType . '_' . $periodeLabel . '.csv"');
 
   $output = fopen('php://output', 'w');
   if ($output === false) {
@@ -341,8 +313,8 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         d.kode_bagian,
         SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
         COUNT(*) AS denum
-      FROM audit_gizi a
-      JOIN audit_gizi_detail d ON a.id = d.audit_id
+      FROM audit_cssd a
+      JOIN detail_audit_cssd d ON a.id = d.audit_id
       $rekapWhereSql
       GROUP BY d.kode_bagian
       ORDER BY d.kode_bagian ASC
@@ -382,8 +354,8 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         MONTH(a.tanggal_audit) AS bulan,
         SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
         COUNT(*) AS denum
-      FROM audit_gizi a
-      JOIN audit_gizi_detail d ON a.id = d.audit_id
+      FROM audit_cssd a
+      JOIN detail_audit_cssd d ON a.id = d.audit_id
       $matrixWhereSql
       GROUP BY d.kode_bagian, MONTH(a.tanggal_audit)
       ORDER BY d.kode_bagian ASC, MONTH(a.tanggal_audit) ASC
@@ -419,7 +391,7 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Audit Gizi | PPI PHBW</title>
+  <title>Audit CSSD | PPI PHBW</title>
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
     :root {
@@ -686,8 +658,8 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
       <?php include_once '../topbar.php'; ?>
       <div class="audit-wrapper">
         <section class="hero-header">
-          <h1>Audit Pelayanan Gizi</h1>
-          <p class="subtitle">Form checklist audit gizi D01-D09, data audit, rekap, dan grafik.</p>
+          <h1>Audit CSSD</h1>
+          <p class="subtitle">Form checklist audit CSSD C01-C06, data audit, rekap, dan grafik.</p>
         </section>
 
         <?= $message ?>
@@ -702,17 +674,17 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         <?php
         switch ($activeTab) {
           case 'tab-data':
-            include __DIR__ . '/tabs_gizi/tab_data_audit.php';
+            include __DIR__ . '/tabs_cssd/tab_data_audit.php';
             break;
           case 'tab-rekap':
-            include __DIR__ . '/tabs_gizi/tab_rekap_audit.php';
+            include __DIR__ . '/tabs_cssd/tab_rekap_audit.php';
             break;
           case 'tab-grafik':
-            include __DIR__ . '/tabs_gizi/tab_grafik_audit.php';
+            include __DIR__ . '/tabs_cssd/tab_grafik_audit.php';
             break;
           case 'tab-form':
           default:
-            include __DIR__ . '/tabs_gizi/tab_form_audit.php';
+            include __DIR__ . '/tabs_cssd/tab_form_audit.php';
             break;
         }
         ?>

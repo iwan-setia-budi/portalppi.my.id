@@ -12,14 +12,14 @@ if ($id <= 0) {
   die('ID audit tidak valid.');
 }
 
-$qAudit = mysqli_query($conn, "SELECT * FROM audit_gizi WHERE id = $id");
+$qAudit = mysqli_query($conn, "SELECT * FROM audit_cssd WHERE id = $id");
 $audit = mysqli_fetch_assoc($qAudit);
 if (!$audit) {
   die('Data audit tidak ditemukan.');
 }
 
-$qDetail = mysqli_query($conn, "SELECT * FROM audit_gizi_detail WHERE audit_id = $id ORDER BY kode_bagian, urutan_item");
-$qFoto = mysqli_query($conn, "SELECT * FROM audit_gizi_foto WHERE audit_id = $id ORDER BY id DESC");
+$qDetail = mysqli_query($conn, "SELECT * FROM detail_audit_cssd WHERE audit_id = $id ORDER BY kode_bagian, urutan_item");
+$qFoto = mysqli_query($conn, "SELECT * FROM audit_cssd_foto WHERE audit_id = $id ORDER BY id DESC");
 $statusMessage = '';
 if (isset($_GET['status']) && $_GET['status'] === 'updated') {
   $statusMessage = 'Data audit berhasil diperbarui.';
@@ -30,7 +30,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated') {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Detail Audit Gizi</title>
+  <title>Detail Audit CSSD</title>
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
     :root {
@@ -137,8 +137,8 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated') {
         <?php endif; ?>
 
         <div class="hero-card">
-          <h1>Detail Audit Gizi #<?= (int) $audit['id'] ?></h1>
-          <p class="subtitle">Ringkasan data audit pelayanan gizi.</p>
+          <h1>Detail Audit CSSD #<?= (int) $audit['id'] ?></h1>
+          <p class="subtitle">Ringkasan data audit CSSD.</p>
           <div class="stat-grid">
             <div class="stat-item"><strong><?= htmlspecialchars($audit['tanggal_audit']) ?></strong><span class="label">Tanggal Audit</span></div>
             <div class="stat-item"><strong><?= htmlspecialchars($audit['nama_petugas_unit']) ?></strong><span class="label">Petugas Unit</span></div>
@@ -146,7 +146,7 @@ if (isset($_GET['status']) && $_GET['status'] === 'updated') {
             <div class="stat-item"><strong><?= (int) mysqli_num_rows($qFoto) ?></strong><span class="label">Foto</span></div>
           </div>
           <div class="action-row">
-            <a class="btn btn-secondary" href="../audit_gizi.php?tab=tab-data">Kembali ke Data</a>
+            <a class="btn btn-secondary" href="../audit_cssd.php?tab=tab-data">Kembali ke Data</a>
             <a class="btn btn-warning" href="edit_audit.php?id=<?= (int) $audit['id'] ?>">Edit Audit</a>
           </div>
         </div>

@@ -532,7 +532,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Praktek Lumbal Fungsi</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_cssd.php" class="internal-card">
                                 <div class="internal-icon">🧴</div>
                                 <h4>Audit CSSD</h4>
                             </a>

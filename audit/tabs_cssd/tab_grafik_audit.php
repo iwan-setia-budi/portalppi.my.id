@@ -32,8 +32,8 @@ $qGrafik = mysqli_query($conn, "
     d.kode_bagian,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_gizi a
-  JOIN audit_gizi_detail d ON a.id = d.audit_id
+  FROM audit_cssd a
+  JOIN detail_audit_cssd d ON a.id = d.audit_id
   $grafikWhereSql
   GROUP BY d.kode_bagian
   ORDER BY d.kode_bagian ASC
@@ -58,8 +58,8 @@ if ($grafikPeriode === 'bulanan') {
 } else {
   $periodeLabel = 'Tahun ' . $grafikTahun;
 }
-$judulGrafik = 'Grafik Kepatuhan Pelayanan Gizi di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
-$judulTren = 'Grafik Tren Kepatuhan Pelayanan Gizi di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulGrafik = 'Grafik Kepatuhan Audit CSSD di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulTren = 'Grafik Tren Kepatuhan Audit CSSD di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
 $subJudulGrafik = 'Kepatuhan per Bagian (' . $periodeLabel . ')';
 $subJudulTren = 'Tren Kepatuhan (' . $periodeLabel . ')';
 
@@ -89,8 +89,8 @@ $qTrend = mysqli_query($conn, "
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_gizi a
-  JOIN audit_gizi_detail d ON a.id = d.audit_id
+  FROM audit_cssd a
+  JOIN detail_audit_cssd d ON a.id = d.audit_id
   $trendWhereSql
   GROUP BY MONTH(a.tanggal_audit)
   ORDER BY MONTH(a.tanggal_audit) ASC
@@ -204,7 +204,7 @@ foreach ($dataGrafik as $val) {
     </div>
     <div class="chart-wrap">
       <div class="chart-canvas-wrap">
-        <canvas id="chartGizi"></canvas>
+        <canvas id="chartCssd"></canvas>
       </div>
     </div>
   </div>
@@ -217,7 +217,7 @@ foreach ($dataGrafik as $val) {
     </div>
     <div class="chart-wrap">
       <div class="chart-canvas-wrap is-trend">
-        <canvas id="chartTrenGizi"></canvas>
+        <canvas id="chartTrenCssd"></canvas>
       </div>
     </div>
   </div>
@@ -253,7 +253,7 @@ foreach ($dataGrafik as $val) {
       syncFields();
     }
 
-    const el = document.getElementById('chartGizi');
+    const el = document.getElementById('chartCssd');
     if (!el) return;
     const getAdaptiveTitleSize = (chart) => {
       const w = chart && chart.width ? chart.width : window.innerWidth;
@@ -375,12 +375,12 @@ foreach ($dataGrafik as $val) {
       btnDownload.addEventListener('click', function () {
         const link = document.createElement('a');
         link.href = chart.toBase64Image('image/png', 1);
-        link.download = 'grafik-kepatuhan-gizi.png';
+        link.download = 'grafik-kepatuhan-cssd.png';
         link.click();
       });
     }
 
-    const elTrend = document.getElementById('chartTrenGizi');
+    const elTrend = document.getElementById('chartTrenCssd');
     if (!elTrend) return;
     const trendChart = new Chart(elTrend, {
       type: 'line',
@@ -489,7 +489,7 @@ foreach ($dataGrafik as $val) {
       btnDownloadTren.addEventListener('click', function () {
         const link = document.createElement('a');
         link.href = trendChart.toBase64Image('image/png', 1);
-        link.download = 'grafik-tren-kepatuhan-gizi.png';
+        link.download = 'grafik-tren-kepatuhan-cssd.png';
         link.click();
       });
     }

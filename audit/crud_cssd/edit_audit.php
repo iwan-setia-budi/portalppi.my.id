@@ -19,118 +19,74 @@ $opsiJawaban = [
 ];
 
 $checklistSections = [
-  'D01' => [
-    'title' => 'Penerimaan Bahan Makanan Mentah',
+  'C01' => [
+    'title' => 'Penerimaan Alat',
     'items' => [
-      'Bahan makanan mentah dimasukkan ke tempat penyimpanan dalam keadaan bersih (sudah dicuci)',
-      'Penyimpanan bahan makanan mentah tidak menggunakan wadah dari luar',
-      'Kualitas bahan makanan mentah yang diantar dalam keadaan baik (tidak busuk/tidak bonyok)',
-      'Ada pencatatan suhu bahan makanan mentah protein hewani dari supplier (suhu < 7 derajat C)'
+      'Pengiriman barang kotor menggunakan kontainer khusus dan tertutup',
+      'Pintu keluar/masuk yang terpisah antara ruang bersih dan ruang kotor'
     ]
   ],
-  'D02' => [
-    'title' => 'Higiene dan Sanitasi Gudang',
-    'items' => [
-      'Ada rotasi penyimpanan barang lama dan baru (FIFO/FEFO)',
-      'Cantumkan tanggal buka kemasan',
-      'Tidak ada barang kadaluarsa',
-      'Penyimpanan barang rapi dan sesuai jenisnya',
-      'Bebas binatang/serangga (kucing, kecoa, semut, tikus)',
-      'Penempatan barang minimal 15 cm dari lantai, 60 cm dari langit-langit, 5 cm dari dinding',
-      'Tidak ada bahan kimia berbahaya di gudang penyimpanan',
-      'Kemasan bahan makanan selalu dalam keadaan tertutup'
-    ]
-  ],
-  'D03' => [
-    'title' => 'Kebersihan Dapur',
-    'items' => [
-      'Air memenuhi syarat air minum, tidak terkontaminasi',
-      'Pembuangan air kotor lancar, tertutup rapat',
-      'Tempat penyimpanan bahan makanan tertutup dan bersih',
-      'Tidak ada genangan air',
-      'Tempat sampah tertutup dan dioperasikan dengan pedal',
-      'Bebas serangga dan tikus, semut, kecoa, kucing',
-      'Lantai bersih dari debu dan sampah',
-      'Lawa-lawa tidak ada dan water intrusion',
-      'Lantai kering/tidak licin',
-      'Wastafel cuci tangan selalu bersih dan bebas dari peralatan',
-      'Rak penyimpanan bersih (tidak ada noda dan debu)',
-      'Ada checklist pembersihan rutin',
-      'Kain lap bersih',
-      'Ada jadwal pembersihan ruangan gizi'
-    ]
-  ],
-  'D04' => [
-    'title' => 'Tenaga Pengolah',
-    'items' => [
-      'Kebersihan perseorangan baik, berkuku pendek',
-      'Tidak memakai perhiasan tangan',
-      'Selalu mencuci tangan sebelum menjamah makanan',
-      'Memakai tutup kepala',
-      'Memakai masker dengan benar',
-      'Memakai celemek/apron',
-      'Menggunakan alas kaki bagian depan tertutup rapat',
-      'Menggunakan APD lengkap terutama saat menjamah makanan matang menggunakan alat (penjepit/garpu/sarung tangan plastik)'
-    ]
-  ],
-  'D05' => [
-    'title' => 'Proses Pengolahan',
+  'C02' => [
+    'title' => 'Perendaman',
     'items' => [
       'Petugas menggunakan APD',
-      'Cara pengolahan makanan bersih',
-      'Tempat persiapan dan meja peracikan bersih',
-      'Tempat persiapan dan meja peracikan bebas dari kecoa, semut, tikus, kucing',
-      'Peralatan pengolahan tidak dicampur aduk penggunaannya (talenan dan pisau)'
+      'Bersihkan semua kotoran dan dilakukan perendaman dengan menggunakan larutan enzymatic',
+      'Alat sudah di urai',
+      'Cairan enzymatic digunakan sesuai petunjuk pabrik'
     ]
   ],
-  'D06' => [
-    'title' => 'Cara Pengangkutan Makanan',
+  'C03' => [
+    'title' => 'Pembersihan',
     'items' => [
-      'Alat pengangkutan makanan/kereta makan bersih (tidak bau)',
-      'Makanan senantiasa dalam keadaan tertutup',
-      'Suhu trolley food warmer sesuai standar',
-      'Ada checklist pembersihan trolley harian dan mingguan'
+      'Petugas melakukan kebersihan tangan',
+      'Petugas menggunakan APD yang tepat (Apron, Sarung tangan, google, masker, sepatu/alas kaki)',
+      'Tidak ditemukan ada noda, sisa darah, sisa jaringan'
     ]
   ],
-  'D07' => [
-    'title' => 'Penyimpanan Dingin',
+  'C04' => [
+    'title' => 'Pengemasan',
     'items' => [
-      'Sesuai bahan makanan',
-      'Sampel makanan disimpan di lemari pendingin selama 3x24 jam pada suhu 2-10 C',
-      'Suhu freezer sesuai standar -5 C s.d -15 C',
-      'Suhu chiller sesuai standar 8 C s.d 10 C',
-      'Isi lemari pendingin tidak penuh sesak dan tidak sering buka tutup',
-      'Ada form pemantauan suhu',
-      'Diisi secara rutin'
+      'Alat dalam keadaan bersih dan kering sebelum di packing',
+      'Alat tidak berkarat',
+      'Pengepakan instrumen dengan 2 sisi dalam keadaan terbuka',
+      'Setiap alat dikemas sesuai kebutuhan, dan disusun dengan cara yang benar dalam tray sesuai jenis operasi',
+      'Pemberian indikator dalam dan luar kemasan',
+      'Pemberian tanggal sterilisasi dan kadaluarsa'
     ]
   ],
-  'D08' => [
-    'title' => 'Cara Penyajian Makanan',
+  'C05' => [
+    'title' => 'Intra Sterilisasi',
     'items' => [
-      'Kebersihan alat dan tempat di lokasi penyajian baik',
-      'Higiene perorangan baik',
-      'Teknik penyajian baik, makanan ditutup wrap'
+      'Peralatan yang dimasukan kedalam alat sterilisasi tidak over load',
+      'Mesin sterilisator dibersihkan secara rutin',
+      'Ada indikator eksternal dan internal',
+      'Test bowie dick dilakukan',
+      'Uji biological indicator'
     ]
   ],
-  'D09' => [
-    'title' => 'Alat Makan',
+  'C06' => [
+    'title' => 'Pasca Sterilisasi',
     'items' => [
-      'Alat makan dicuci dengan detergen/sabun lalu dibilas',
-      'Alat makan disimpan dalam keadaan tidak basah dan tidak ada jamur',
-      'Penyimpanan alat makan tertata rapi',
-      'Lakukan perendaman alat makan dengan air panas suhu 70 C'
+      'Kemasan packing tidak basah, tidak terbuka, tidak sobek',
+      'Indicator tip berubah warna',
+      'Suhu ruang penyimpanan instrumen steril sesuai (18°C-22°C)',
+      'Kelembaban ruang penyimpanan instrumen steril sesuai (35%-75%)',
+      'Ada pemantauan kontrol suhu dan kelembaban',
+      'Penyimpanan alat menggunakan sistem FIFO',
+      'Tidak ada yang expired date',
+      'Rak penyimpanan bersih'
     ]
   ]
 ];
 
-$qAudit = mysqli_query($conn, "SELECT * FROM audit_gizi WHERE id = $id");
+$qAudit = mysqli_query($conn, "SELECT * FROM audit_cssd WHERE id = $id");
 $audit = mysqli_fetch_assoc($qAudit);
 if (!$audit) {
   die('Data audit tidak ditemukan.');
 }
 
 $existingJawaban = [];
-$qDetail = mysqli_query($conn, "SELECT kode_bagian, urutan_item, jawaban FROM audit_gizi_detail WHERE audit_id = $id");
+$qDetail = mysqli_query($conn, "SELECT kode_bagian, urutan_item, jawaban FROM detail_audit_cssd WHERE audit_id = $id");
 while ($d = mysqli_fetch_assoc($qDetail)) {
   $existingJawaban[$d['kode_bagian']][(int) $d['urutan_item']] = $d['jawaban'];
 }
@@ -168,7 +124,7 @@ if (isset($_POST['update'])) {
       $message = 'Semua item checklist harus dipilih (Ya/Tidak/NA).';
     } else {
       if (preg_match('/^data:image\/png;base64,/', $signatureData)) {
-        $uploadDir = __DIR__ . '/../../uploads/audit_gizi/';
+        $uploadDir = __DIR__ . '/../../uploads/audit_cssd/';
         if (!is_dir($uploadDir)) {
           mkdir($uploadDir, 0777, true);
         }
@@ -177,7 +133,7 @@ if (isset($_POST['update'])) {
         if ($signatureBinary !== false && strlen($signatureBinary) > 0) {
           $signatureFileName = 'ttd_' . time() . '_' . bin2hex(random_bytes(4)) . '.png';
           if (file_put_contents($uploadDir . $signatureFileName, $signatureBinary) !== false) {
-            $ttd = 'uploads/audit_gizi/' . $signatureFileName;
+            $ttd = 'uploads/audit_cssd/' . $signatureFileName;
           }
         }
       }
@@ -191,13 +147,13 @@ if (isset($_POST['update'])) {
       } else {
         mysqli_begin_transaction($conn);
         try {
-          $stmt = mysqli_prepare($conn, "UPDATE audit_gizi SET tanggal_audit=?, catatan_audit=?, nama_petugas_unit=?, tanda_tangan_petugas=? WHERE id=?");
+          $stmt = mysqli_prepare($conn, "UPDATE audit_cssd SET tanggal_audit=?, catatan_audit=?, nama_petugas_unit=?, tanda_tangan_petugas=? WHERE id=?");
           mysqli_stmt_bind_param($stmt, "ssssi", $tanggal, $catatan, $petugas, $ttd, $id);
           mysqli_stmt_execute($stmt);
 
-          mysqli_query($conn, "DELETE FROM audit_gizi_detail WHERE audit_id = $id");
+          mysqli_query($conn, "DELETE FROM detail_audit_cssd WHERE audit_id = $id");
 
-          $stmtDetail = mysqli_prepare($conn, "INSERT INTO audit_gizi_detail (audit_id, kode_bagian, urutan_item, item_text, jawaban) VALUES (?, ?, ?, ?, ?)");
+          $stmtDetail = mysqli_prepare($conn, "INSERT INTO detail_audit_cssd (audit_id, kode_bagian, urutan_item, item_text, jawaban) VALUES (?, ?, ?, ?, ?)");
           foreach ($checklistSections as $kode => $section) {
             foreach ($section['items'] as $idx => $item) {
               $urutan = $idx + 1;
@@ -224,7 +180,7 @@ if (isset($_POST['update'])) {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Edit Audit Gizi</title>
+  <title>Edit Audit CSSD</title>
   <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
   <style>
     :root { --bg:#eef3f7; --card:#ffffff; --card-2:#f8fafc; --ink:#0f172a; --muted:#64748b; --line:#dbe3ee; --line-strong:#94a3b8; }
@@ -330,7 +286,7 @@ if (isset($_POST['update'])) {
       <?php include_once __DIR__ . '/../../topbar.php'; ?>
       <div class="page-wrap">
         <div class="hero-card">
-          <h1>Edit Audit Gizi #<?= (int) $audit['id'] ?></h1>
+          <h1>Edit Audit CSSD #<?= (int) $audit['id'] ?></h1>
           <p class="subtitle">Tampilan edit disamakan dengan form audit awal agar lebih konsisten.</p>
         </div>
 
@@ -439,7 +395,7 @@ if (isset($_POST['update'])) {
             <div class="btn-row">
               <button class="btn btn-primary" name="update" type="submit">Simpan Perubahan</button>
               <a class="btn btn-secondary" href="detail_audit.php?id=<?= $id ?>">Kembali ke Detail</a>
-              <a class="btn btn-secondary" href="../audit_gizi.php?tab=tab-data">Data Audit</a>
+              <a class="btn btn-secondary" href="../audit_cssd.php?tab=tab-data">Data Audit</a>
             </div>
           </div>
         </form>

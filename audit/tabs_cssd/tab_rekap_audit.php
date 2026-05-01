@@ -116,15 +116,12 @@
 
 <?php
 $bagianLabels = [
-  'D01' => 'Penerimaan Bahan Makanan Mentah',
-  'D02' => 'Higiene dan Sanitasi Gudang',
-  'D03' => 'Kebersihan Dapur',
-  'D04' => 'Tenaga Pengolah',
-  'D05' => 'Proses Pengolahan',
-  'D06' => 'Cara Pengangkutan Makanan',
-  'D07' => 'Penyimpanan Dingin',
-  'D08' => 'Cara Penyajian Makanan',
-  'D09' => 'Alat Makan'
+  'C01' => 'Penerimaan Alat',
+  'C02' => 'Perendaman',
+  'C03' => 'Pembersihan',
+  'C04' => 'Pengemasan',
+  'C05' => 'Intra Sterilisasi',
+  'C06' => 'Pasca Sterilisasi'
 ];
 $rekapRows = [];
 $totalNum = 0;
@@ -169,8 +166,8 @@ $qMatrix = mysqli_query($conn, "
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
-  FROM audit_gizi a
-  JOIN audit_gizi_detail d ON a.id = d.audit_id
+  FROM audit_cssd a
+  JOIN detail_audit_cssd d ON a.id = d.audit_id
   $matrixWhereSql
   GROUP BY d.kode_bagian, MONTH(a.tanggal_audit)
 ");
@@ -287,7 +284,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
   <div class="section-card" id="rekap-bagian-card">
     <h3 class="card-title">Rekap Kepatuhan per Bagian</h3>
     <div class="download-toolbar">
-      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-bagian-card" data-file-prefix="rekap_bagian_gizi">Download Gambar Rekap Bagian</a>
+      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-bagian-card" data-file-prefix="rekap_bagian_cssd">Download Gambar Rekap Bagian</a>
     </div>
     <?php if (count($rekapRows) > 0): ?>
       <div class="table-shell">
@@ -349,7 +346,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
   <div class="section-card" id="rekap-periode-card">
     <h3 class="card-title">Rekap per Periode (Skor per Bulan)</h3>
     <div class="download-toolbar">
-      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-periode-card" data-file-prefix="rekap_periode_gizi">Download Gambar Rekap Periode</a>
+      <a class="btn-download-image js-download-image" href="#" data-target-id="rekap-periode-card" data-file-prefix="rekap_periode_cssd">Download Gambar Rekap Periode</a>
     </div>
     <p class="subheading-note">
       <?php if ($rekapPeriode === 'tahunan'): ?>
@@ -684,7 +681,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
     function renderTableDataToCanvas(target) {
       const titleEl = target.querySelector('.card-title');
       const tableEl = target.querySelector('.desktop-table table') || target.querySelector('table');
-      const title = titleEl ? titleEl.textContent.trim() : 'Rekap Audit Gizi';
+      const title = titleEl ? titleEl.textContent.trim() : 'Rekap Audit CSSD';
       if (!tableEl) {
         throw new Error('table-not-found');
       }
@@ -900,7 +897,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
       btn.addEventListener('click', function (e) {
         e.preventDefault();
         const targetId = btn.getAttribute('data-target-id') || '';
-        const filePrefix = btn.getAttribute('data-file-prefix') || 'rekap_gizi';
+        const filePrefix = btn.getAttribute('data-file-prefix') || 'rekap_cssd';
         downloadSectionAsImage(targetId, filePrefix);
       });
     });
