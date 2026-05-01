@@ -522,12 +522,12 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Audit Unit</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_etika_batuk.php" class="internal-card">
                                 <div class="internal-icon">😷</div>
                                 <h4>Etika Batuk</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_praktik_lumbal_fungsi.php" class="internal-card">
                                 <div class="internal-icon">🩺</div>
                                 <h4>Praktek Lumbal Fungsi</h4>
                             </a>
@@ -567,14 +567,14 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Ruang Isolasi</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_universal_masking.php" class="internal-card">
                                 <div class="internal-icon">😷</div>
                                 <h4>Universal Masking</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_targeted_continuous_medical_mask_use.php" class="internal-card">
                                 <div class="internal-icon">🎯</div>
-                                <h4>Targeted Mask Use</h4>
+                                <h4>Targeted Continuous Medical Mask Use</h4>
                             </a>
                         </div>
 
@@ -587,22 +587,22 @@ $pageTitle = "AUDIT DAN SUPERVISI";
 
                         <div class="internal-grid">
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_bundle_vap.php" class="internal-card">
                                 <div class="internal-icon">🫁</div>
                                 <h4>Bundle VAP</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_bundle_iadp.php" class="internal-card">
                                 <div class="internal-icon">🩸</div>
                                 <h4>Bundle IADP</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_bundle_isk.php" class="internal-card">
                                 <div class="internal-icon">🚻</div>
                                 <h4>Bundle ISK</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_bundle_ido.php" class="internal-card">
                                 <div class="internal-icon">🦠</div>
                                 <h4>Bundle IDO</h4>
                             </a>
