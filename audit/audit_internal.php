@@ -517,7 +517,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Audit APD</h4>
                             </a>
 
-                            <a href="https://myppi.primaya.id/" class="internal-card">
+                            <a href="./audit_unit.php" class="internal-card">
                                 <div class="internal-icon">🏥</div>
                                 <h4>Audit Unit</h4>
                             </a>
@@ -592,6 +592,11 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Bundle VAP</h4>
                             </a>
 
+                            <a href="./audit_unit.php" class="internal-card">
+                                <div class="internal-icon">📋</div>
+                                <h4>Audit Unit</h4>
+                            </a>
+
                             <a href="./audit_bundle_iadp.php" class="internal-card">
                                 <div class="internal-icon">🩸</div>
                                 <h4>Bundle IADP</h4>
@@ -602,7 +607,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                 <h4>Bundle ISK</h4>
                             </a>
 
-                            <a href="./audit_bundle_ido.php" class="internal-card">
+                            <a href="./audit_bundle_ido  .php" class="internal-card">
                                 <div class="internal-icon">🦠</div>
                                 <h4>Bundle IDO</h4>
                             </a>
