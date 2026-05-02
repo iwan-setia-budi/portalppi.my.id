@@ -13,6 +13,9 @@ if ($id <= 0) {
   exit;
 }
 
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+ppi_require_admin_delete_redirect('../audit_ruang_isolasi.php?tab=tab-data');
+
 mysqli_begin_transaction($conn);
 try {
   mysqli_query($conn, "DELETE FROM audit_ruang_isolasi_foto WHERE audit_id = $id");

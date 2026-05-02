@@ -1,3 +1,4 @@
+<?php require __DIR__ . '/../inc_audit_mark_all_role.php'; ?>
 <style>
   #tab-form .section-title {
     margin: 0 0 12px;
@@ -387,12 +388,86 @@
     margin-top: 12px;
   }
 
+  /* Mark-all: tampil default via class show-bulk-actions pada #tab-form; Ctrl+Alt+M menyembunyikan (localStorage '0'). */
   #tab-form .bulk-actions-wrap {
     display: none;
   }
 
   #tab-form.show-bulk-actions .bulk-actions-wrap {
     display: block;
+  }
+
+  #tab-form .bulk-toggle-bar {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px dashed rgba(37, 99, 235, 0.35);
+    background: rgba(239, 246, 255, 0.65);
+  }
+
+  #tab-form .bulk-toggle-label {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.02em;
+  }
+
+  #tab-form .bulk-toggle-label span {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0;
+  }
+
+  #tab-form .btn-bulk-toggle {
+    display: inline-flex;
+    align-items: center;
+    padding: 9px 14px;
+    font-size: 13px;
+    font-weight: 800;
+    color: #1e40af;
+    background: #ffffff;
+    border: 2px solid rgba(37, 99, 235, 0.45);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.12);
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease;
+  }
+
+  #tab-form .btn-bulk-toggle:hover {
+    background: #eff6ff;
+    border-color: #2563eb;
+    color: #1e3a8a;
+    transform: translateY(-1px);
+  }
+
+  body.dark-mode #tab-form .bulk-toggle-bar {
+    border-color: rgba(96, 165, 250, 0.35);
+    background: rgba(30, 58, 138, 0.22);
+  }
+
+  body.dark-mode #tab-form .bulk-toggle-label span {
+    color: #94a3b8;
+  }
+
+  body.dark-mode #tab-form .btn-bulk-toggle {
+    color: #dbeafe;
+    background: #1e293b;
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  body.dark-mode #tab-form .btn-bulk-toggle:hover {
+    color: #ffffff;
+    background: #334155;
+    border-color: #93c5fd;
   }
 
   #tab-form .bulk-actions .btn {
@@ -687,6 +762,7 @@
 
     #tab-form .mobile-card,
     #tab-form .section-toggle .section-chevron,
+    #tab-form .bulk-toggle-bar,
     #tab-form .bulk-actions-wrap,
     #tab-form .sticky-submit-wrap {
       display: none !important;
@@ -744,7 +820,7 @@
   }
 </style>
 
-<div id="tab-form" class="tab-pane active">
+<div id="tab-form" class="tab-pane active<?= !empty($auditMarkAllEnabled) ? ' show-bulk-actions' : '' ?>">
   <form method="post" enctype="multipart/form-data">
     <div class="section-card">
       <h2 class="section-title">Form Audit Bundle VAP</h2>
@@ -762,7 +838,12 @@
       <label class="field-label">Nama Pasien <span class="required">*</span></label>
       <input type="text" name="nama_pasien" class="form-control" value="<?= htmlspecialchars($_POST['nama_pasien'] ?? '') ?>" required>
 
-      <div class="bulk-actions-wrap">
+      <?php if (!empty($auditMarkAllEnabled)): ?>
+      <div class="bulk-toggle-bar">
+        <span class="bulk-toggle-label">Tampilkan / sembunyikan pintasan<span>Tombol biru di bawah ini untuk menyembunyikan atau menampilkan Semua Ya · Tidak · NA</span></span>
+        <button type="button" class="btn-bulk-toggle" id="bulkMarkAllToggle" aria-expanded="true" aria-controls="bulkMarkAllPanel">Sembunyikan tombol isi semua</button>
+      </div>
+      <div class="bulk-actions-wrap" id="bulkMarkAllPanel">
         <div class="bulk-actions">
           <button type="button" class="btn btn-primary" data-bulk-jawaban="ya">Semua Ya</button>
           <button type="button" class="btn btn-warning" data-bulk-jawaban="tidak">Semua Tidak</button>
@@ -770,6 +851,7 @@
         </div>
         <div class="small-note">Klik salah satu tombol untuk isi semua item sekaligus.</div>
       </div>
+      <?php endif; ?>
       <div class="progress-wrap">
         <div class="progress-head">
           <span>Progress Pengisian</span>
@@ -992,12 +1074,23 @@
     resizeCanvas();
   })();
 
+  <?php if (!empty($auditMarkAllEnabled)): ?>
   (function () {
     const tabForm = document.getElementById('tab-form');
     const bulkButtons = document.querySelectorAll('#tab-form [data-bulk-jawaban]');
     if (!bulkButtons.length || !tabForm) return;
 
     const STORAGE_KEY = 'auditCssdShowBulkActions';
+    const bulkToggleBtn = document.getElementById('bulkMarkAllToggle');
+
+    function syncBulkToggleUi() {
+      if (!bulkToggleBtn) return;
+      const visible = tabForm.classList.contains('show-bulk-actions');
+      bulkToggleBtn.setAttribute('aria-expanded', visible ? 'true' : 'false');
+      bulkToggleBtn.textContent = visible
+        ? 'Sembunyikan tombol isi semua'
+        : 'Tampilkan tombol isi semua';
+    }
 
     function setAllJawaban(targetValue) {
       const radios = document.querySelectorAll('#tab-form input[type="radio"][name^="jawaban["]');
@@ -1010,9 +1103,11 @@
         groupMap.get(radio.name).push(radio);
       });
 
+      const isMobileLayout = window.matchMedia('(max-width: 768px)').matches;
+
       groupMap.forEach((groupRadios) => {
-        // Each question appears twice (desktop + mobile) with same name.
-        // Browser only allows one checked radio per name, so pick visible input.
+        // Nama sama untuk baris tabel (desktop) & kartu HP. Sub bab tertutup = tak ada input "visible".
+        // Di HP tabel disembunyikan CSS; fallback harus memilih radio di .mobile-card agar saat dibuka tampilan cocok.
         const candidates = groupRadios.filter((radio) => radio.value === targetValue);
         if (!candidates.length) return;
 
@@ -1023,7 +1118,20 @@
             radio.offsetParent !== null;
         });
 
-        const targetRadio = visibleCandidate || candidates[0];
+        let targetRadio = visibleCandidate;
+
+        if (!targetRadio) {
+          const mobileCand = candidates.find((r) => r.closest('.mobile-card'));
+          const tableCand = candidates.find((r) => r.closest('.table-responsive'));
+          if (isMobileLayout && mobileCand) {
+            targetRadio = mobileCand;
+          } else if (!isMobileLayout && tableCand) {
+            targetRadio = tableCand;
+          } else {
+            targetRadio = candidates[0];
+          }
+        }
+
         if (targetRadio) {
           targetRadio.checked = true;
         }
@@ -1037,6 +1145,7 @@
       } catch (e) {
         // Ignore storage errors in restricted browser mode.
       }
+      syncBulkToggleUi();
     }
 
     function toggleBulkVisibility() {
@@ -1046,11 +1155,11 @@
 
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === '1') {
-        setBulkVisibility(true);
+      if (saved === '0') {
+        setBulkVisibility(false);
       }
     } catch (e) {
-      // Ignore storage errors in restricted browser mode.
+      // Penyimpanan tidak tersedia (mis. mode privat): biarkan default dari HTML (tetap tampil).
     }
 
     bulkButtons.forEach((button) => {
@@ -1077,7 +1186,16 @@
         toggleBulkVisibility();
       }
     });
+
+    if (bulkToggleBtn) {
+      bulkToggleBtn.addEventListener('click', function () {
+        toggleBulkVisibility();
+      });
+    }
+
+    syncBulkToggleUi();
   })();
+  <?php endif; ?>
 
   (function () {
     const tabForm = document.getElementById('tab-form');

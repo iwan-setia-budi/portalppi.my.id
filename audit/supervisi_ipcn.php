@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
+require_once __DIR__ . '/../include/audit_delete_auth.php';
+$ppiAuditCanDelete = ppi_audit_delete_allowed();
 
 /* ===== SIMPAN DATA ===== */
 if (isset($_POST['action']) && $_POST['action'] == 'save') {
@@ -39,6 +41,10 @@ if (isset($_POST['action']) && $_POST['action'] == 'save') {
 
 /* ===== HAPUS ===== */
 if (isset($_POST['action']) && $_POST['action'] == 'delete') {
+    if (!ppi_audit_delete_allowed()) {
+        header('Location: supervisi_ipcn.php?delete_denied=1');
+        exit;
+    }
     $id = (int) $_POST['id'];
     $stmt = $conn->prepare("DELETE FROM tb_supervisi_ipcn WHERE id=?");
     $stmt->bind_param("i", $id);
@@ -827,6 +833,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
 
 
                                         <td>
+                                            <?php if ($ppiAuditCanDelete): ?>
                                             <form method="post" style="display:inline;">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="id" value="<?= $row['id'] ?>">
@@ -834,6 +841,7 @@ $pageTitle = "AUDIT DAN SUPERVISI";
                                                     onclick="return confirm('Yakin ingin menghapus data ini?')">🗑</button>
 
                                             </form>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -13,6 +13,9 @@ if ($id <= 0) {
   exit;
 }
 
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+ppi_require_admin_delete_redirect('../audit_targeted_continuous_medical_mask_use.php?tab=tab-data');
+
 mysqli_begin_transaction($conn);
 try {
   mysqli_query($conn, "DELETE FROM audit_targeted_continuous_medical_mask_use_foto WHERE audit_id = $id");

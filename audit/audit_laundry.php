@@ -3,6 +3,8 @@ require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include_once '../cek_akses.php';
 $conn = $koneksi;
+require_once __DIR__ . '/../include/audit_delete_auth.php';
+$ppiAuditCanDelete = ppi_audit_delete_allowed();
 
 $fotos = mysqli_query($conn,"
     SELECT 
@@ -18,6 +20,10 @@ $fotos = mysqli_query($conn,"
 
 <?php
 if (isset($_GET['hapus_foto_group'])) {
+    if (!ppi_audit_delete_allowed()) {
+        echo "<script>alert('Hanya administrator yang dapat menghapus data.'); location.href='audit_laundry.php?tab=foto';</script>";
+        exit;
+    }
 
     $tanggal = $_GET['hapus_foto_group'];
     $ket     = $_GET['ket'];
@@ -53,6 +59,10 @@ if (isset($_GET['hapus_foto_group'])) {
 <?php
 
     if (isset($_GET['hapus'])) {
+        if (!ppi_audit_delete_allowed()) {
+            echo "<script>alert('Hanya administrator yang dapat menghapus data.'); window.location.href='audit_laundry.php?tab=rekap';</script>";
+            exit;
+        }
         $id = (int) $_GET['hapus'];
     
         mysqli_query($conn, "DELETE FROM tb_audit_laundry_detail WHERE audit_id = $id");
@@ -1581,12 +1591,14 @@ $pageTitle = "Audit Laundry";
                                     </td>
                                     <td style="text-align:center">
                                         <a href="audit_laundry_detail.php?id=<?= $r['id'] ?>">Lihat</a>
+                                        <?php if ($ppiAuditCanDelete): ?>
                                         |
                                         <a href="?hapus=<?= $r['id'] ?>&tab=rekap"
                                             onclick="return confirm('Yakin ingin menghapus data audit ini?')"
                                             style="color:red;">
                                             Hapus
                                         </a>
+                                        <?php endif; ?>
 
                                     </td>
 
@@ -1664,10 +1676,12 @@ $pageTitle = "Audit Laundry";
                                             Lihat
                                         </a>
 
+                                        <?php if ($ppiAuditCanDelete): ?>
                                         <a href="?hapus_foto_group=<?= urlencode($f['tanggal']) ?>&ket=<?= urlencode($f['keterangan']) ?>&tab=foto"
                                             style="color:red" onclick="return confirm('Hapus semua foto ini?')">
                                             Hapus
                                         </a>
+                                        <?php endif; ?>
 
 
                                     </td>

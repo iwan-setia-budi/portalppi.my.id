@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+$ppiAuditCanDelete = ppi_audit_delete_allowed();
+?>
 <div id="tab-data-apd" class="tab-pane active">
   <div class="section-card">
     <div class="section-title">Filter Data Audit APD</div>
@@ -123,12 +127,14 @@
                       Edit
                     </a>
 
+                    <?php if ($ppiAuditCanDelete): ?>
                     <a
                       href="crud_apd/hapus_audit.php?id=<?= (int) $row['id'] ?>"
                       class="btn btn-danger"
                       onclick="return confirm('Yakin hapus data audit APD ini?')">
                       Hapus
                     </a>
+                    <?php endif; ?>
                   </div>
                 </td>
               </tr>

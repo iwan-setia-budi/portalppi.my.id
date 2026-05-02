@@ -9,6 +9,12 @@ if (!isset($_SESSION['username'])) {
   exit;
 }
 
+// Hanya admin yang boleh mengelola user
+if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+  header("Location: " . base_url('dashboard.php'));
+  exit;
+}
+
 $csrfToken = csrf_token();
 
 $available_pages = [
@@ -20,6 +26,8 @@ $available_pages = [
   'diklat' => ['icon' => '🎓', 'label' => 'Diklat & Pelatihan'],
   'dokumen' => ['icon' => '📁', 'label' => 'Dokumen & Formulir'],
   'laporan' => ['icon' => '📈', 'label' => 'Laporan PPI'],
+  'master' => ['icon' => '🏥', 'label' => 'Master Aplikasi'],
+  'drive' => ['icon' => '☁️', 'label' => 'Drive PPI'],
   'users' => ['icon' => '👥', 'label' => 'Manajemen User']
 ];
 
@@ -224,7 +232,8 @@ while ($usersResult && ($row = mysqli_fetch_assoc($usersResult))) {
 $accessMap = [];
 $allAccessResult = mysqli_query($koneksi, "SELECT user_id, halaman FROM user_access WHERE diizinkan = 1 ORDER BY halaman ASC");
 while ($allAccessResult && ($row = mysqli_fetch_assoc($allAccessResult))) {
-  $accessMap[(int) $row['user_id']][] = ucfirst($row['halaman']);
+  $h = (string) $row['halaman'];
+  $accessMap[(int) $row['user_id']][] = $available_pages[$h]['label'] ?? ucfirst($h);
 }
 ?>
 
@@ -1107,6 +1116,38 @@ $pageTitle = "Manajemen User";
   body.dark-mode .um-mobile-card-body .um-row {
     border-bottom-color: rgba(96, 165, 250, .16);
   }
+
+  .um-access-bulk {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+  .um-btn-bulk {
+    font-size: .78rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(11, 95, 166, .35);
+    background: #fff;
+    color: var(--blue-1);
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .um-btn-bulk:hover {
+    background: var(--blue-soft, #e8f4ff);
+  }
+  .um-btn-bulk-secondary {
+    border-color: rgba(100, 116, 139, .4);
+    color: #64748b;
+  }
+  body.dark-mode .um-btn-bulk {
+    background: rgba(15, 23, 42, .6);
+    color: #e2e8f0;
+    border-color: rgba(96, 165, 250, .3);
+  }
+  body.dark-mode .um-btn-bulk-secondary {
+    color: #94a3b8;
+  }
 </style>
 
 
@@ -1185,6 +1226,10 @@ $pageTitle = "Manajemen User";
 
             <div class="um-form-group full">
               <span class="um-access-label">Pilih Halaman yang Bisa Diakses</span>
+              <div class="um-access-bulk">
+                <button type="button" class="um-btn-bulk" id="um-access-all">Pilih semua</button>
+                <button type="button" class="um-btn-bulk um-btn-bulk-secondary" id="um-access-none">Kosongkan</button>
+              </div>
               <div class="um-access-grid">
                 <?php foreach ($available_pages as $key => $meta): ?>
                   <label class="um-check-label">
@@ -1408,6 +1453,17 @@ $pageTitle = "Manajemen User";
             toggle.innerHTML = showPassword
               ? '<i class="bi bi-eye-slash"></i>'
               : '<i class="bi bi-eye"></i>';
+          });
+        });
+
+        document.getElementById('um-access-all')?.addEventListener('click', function () {
+          document.querySelectorAll('input[name="akses[]"]').forEach(function (cb) {
+            cb.checked = true;
+          });
+        });
+        document.getElementById('um-access-none')?.addEventListener('click', function () {
+          document.querySelectorAll('input[name="akses[]"]').forEach(function (cb) {
+            cb.checked = false;
           });
         });
       })();

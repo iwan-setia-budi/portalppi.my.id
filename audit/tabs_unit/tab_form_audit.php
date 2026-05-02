@@ -1,3 +1,4 @@
+<?php require __DIR__ . '/../inc_audit_mark_all_role.php'; ?>
 <style>
   #tab-form .section-title {
     margin: 0 0 12px;
@@ -387,12 +388,49 @@
     margin-top: 12px;
   }
 
+  /* Disembunyikan hanya bila #tab-form tidak punya .show-bulk-actions (toggle: Ctrl+Alt+M, tersimpan di localStorage). */
   #tab-form .bulk-actions-wrap {
     display: none;
   }
 
   #tab-form.show-bulk-actions .bulk-actions-wrap {
     display: block;
+  }
+
+  #tab-form .bulk-toggle-bar {
+    margin-top: 12px;
+  }
+
+  #tab-form .btn-bulk-toggle {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--muted);
+    background: var(--card-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  }
+
+  #tab-form .btn-bulk-toggle:hover {
+    background: var(--card);
+    border-color: var(--line-strong);
+    color: var(--ink);
+  }
+
+  body.dark-mode #tab-form .btn-bulk-toggle {
+    color: #94a3b8;
+    background: #111827;
+    border-color: #334155;
+  }
+
+  body.dark-mode #tab-form .btn-bulk-toggle:hover {
+    color: #e5e7eb;
+    border-color: #475569;
   }
 
   #tab-form .bulk-actions .btn {
@@ -687,6 +725,7 @@
 
     #tab-form .mobile-card,
     #tab-form .section-toggle .section-chevron,
+    #tab-form .bulk-toggle-bar,
     #tab-form .bulk-actions-wrap,
     #tab-form .sticky-submit-wrap {
       display: none !important;
@@ -744,7 +783,7 @@
   }
 </style>
 
-<div id="tab-form" class="tab-pane active">
+<div id="tab-form" class="tab-pane active<?= !empty($auditMarkAllEnabled) ? ' show-bulk-actions' : '' ?>">
   <form method="post" enctype="multipart/form-data">
     <div class="section-card">
       <h2 class="section-title">Form Audit Unit</h2>
@@ -759,7 +798,11 @@
         <?php endforeach; ?>
       </select>
 
-      <div class="bulk-actions-wrap">
+      <?php if (!empty($auditMarkAllEnabled)): ?>
+      <div class="bulk-toggle-bar">
+        <button type="button" class="btn-bulk-toggle" id="bulkMarkAllToggle" aria-expanded="true" aria-controls="bulkMarkAllPanel">Sembunyikan tombol isi semua</button>
+      </div>
+      <div class="bulk-actions-wrap" id="bulkMarkAllPanel">
         <div class="bulk-actions">
           <button type="button" class="btn btn-primary" data-bulk-jawaban="ya">Semua Ya</button>
           <button type="button" class="btn btn-warning" data-bulk-jawaban="tidak">Semua Tidak</button>
@@ -767,6 +810,7 @@
         </div>
         <div class="small-note">Klik salah satu tombol untuk isi semua item sekaligus.</div>
       </div>
+      <?php endif; ?>
       <div class="progress-wrap">
         <div class="progress-head">
           <span>Progress Pengisian</span>
@@ -990,12 +1034,23 @@
     resizeCanvas();
   })();
 
+  <?php if (!empty($auditMarkAllEnabled)): ?>
   (function () {
     const tabForm = document.getElementById('tab-form');
     const bulkButtons = document.querySelectorAll('#tab-form [data-bulk-jawaban]');
     if (!bulkButtons.length || !tabForm) return;
 
     const STORAGE_KEY = 'auditUnitShowBulkActions';
+    const bulkToggleBtn = document.getElementById('bulkMarkAllToggle');
+
+    function syncBulkToggleUi() {
+      if (!bulkToggleBtn) return;
+      const visible = tabForm.classList.contains('show-bulk-actions');
+      bulkToggleBtn.setAttribute('aria-expanded', visible ? 'true' : 'false');
+      bulkToggleBtn.textContent = visible
+        ? 'Sembunyikan tombol isi semua'
+        : 'Tampilkan tombol isi semua';
+    }
 
     function setAllJawaban(targetValue) {
       const radios = document.querySelectorAll('#tab-form input[type="radio"][name^="jawaban["]');
@@ -1008,9 +1063,11 @@
         groupMap.get(radio.name).push(radio);
       });
 
+      const isMobileLayout = window.matchMedia('(max-width: 768px)').matches;
+
       groupMap.forEach((groupRadios) => {
-        // Each question appears twice (desktop + mobile) with same name.
-        // Browser only allows one checked radio per name, so pick visible input.
+        // Nama sama untuk baris tabel (desktop) & kartu HP. Sub bab tertutup = tak ada input "visible".
+        // Di HP tabel disembunyikan CSS; fallback harus memilih radio di .mobile-card agar saat dibuka tampilan cocok.
         const candidates = groupRadios.filter((radio) => radio.value === targetValue);
         if (!candidates.length) return;
 
@@ -1021,7 +1078,20 @@
             radio.offsetParent !== null;
         });
 
-        const targetRadio = visibleCandidate || candidates[0];
+        let targetRadio = visibleCandidate;
+
+        if (!targetRadio) {
+          const mobileCand = candidates.find((r) => r.closest('.mobile-card'));
+          const tableCand = candidates.find((r) => r.closest('.table-responsive'));
+          if (isMobileLayout && mobileCand) {
+            targetRadio = mobileCand;
+          } else if (!isMobileLayout && tableCand) {
+            targetRadio = tableCand;
+          } else {
+            targetRadio = candidates[0];
+          }
+        }
+
         if (targetRadio) {
           targetRadio.checked = true;
         }
@@ -1035,6 +1105,7 @@
       } catch (e) {
         // Ignore storage errors in restricted browser mode.
       }
+      syncBulkToggleUi();
     }
 
     function toggleBulkVisibility() {
@@ -1044,11 +1115,13 @@
 
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === '1') {
-        setBulkVisibility(true);
+      // Default: tampilkan tombol mark-all di semua perangkat (lihat class show-bulk-actions di HTML).
+      // Hanya sembunyikan jika pengguna pernah memilih menyembunyikan (Ctrl+Alt+M) dan tersimpan '0'.
+      if (saved === '0') {
+        setBulkVisibility(false);
       }
     } catch (e) {
-      // Ignore storage errors in restricted browser mode.
+      // Penyimpanan tidak tersedia (mis. mode privat): biarkan default dari HTML (tetap tampil).
     }
 
     bulkButtons.forEach((button) => {
@@ -1075,7 +1148,16 @@
         toggleBulkVisibility();
       }
     });
+
+    if (bulkToggleBtn) {
+      bulkToggleBtn.addEventListener('click', function () {
+        toggleBulkVisibility();
+      });
+    }
+
+    syncBulkToggleUi();
   })();
+  <?php endif; ?>
 
   (function () {
     const tabForm = document.getElementById('tab-form');

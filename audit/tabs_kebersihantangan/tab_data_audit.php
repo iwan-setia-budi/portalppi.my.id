@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+$ppiAuditCanDelete = ppi_audit_delete_allowed();
+?>
 <div id="tab-data" class="tab-pane active">
     <div class="section-card">
         <div class="section-title">Filter Data Audit</div>
@@ -90,10 +94,12 @@
                                         <a href="crud_kebersihantangan/edit_audit.php?id=<?= (int) $row['id'] ?>"
                                             class="btn btn-warning">Edit</a>
 
+                                        <?php if ($ppiAuditCanDelete): ?>
                                         <a href="crud_kebersihantangan/hapus_audit.php?id=<?= (int) $row['id'] ?>"
                                             class="btn btn-danger" onclick="return confirm('Yakin hapus data ini?')">
                                             Hapus
                                         </a>
+                                        <?php endif; ?>
                                     </div>
                                 </td>
                             </tr>

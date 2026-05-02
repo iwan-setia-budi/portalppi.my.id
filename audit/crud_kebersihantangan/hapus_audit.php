@@ -12,6 +12,9 @@ if ($id <= 0) {
   exit;
 }
 
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+ppi_require_admin_delete_redirect('../kebersihantangan.php?tab=tab-data');
+
 mysqli_begin_transaction($conn);
 
 try {

@@ -13,6 +13,9 @@ if ($id <= 0) {
   exit;
 }
 
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+ppi_require_admin_delete_redirect('../audit_kamar_jenazah.php?tab=tab-data');
+
 mysqli_begin_transaction($conn);
 try {
   mysqli_query($conn, "DELETE FROM audit_kamar_jenazah_foto WHERE audit_id = $id");

@@ -12,6 +12,9 @@ if ($id <= 0) {
   exit;
 }
 
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+ppi_require_admin_delete_redirect('../apd.php?tab=tab-data');
+
 $foto = '';
 $stmtFoto = mysqli_prepare($conn, "SELECT foto FROM audit_apd WHERE id = ?");
 if ($stmtFoto) {

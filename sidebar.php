@@ -1,3 +1,9 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/include/sidebar_access.php';
+?>
 <aside class="sidebar" id="sb">
     <div class="brand"><span class="dot"></span>
         <div class="name">PORTAL PPI</div>
@@ -11,6 +17,7 @@
           </span>
         </a>
 
+        <?php if (ppi_sidebar_show_module('regulasi')): ?>
         <details data-type="reg">
             <summary>
                 <span class="menu-left">
@@ -25,7 +32,9 @@
                 <li><a href="<?= base_url('regulasi/mou.php') ?>">MOU & Perizinan</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('komite')): ?>
         <details data-type="komite">
             <summary>
                 <span class="menu-left">
@@ -42,7 +51,9 @@
                 <li><a href="<?= base_url('komite/umanf.php') ?>">Uman Rapat</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('surveilance')): ?>
         <details data-type="surv">
             <summary>
                 <span class="menu-left">
@@ -57,7 +68,9 @@
                 <li><a href="<?= base_url('surveilance/emerging.php') ?>">Infeksi Emerging</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('audit')): ?>
         <details data-type="audit">
             <summary>
                 <span class="menu-left">
@@ -73,7 +86,9 @@
                 <li><a href="<?= base_url('audit/audit_eksternal.php') ?>">Audit Eksternal</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('diklat')): ?>
         <details data-type="diklat">
             <summary>
                 <span class="menu-left">
@@ -89,7 +104,9 @@
                 <li><a href="<?= base_url('diklat/materi.php') ?>">Semua Materi</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('dokumen')): ?>
         <details data-type="doc">
             <summary>
                 <span class="menu-left">
@@ -103,7 +120,9 @@
                 <li><a href="<?= base_url('dokumen/foto_video.php') ?>">Foto & Video</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('laporan')): ?>
         <details data-type="lap">
             <summary>
                 <span class="menu-left">
@@ -120,7 +139,9 @@
                 <li><a href="<?= base_url('laporan/hasilkultur.php') ?>">Hasil Kultur</a></li>
             </ul>
         </details>
+        <?php endif; ?>
 
+        <?php if (ppi_sidebar_show_module('drive')): ?>
         <details data-type="drive">
             <summary>
                 <span class="menu-left">
@@ -134,16 +155,19 @@
 
             </ul>
         </details>
+        <?php endif; ?>
 
 
 
         <div class="section">Lainnya</div>
+        <?php if (ppi_sidebar_show_module('master')): ?>
         <a class="root-link" href="<?= base_url('master/master-app.php') ?>">
             <span class="menu-left">
                 <span class="icon">🏥</span>
                 <span>Master Aplikasi</span>
             </span>
         </a>
+        <?php endif; ?>
         <ul style="list-style:none; padding:0; margin:0;">
             <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
             <li>

@@ -2,6 +2,8 @@
 require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
+require_once __DIR__ . '/../include/audit_delete_auth.php';
+$ppiAuditCanDelete = ppi_audit_delete_allowed();
 
 /* ================== SIMPAN DATA ================== */
 if(isset($_POST['action']) && $_POST['action']=='save'){
@@ -29,6 +31,10 @@ if(isset($_POST['action']) && $_POST['action']=='save'){
 
 /* ================== HAPUS ================== */
 if(isset($_POST['action']) && $_POST['action']=='delete'){
+    if (!ppi_audit_delete_allowed()) {
+        header('Location: supervise.php?delete_denied=1');
+        exit;
+    }
     $stmt = $conn->prepare("DELETE FROM tb_supervise WHERE id=?");
     $stmt->bind_param("i",$_POST['id']);
     $stmt->execute();
@@ -638,6 +644,7 @@ textarea {
                                         <td data-label="Aksi">
                                             <button class="action-btn view">Lihat</button>
                                             <button class="action-btn edit">Edit</button>
+                                            <?php if ($ppiAuditCanDelete): ?>
                                             <form method="post" style="display:inline;">
                                                 <input type="hidden" name="action" value="delete">
                                                 <input type="hidden" name="id" value="<?= $row['id']?>">
@@ -646,6 +653,7 @@ textarea {
                                                     Hapus
                                                 </button>
                                             </form>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                     <?php endwhile;?>

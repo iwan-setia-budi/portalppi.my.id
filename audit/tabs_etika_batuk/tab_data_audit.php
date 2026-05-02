@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/../../include/audit_delete_auth.php';
+$ppiAuditCanDelete = ppi_audit_delete_allowed();
+?>
 <style>
   #tab-data .data-title { margin: 0 0 12px; font-size: 20px; font-weight: 900; letter-spacing: -0.2px; }
   #tab-data .card-title { margin: 0 0 12px; font-size: 20px; font-weight: 900; letter-spacing: -0.2px; }
@@ -189,7 +193,9 @@ while ($tmp = mysqli_fetch_assoc($qData)) {
                   <div class="action-group">
                     <a class="icon-btn view" href="crud_etika_batuk/detail_audit.php?id=<?= (int) $row['id'] ?>" title="Lihat detail" aria-label="Lihat detail">👁</a>
                     <a class="icon-btn edit" href="crud_etika_batuk/edit_audit.php?id=<?= (int) $row['id'] ?>" title="Edit data" aria-label="Edit data">✏</a>
+                    <?php if ($ppiAuditCanDelete): ?>
                     <a class="icon-btn del" href="crud_etika_batuk/hapus_audit.php?id=<?= (int) $row['id'] ?>" title="Hapus data" aria-label="Hapus data" onclick="return confirm('Yakin hapus data ini?')">🗑</a>
+                    <?php endif; ?>
                   </div>
                 </td>
               </tr>
@@ -223,7 +229,9 @@ while ($tmp = mysqli_fetch_assoc($qData)) {
               <div class="mobile-actions">
                 <a class="icon-btn view" href="crud_etika_batuk/detail_audit.php?id=<?= (int) $row['id'] ?>" title="Lihat detail">👁</a>
                 <a class="icon-btn edit" href="crud_etika_batuk/edit_audit.php?id=<?= (int) $row['id'] ?>" title="Edit data">✏</a>
+                <?php if ($ppiAuditCanDelete): ?>
                 <a class="icon-btn del" href="crud_etika_batuk/hapus_audit.php?id=<?= (int) $row['id'] ?>" title="Hapus data" onclick="return confirm('Yakin hapus data ini?')">🗑</a>
+                <?php endif; ?>
               </div>
             </div>
           <?php endforeach; ?>
