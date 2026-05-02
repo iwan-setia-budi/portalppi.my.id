@@ -796,3 +796,34 @@ CREATE TABLE IF NOT EXISTS `audit_bundle_ido_foto` (
     FOREIGN KEY (`audit_id`) REFERENCES `audit_bundle_ido` (`id`)
     ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- =========================
+-- Dokumen diklat (Uman Diklat)
+-- Undangan, materi, absensi, pretest, posttest, sertifikat, foto (JSON array path)
+-- =========================
+
+CREATE TABLE IF NOT EXISTS `tb_uman_diklat` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `nama_diklat` varchar(255) NOT NULL,
+  `tanggal_diklat` date DEFAULT NULL COMMENT 'Tanggal pelaksanaan (filter & folder uploads/diklat/...)',
+  `upload_rel_dir` varchar(512) DEFAULT NULL COMMENT 'Path relatif dari uploads/, tanpa slash depan',
+  `file_undangan` varchar(512) DEFAULT NULL,
+  `file_materi` varchar(512) DEFAULT NULL,
+  `file_absensi` varchar(512) DEFAULT NULL,
+  `file_pretest` varchar(512) DEFAULT NULL,
+  `file_posttest` varchar(512) DEFAULT NULL,
+  `file_sertifikat` varchar(512) DEFAULT NULL,
+  `file_foto` longtext DEFAULT NULL COMMENT 'JSON array of stored file paths',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_uman_diklat_nama` (`nama_diklat`(191)),
+  KEY `idx_uman_diklat_tanggal` (`tanggal_diklat`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Jika tabel sudah ada tanpa kolom baru (jalankan sekali):
+-- ALTER TABLE `tb_uman_diklat`
+--   ADD COLUMN `tanggal_diklat` date DEFAULT NULL COMMENT 'Tanggal pelaksanaan' AFTER `nama_diklat`,
+--   ADD COLUMN `upload_rel_dir` varchar(512) DEFAULT NULL AFTER `tanggal_diklat`,
+--   ADD KEY `idx_uman_diklat_tanggal` (`tanggal_diklat`);

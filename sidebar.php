@@ -99,6 +99,7 @@ require_once __DIR__ . '/include/sidebar_access.php';
             </summary>
             <ul>
                 <li><a href="<?= base_url('diklat/jadwalpelatihan.php') ?>">Jadwal</a></li>
+                <li><a href="<?= base_url('diklat/uman_diklat.php') ?>">Uman Diklat</a></li>
                 <li><a href="<?= base_url('diklat/pelatihan_terlaksana.php') ?>">Hasil Pelaksanaan</a></li>
                 <li><a href="<?= base_url('diklat/sertifikat.php') ?>">Semua Sertifikat</a></li>
                 <li><a href="<?= base_url('diklat/materi.php') ?>">Semua Materi</a></li>

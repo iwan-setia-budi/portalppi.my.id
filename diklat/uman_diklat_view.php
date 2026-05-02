@@ -2,10 +2,11 @@
 require_once __DIR__ . '/../config/assets.php';
 include_once '../koneksi.php';
 include "../cek_akses.php";
+require_once __DIR__ . '/diklat_helpers.php';
 $conn = $koneksi;
 
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$stmt = mysqli_prepare($conn, "SELECT * FROM tb_umanf WHERE id = ? LIMIT 1");
+$stmt = mysqli_prepare($conn, "SELECT * FROM tb_uman_diklat WHERE id = ? LIMIT 1");
 mysqli_stmt_bind_param($stmt, "i", $id);
 mysqli_stmt_execute($stmt);
 $q = mysqli_stmt_get_result($stmt);
@@ -13,9 +14,11 @@ $data = mysqli_fetch_assoc($q);
 mysqli_stmt_close($stmt);
 
 if (!$data) {
-    echo "<script>alert('Data tidak ditemukan');location.href='umanf.php';<\/script>";
+    echo "<script>alert('Data tidak ditemukan');location.href='uman_diklat.php';<\/script>";
     exit;
 }
+
+$diklatTanggalTeks = ppi_diklat_format_tanggal_id(ppi_diklat_sort_date_ymd($data));
 
 function pathToUrl($path) {
     if (empty($path)) return '';
@@ -32,10 +35,12 @@ function pathToUrl($path) {
 function collectDownloadItems($data) {
     $items = [];
     $map = [
-        'file_undangan' => 'Undangan',
-        'file_materi'   => 'Materi',
-        'file_absensi'  => 'Absensi',
-        'file_notulen'  => 'Notulen',
+        'file_undangan'   => 'Undangan',
+        'file_materi'     => 'Materi',
+        'file_absensi'    => 'Absensi',
+        'file_pretest'    => 'Pretest',
+        'file_posttest'   => 'Posttest',
+        'file_sertifikat' => 'Sertifikat',
     ];
 
     foreach ($map as $key => $label) {
@@ -80,28 +85,28 @@ if (isset($_GET['download']) && $_GET['download'] == 'all') {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Unduh Semua Berkas</title>
         <style>
-            body { font-family: Arial, sans-serif; background: #f5f7fb; margin: 0; padding: 20px; color: #1e293b; }
+            body { font-family: system-ui, 'Segoe UI', sans-serif; background: #f5f7fb; margin: 0; padding: 20px; color: #1e293b; font-size: 16px; line-height: 1.5; }
             .wrap { max-width: 860px; margin: 0 auto; }
-            .card { background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.08); padding: 18px; }
-            h2 { margin: 0 0 6px; }
-            p { margin: 0 0 16px; color: #64748b; }
-            .row { display: grid; gap: 10px; }
-            .item { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 10px; }
+            .card { background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.08); padding: 22px 24px; }
+            h2 { margin: 0 0 10px; font-size: 1.5rem; }
+            .lead { margin: 0 0 18px; color: #475569; font-size: 1.05rem; }
+            .row { display: grid; gap: 12px; }
+            .item { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #e2e8f0; border-radius: 12px; }
             .name { min-width: 0; }
-            .name strong { display: block; }
-            .name span { font-size: 12px; color: #64748b; word-break: break-all; }
-            .btn { text-decoration: none; background: #0ea5e9; color: #fff; padding: 8px 12px; border-radius: 8px; font-size: 13px; white-space: nowrap; }
+            .name strong { display: block; font-size: 1.05rem; margin-bottom: 4px; }
+            .name span { font-size: 0.95rem; color: #64748b; word-break: break-all; }
+            .btn { text-decoration: none; background: #0ea5e9; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 1rem; font-weight: 600; white-space: nowrap; }
             .btn:hover { background: #0284c7; }
-            .actions { margin-top: 14px; display: flex; gap: 8px; flex-wrap: wrap; }
-            .btn-back { background: #334155; }
+            .actions { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+            .btn-back { background: #334155; font-weight: 600; }
             .btn-back:hover { background: #1e293b; }
         </style>
     </head>
     <body>
         <div class="wrap">
             <div class="card">
-                <h2>Semua Berkas Rapat</h2>
-                <p>Klik tombol Unduh di setiap berkas untuk mengunduh satu per satu.</p>
+                <h2>Unduh berkas diklat</h2>
+                <p class="lead">Klik <strong>Unduh</strong> pada tiap baris untuk menyimpan berkas satu per satu.</p>
 
                 <div class="row">
                     <?php if (!empty($downloadItems)): ?>
@@ -125,7 +130,7 @@ if (isset($_GET['download']) && $_GET['download'] == 'all') {
                 </div>
 
                 <div class="actions">
-                    <a class="btn btn-back" href="umanf_view.php?id=<?= (int)$id ?>">Kembali ke Detail</a>
+                    <a class="btn btn-back" href="uman_diklat_view.php?id=<?= (int)$id ?>">Kembali ke Detail</a>
                 </div>
             </div>
         </div>
@@ -139,10 +144,12 @@ $fotos       = !empty($data['file_foto']) ? json_decode($data['file_foto'], true
 $jumlahFoto  = count($fotos);
 
 $docSections = [
-    ['file_undangan', '📄', 'Undangan'],
-    ['file_materi',   '🧾', 'Materi'],
-    ['file_absensi',  '👥', 'Absensi'],
-    ['file_notulen',  '🖋️', 'Notulen'],
+    ['file_undangan',   '📄', 'Undangan'],
+    ['file_materi',     '🧾', 'Materi'],
+    ['file_absensi',    '👥', 'Absensi'],
+    ['file_pretest',    '📝', 'Pretest'],
+    ['file_posttest',   '📋', 'Posttest'],
+    ['file_sertifikat', '🏅', 'Sertifikat'],
 ];
 $availCount = 0;
 foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
@@ -152,7 +159,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Detail Rapat – <?= htmlspecialchars($data['jenis_rapat']) ?> | PPI PHBW</title>
+    <title>Detail Diklat – <?= htmlspecialchars($data['nama_diklat']) ?> | PPI PHBW</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= asset('assets/css/utama.css') ?>">
 
@@ -229,7 +236,8 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
         }
         .hero-label { font-size:12px; color:rgba(255,255,255,.65); font-weight:500; text-transform:uppercase; letter-spacing:.5px; }
         .hero-title { color:#fff; font-size:20px; font-weight:700; margin:4px 0 0; line-height:1.35; overflow-wrap:anywhere; word-break:break-word; }
-        .hero-actions { display:flex; gap:10px; flex-shrink:0; }
+        .hero-meta { font-size:13px; color:rgba(255,255,255,.82); margin-top:8px; font-weight:500; }
+        .hero-actions { display:flex; gap:10px; flex-shrink:0; flex-wrap:wrap; justify-content:flex-end; }
 
         /* ===== SUMMARY ROW ===== */
         .summary-row { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
@@ -244,7 +252,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
         .sum-icon.green { background:#f0fdf4; }
         .sum-icon.amber { background:#fffbeb; }
         .sum-val { font-size:24px; font-weight:800; color:#0f172a; line-height:1; }
-        .sum-lbl { font-size:11.5px; color:#64748b; margin-top:3px; font-weight:500; }
+        .sum-lbl { font-size:13px; color:#64748b; margin-top:3px; font-weight:600; }
 
         /* ===== TABS ===== */
         .tab-bar {
@@ -260,8 +268,8 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
             height: 4px;
         }
         .tab-btn {
-            padding:9px 18px; border:none; border-radius:10px;
-            font-size:13px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;
+            padding:10px 18px; border:none; border-radius:10px;
+            font-size:14px; font-weight:600; cursor:pointer; font-family:'Inter',sans-serif;
             display:flex; align-items:center; gap:7px; transition:all .2s;
             background:transparent; color:#64748b;
             white-space: nowrap;
@@ -271,7 +279,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
         .tab-btn.active { background:linear-gradient(135deg,#1565c0,#1e88e5); color:#fff; box-shadow:0 4px 12px rgba(30,136,229,.3); }
         .tab-badge {
             background:rgba(255,255,255,.25); border-radius:20px;
-            padding:2px 7px; font-size:11px; font-weight:700;
+            padding:3px 8px; font-size:12px; font-weight:700;
         }
         .tab-btn:not(.active) .tab-badge { background:#e2e8f0; color:#64748b; }
 
@@ -375,6 +383,9 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
             background: rgba(255, 255, 255, 0.12);
             border-color: rgba(191, 219, 254, 0.45);
             box-shadow: 0 6px 18px rgba(2, 6, 23, 0.32);
+        }
+        body.dark-mode .hero-meta {
+            color: rgba(226, 232, 240, 0.88);
         }
 
         body.dark-mode .sum-card {
@@ -605,15 +616,16 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
             <!-- HERO -->
             <div class="view-hero">
                 <div class="hero-left">
-                    <div class="hero-icon">🗂️</div>
+                    <div class="hero-icon">🎓</div>
                     <div>
-                        <div class="hero-label">Detail Dokumen Rapat</div>
-                        <div class="hero-title"><?= htmlspecialchars($data['jenis_rapat']) ?></div>
+                        <div class="hero-label">Detail Dokumen Diklat</div>
+                        <div class="hero-title"><?= htmlspecialchars($data['nama_diklat']) ?></div>
+                        <div class="hero-meta">📅 <?= htmlspecialchars($diklatTanggalTeks, ENT_QUOTES, 'UTF-8') ?></div>
                     </div>
                 </div>
                 <div class="hero-actions">
-                    <a href="?id=<?= $id ?>&download=all" class="btn btn-success">⬇️ Unduh Semua</a>
-                    <a href="umanf.php" class="btn btn-back">← Kembali</a>
+                    <a href="?id=<?= $id ?>&download=all" class="btn btn-success">⬇️ Unduh semua (daftar)</a>
+                    <a href="uman_diklat.php" class="btn btn-back">← Kembali</a>
                 </div>
             </div>
             <!-- SUMMARY -->
@@ -628,7 +640,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                 </div>
                 <div class="sum-card">
                     <div class="sum-icon amber">🗂️</div>
-                    <div><div class="sum-val"><?= 4 - $availCount ?></div><div class="sum-lbl">Dokumen Belum Ada</div></div>
+                    <div><div class="sum-val"><?= 6 - $availCount ?></div><div class="sum-lbl">Dokumen Belum Ada</div></div>
                 </div>
             </div>
             <!-- TABS -->
@@ -692,7 +704,7 @@ foreach ($docSections as [$key,$_,$__]) if (!empty($data[$key])) $availCount++;
                             <span class="dci">🖼️</span>
                             <h4>Dokumentasi Foto</h4>
                         </div>
-                        <span style="font-size:13px;color:#64748b;font-weight:600;"><?= $jumlahFoto ?> foto</span>
+                        <span style="font-size:14px;color:#64748b;font-weight:700;"><?= $jumlahFoto ?> foto</span>
                     </div>
                     <div class="doc-card-body">
                         <?php if ($jumlahFoto > 0): ?>
