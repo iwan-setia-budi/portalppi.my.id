@@ -86,8 +86,8 @@ if ($grafikPeriode === 'bulanan') {
 } else {
   $periodeLabel = 'Tahun ' . $grafikTahun;
 }
-$judulGrafik = 'Grafik Kepatuhan Audit Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
-$judulTren = 'Grafik Tren Kepatuhan Audit Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulGrafik = 'Grafik Kepatuhan Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulTren = 'Grafik Tren Kepatuhan Bundle VAP di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
 $subJudulGrafik = 'Kepatuhan per Item (' . $periodeLabel . ')';
 $subJudulTren = 'Tren Kepatuhan (' . $periodeLabel . ')';
 
@@ -316,7 +316,7 @@ foreach ($dataGrafik as $val) {
         <button type="button" class="btn btn-primary btn-download" id="btnDownloadGrafik">Download Gambar</button>
       </div>
     </div>
-    <div class="chart-wrap">
+    <div class="chart-wrap" id="grafikBundleVapExportWrap">
       <div class="chart-canvas-wrap">
         <canvas id="chartCssd"></canvas>
       </div>
@@ -355,6 +355,7 @@ foreach ($dataGrafik as $val) {
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
 <script>
   (function () {
     const whiteBackgroundPlugin = {
@@ -517,11 +518,52 @@ foreach ($dataGrafik as $val) {
 
     const btnDownload = document.getElementById('btnDownloadGrafik');
     if (btnDownload) {
-      btnDownload.addEventListener('click', function () {
-        const link = document.createElement('a');
-        link.href = chart.toBase64Image('image/png', 1);
-        link.download = 'grafik-kepatuhan-bundle-vap.png';
-        link.click();
+      btnDownload.addEventListener('click', async function () {
+        const wrap = document.getElementById('grafikBundleVapExportWrap');
+        const tryCanvasOnly = function () {
+          const link = document.createElement('a');
+          link.href = chart.toBase64Image('image/png', 1);
+          link.download = 'grafik-kepatuhan-bundle-vap.png';
+          link.click();
+        };
+        if (!wrap || typeof html2canvas !== 'function') {
+          tryCanvasOnly();
+          return;
+        }
+        const prevText = btnDownload.textContent;
+        btnDownload.disabled = true;
+        btnDownload.textContent = 'Menyiapkan…';
+        try {
+          chart.resize();
+          await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
+          const out = await html2canvas(wrap, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            onclone: function (doc) {
+              const w = doc.getElementById('grafikBundleVapExportWrap');
+              if (w) {
+                w.style.borderRadius = '14px';
+                w.style.background = '#ffffff';
+              }
+              const kk = doc.querySelector('#grafikBundleVapExportWrap .kode-keterangan-wrap');
+              if (kk) {
+                kk.style.background = '#f1f5f9';
+                kk.style.borderColor = '#e2e8f0';
+              }
+            }
+          });
+          const link = document.createElement('a');
+          link.href = out.toDataURL('image/png');
+          link.download = 'grafik-kepatuhan-bundle-vap.png';
+          link.click();
+        } catch (_e) {
+          tryCanvasOnly();
+        } finally {
+          btnDownload.disabled = false;
+          btnDownload.textContent = prevText;
+        }
       });
     }
 
