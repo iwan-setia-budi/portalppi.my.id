@@ -26,24 +26,54 @@ if ($grafikPeriode === 'bulanan') {
 $grafikWhereSql = count($grafikWhere) ? 'WHERE ' . implode(' AND ', $grafikWhere) : '';
 
 $labelGrafik = [];
+$labelGrafikNama = [];
+$kodeKeterangan = [];
 $dataGrafik = [];
+$itemLabelMap = [];
+if (isset($checklistSections) && is_array($checklistSections)) {
+  foreach ($checklistSections as $kode => $section) {
+    $items = $section['items'] ?? [];
+    foreach ($items as $idx => $itemText) {
+      $indikatorKode = sprintf('%s%04d', (string) $kode, $idx + 1);
+      $itemLabelMap[$indikatorKode] = (string) $itemText;
+    }
+  }
+}
+$grafikDataMap = [];
 $qGrafik = mysqli_query($conn, "
   SELECT
-    d.kode_bagian,
+    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+    MAX(d.item_text) AS item_text,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
   FROM audit_ambulance a
   JOIN detail_audit_ambulance d ON a.id = d.audit_id
   $grafikWhereSql
-  GROUP BY d.kode_bagian
-  ORDER BY d.kode_bagian ASC
+  GROUP BY d.kode_bagian, d.urutan_item
+  ORDER BY d.kode_bagian ASC, d.urutan_item ASC
 ");
 while ($row = mysqli_fetch_assoc($qGrafik)) {
-  $num = (int) ($row['num'] ?? 0);
-  $den = (int) ($row['denum'] ?? 0);
-  $labelGrafik[] = $row['kode_bagian'] ?? '-';
+  $kb = (string) ($row['kode_bagian'] ?? '');
+  if ($kb === '') {
+    continue;
+  }
+  $grafikDataMap[$kb] = $row;
+}
+foreach ($itemLabelMap as $indikatorKode => $namaItem) {
+  $row = $grafikDataMap[$indikatorKode] ?? null;
+  $num = $row ? (int) ($row['num'] ?? 0) : 0;
+  $den = $row ? (int) ($row['denum'] ?? 0) : 0;
+  $namaFinal = $namaItem !== '' ? $namaItem : (string) ($row['item_text'] ?? '');
+  $labelGrafik[] = $indikatorKode;
+  $labelGrafikNama[] = $namaFinal;
+  $kodeKeterangan[] = [
+    'kode' => $indikatorKode,
+    'nama' => $namaFinal,
+    'color_key' => count($kodeKeterangan) % 6,
+  ];
   $dataGrafik[] = $den > 0 ? round(($num / $den) * 100, 2) : 0;
 }
+$ikonKodeMap = [];
 $targetGrafik = array_fill(0, count($labelGrafik), $grafikTarget);
 $namaBulan = [
   1 => 'Januari', 2 => 'Februari', 3 => 'Maret', 4 => 'April',
@@ -58,9 +88,9 @@ if ($grafikPeriode === 'bulanan') {
 } else {
   $periodeLabel = 'Tahun ' . $grafikTahun;
 }
-$judulGrafik = 'Grafik Kepatuhan Audit Ambulance di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
-$judulTren = 'Grafik Tren Kepatuhan Audit Ambulance di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
-$subJudulGrafik = 'Kepatuhan per Bagian (' . $periodeLabel . ')';
+$judulGrafik = 'Grafik Kepatuhan Ambulance di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$judulTren = 'Grafik Tren Kepatuhan Ambulance di Rumah Sakit Primaya Bhakti Wara - ' . $periodeLabel;
+$subJudulGrafik = 'Kepatuhan per Item (' . $periodeLabel . ')';
 $subJudulTren = 'Tren Kepatuhan (' . $periodeLabel . ')';
 
 $trendMonthList = [];
@@ -152,6 +182,84 @@ foreach ($dataGrafik as $val) {
   #tab-grafik .chart-canvas-wrap { position: relative; width: 100%; height: 520px; }
   #tab-grafik .chart-canvas-wrap.is-trend { height: 480px; }
   #tab-grafik .chart-canvas-wrap canvas { width: 100% !important; height: 100% !important; display: block; }
+  #tab-grafik .kode-keterangan-wrap {
+    margin-top: -6px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    background: color-mix(in srgb, var(--card) 95%, #e2e8f0 5%);
+  }
+  #tab-grafik .kode-keterangan-title {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 900;
+    color: #334155;
+    letter-spacing: .2px;
+  }
+  #tab-grafik .kode-keterangan-subtitle {
+    margin: 0 0 10px;
+    color: #64748b;
+    font-size: 13px;
+  }
+  #tab-grafik .kode-keterangan-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+  }
+  #tab-grafik .kode-keterangan-item {
+    border: 1px solid transparent;
+    border-radius: 10px;
+    padding: 10px 10px 9px;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #1f2937;
+    background: #f8fafc;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 8px;
+    align-items: center;
+  }
+  #tab-grafik .kode-keterangan-item strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    margin-right: 6px;
+    color: #0f172a;
+    font-size: 12px;
+    min-width: 62px;
+  }
+  #tab-grafik .kode-keterangan-item.k0 { background: #eff6ff; border-color: #bfdbfe; }
+  #tab-grafik .kode-keterangan-item.k0 strong { background: #dbeafe; border-color: #93c5fd; color: #1e40af; }
+  #tab-grafik .kode-keterangan-item.k1 { background: #f0fdf4; border-color: #bbf7d0; }
+  #tab-grafik .kode-keterangan-item.k1 strong { background: #dcfce7; border-color: #86efac; color: #166534; }
+  #tab-grafik .kode-keterangan-item.k2 { background: #fffbeb; border-color: #fde68a; }
+  #tab-grafik .kode-keterangan-item.k2 strong { background: #fef3c7; border-color: #fcd34d; color: #92400e; }
+  #tab-grafik .kode-keterangan-item.k3 { background: #fef2f2; border-color: #fecaca; }
+  #tab-grafik .kode-keterangan-item.k3 strong { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+  #tab-grafik .kode-keterangan-item.k4 { background: #f5f3ff; border-color: #ddd6fe; }
+  #tab-grafik .kode-keterangan-item.k4 strong { background: #ede9fe; border-color: #c4b5fd; color: #5b21b6; }
+  #tab-grafik .kode-keterangan-item.k5 { background: #f0fdfa; border-color: #99f6e4; }
+  #tab-grafik .kode-keterangan-item.k5 strong { background: #ccfbf1; border-color: #5eead4; color: #115e59; }
+  #tab-grafik .kode-keterangan-item .kode-desc {
+    color: #334155;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.35;
+    min-height: calc(1.35em * 2);
+  }
+  #tab-grafik .kode-keterangan-item-main { min-width: 0; }
+  #tab-grafik .kode-keterangan-icon {
+    font-size: 26px;
+    line-height: 1;
+    opacity: .75;
+    align-self: center;
+    filter: saturate(.9);
+  }
   #tab-grafik .target-input { text-align: center; font-weight: 800; }
   @media (max-width: 900px) {
     #tab-grafik .filter-grid { grid-template-columns: 1fr; }
@@ -161,7 +269,15 @@ foreach ($dataGrafik as $val) {
     #tab-grafik .chart-wrap { padding: 16px 10px 14px; overflow: hidden; }
     #tab-grafik .chart-canvas-wrap { height: clamp(280px, 58vw, 340px); min-width: 0; }
     #tab-grafik .chart-canvas-wrap.is-trend { height: clamp(260px, 54vw, 320px); min-width: 0; }
+    #tab-grafik .kode-keterangan-grid { grid-template-columns: 1fr; }
   }
+  body.dark-mode #tab-grafik .kode-keterangan-wrap { background: color-mix(in srgb, var(--card) 90%, #0f172a 10%); }
+  body.dark-mode #tab-grafik .kode-keterangan-title { color: #cbd5e1; }
+  body.dark-mode #tab-grafik .kode-keterangan-subtitle { color: #94a3b8; }
+  body.dark-mode #tab-grafik .kode-keterangan-item { color: #e2e8f0; background: #0f172a; }
+  body.dark-mode #tab-grafik .kode-keterangan-item .kode-desc { color: #cbd5e1; }
+  body.dark-mode #tab-grafik .kode-keterangan-item strong { color: #f8fafc; }
+  body.dark-mode #tab-grafik .kode-keterangan-icon { opacity: .9; }
 </style>
 <div id="tab-grafik" class="tab-pane active">
   <div class="section-card">
@@ -202,10 +318,27 @@ foreach ($dataGrafik as $val) {
         <button type="button" class="btn btn-primary btn-download" id="btnDownloadGrafik">Download Gambar</button>
       </div>
     </div>
-    <div class="chart-wrap">
+    <div class="chart-wrap" id="grafikAmbulanceExportWrap">
       <div class="chart-canvas-wrap">
         <canvas id="chartCssd"></canvas>
       </div>
+      <?php if (count($kodeKeterangan) > 0): ?>
+        <div class="kode-keterangan-wrap">
+          <p class="kode-keterangan-title">Keterangan kode indikator</p>
+          <p class="kode-keterangan-subtitle">Penjelasan untuk setiap kode indikator yang digunakan pada grafik.</p>
+          <div class="kode-keterangan-grid">
+            <?php foreach ($kodeKeterangan as $ket): ?>
+              <div class="kode-keterangan-item k<?= (int) $ket['color_key'] ?>">
+                <div class="kode-keterangan-item-main">
+                  <strong><?= htmlspecialchars($ket['kode']) ?></strong>
+                  <span class="kode-desc"><?= htmlspecialchars($ket['nama'] !== '' ? $ket['nama'] : '-') ?></span>
+                </div>
+                <span class="kode-keterangan-icon"><?= htmlspecialchars($ikonKodeMap[$ket['kode']] ?? '📌') ?></span>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </div>
+      <?php endif; ?>
     </div>
   </div>
   <div class="section-card">
@@ -224,6 +357,7 @@ foreach ($dataGrafik as $val) {
 </div>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
 <script>
   (function () {
     const whiteBackgroundPlugin = {
@@ -340,14 +474,28 @@ foreach ($dataGrafik as $val) {
             formatter: function (value) {
               return Number(value).toFixed(1).replace('.0', '') + '%';
             }
+          },
+          tooltip: {
+            callbacks: {
+              title: function (items) {
+                if (!items || !items.length) return '';
+                return 'Kode ' + items[0].label;
+              },
+              afterBody: function (items) {
+                if (!items || !items.length) return '';
+                const namaItems = <?= json_encode($labelGrafikNama) ?>;
+                const idx = items[0].dataIndex;
+                return namaItems[idx] ? ['Indikator: ' + namaItems[idx]] : [];
+              }
+            }
           }
         },
         scales: {
           x: {
             ticks: {
               padding: 6,
-              autoSkip: true,
-              maxTicksLimit: 8,
+              autoSkip: false,
+              maxTicksLimit: 24,
               maxRotation: 0,
               minRotation: 0,
               font: {
@@ -372,11 +520,52 @@ foreach ($dataGrafik as $val) {
 
     const btnDownload = document.getElementById('btnDownloadGrafik');
     if (btnDownload) {
-      btnDownload.addEventListener('click', function () {
-        const link = document.createElement('a');
-        link.href = chart.toBase64Image('image/png', 1);
-        link.download = 'grafik-kepatuhan-ambulance.png';
-        link.click();
+      btnDownload.addEventListener('click', async function () {
+        const wrap = document.getElementById('grafikAmbulanceExportWrap');
+        const tryCanvasOnly = function () {
+          const link = document.createElement('a');
+          link.href = chart.toBase64Image('image/png', 1);
+          link.download = 'grafik-kepatuhan-ambulance.png';
+          link.click();
+        };
+        if (!wrap || typeof html2canvas !== 'function') {
+          tryCanvasOnly();
+          return;
+        }
+        const prevText = btnDownload.textContent;
+        btnDownload.disabled = true;
+        btnDownload.textContent = 'Menyiapkan…';
+        try {
+          chart.resize();
+          await new Promise(function (r) { requestAnimationFrame(function () { requestAnimationFrame(r); }); });
+          const out = await html2canvas(wrap, {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#ffffff',
+            logging: false,
+            onclone: function (doc) {
+              const w = doc.getElementById('grafikAmbulanceExportWrap');
+              if (w) {
+                w.style.borderRadius = '14px';
+                w.style.background = '#ffffff';
+              }
+              const kk = doc.querySelector('#grafikAmbulanceExportWrap .kode-keterangan-wrap');
+              if (kk) {
+                kk.style.background = '#f1f5f9';
+                kk.style.borderColor = '#e2e8f0';
+              }
+            }
+          });
+          const link = document.createElement('a');
+          link.href = out.toDataURL('image/png');
+          link.download = 'grafik-kepatuhan-ambulance.png';
+          link.click();
+        } catch (_e) {
+          tryCanvasOnly();
+        } finally {
+          btnDownload.disabled = false;
+          btnDownload.textContent = prevText;
+        }
       });
     }
 

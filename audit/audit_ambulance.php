@@ -216,19 +216,24 @@ $rekapWhereSql = count($rekapWhere) ? 'WHERE ' . implode(' AND ', $rekapWhere) :
 
 $qRekapBagian = mysqli_query($conn, "
   SELECT
-    d.kode_bagian,
+    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+    MAX(d.item_text) AS item_text,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
   FROM audit_ambulance a
   JOIN detail_audit_ambulance d ON a.id = d.audit_id
   $rekapWhereSql
-  GROUP BY d.kode_bagian
-  ORDER BY d.kode_bagian ASC
+  GROUP BY d.kode_bagian, d.urutan_item
+  ORDER BY d.kode_bagian ASC, d.urutan_item ASC
 ");
 
-$bagianLabelsExport = [
-  'B00' => 'Checklist Audit Ambulance',
-];
+$bagianLabelsExport = [];
+foreach ($checklistSections as $kode => $section) {
+  foreach (($section['items'] ?? []) as $idx => $itemText) {
+    $indikatorKode = sprintf('%s%04d', (string) $kode, $idx + 1);
+    $bagianLabelsExport[$indikatorKode] = (string) $itemText;
+  }
+}
 
 if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
   $downloadType = $_GET['download_rekap'];
@@ -258,14 +263,15 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
     fputcsv($output, ['Periode', 'Tahun', 'Bulan', 'Triwulan', 'Kode Bagian', 'Nama Bagian', 'Num', 'Denum', 'Persentase']);
     $qExportBagian = mysqli_query($conn, "
       SELECT
-        d.kode_bagian,
+        CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+        MAX(d.item_text) AS item_text,
         SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
         COUNT(*) AS denum
       FROM audit_ambulance a
       JOIN detail_audit_ambulance d ON a.id = d.audit_id
       $rekapWhereSql
-      GROUP BY d.kode_bagian
-      ORDER BY d.kode_bagian ASC
+      GROUP BY d.kode_bagian, d.urutan_item
+      ORDER BY d.kode_bagian ASC, d.urutan_item ASC
     ");
 
     while ($row = mysqli_fetch_assoc($qExportBagian)) {
@@ -279,7 +285,7 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         $rekapPeriode === 'bulanan' ? $rekapBulan : '',
         $rekapPeriode === 'triwulan' ? $rekapTriwulan : '',
         $kode,
-        $bagianLabelsExport[$kode] ?? 'Bagian Audit',
+        $bagianLabelsExport[$kode] ?? ($row['item_text'] ?? 'Bagian Audit'),
         $num,
         $den,
         $pct
@@ -298,15 +304,16 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
 
     $qExportPeriode = mysqli_query($conn, "
       SELECT
-        d.kode_bagian,
+        CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+        MAX(d.item_text) AS item_text,
         MONTH(a.tanggal_audit) AS bulan,
         SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
         COUNT(*) AS denum
       FROM audit_ambulance a
       JOIN detail_audit_ambulance d ON a.id = d.audit_id
       $matrixWhereSql
-      GROUP BY d.kode_bagian, MONTH(a.tanggal_audit)
-      ORDER BY d.kode_bagian ASC, MONTH(a.tanggal_audit) ASC
+      GROUP BY d.kode_bagian, d.urutan_item, MONTH(a.tanggal_audit)
+      ORDER BY d.kode_bagian ASC, d.urutan_item ASC, MONTH(a.tanggal_audit) ASC
     ");
 
     fputcsv($output, ['Periode', 'Tahun', 'Bulan', 'Triwulan', 'Kode Bagian', 'Nama Bagian', 'Bulan Data', 'Num', 'Denum', 'Persentase']);
@@ -321,7 +328,7 @@ if (isset($_GET['download_rekap']) && $_GET['download_rekap'] !== '') {
         $rekapPeriode === 'bulanan' ? $rekapBulan : '',
         $rekapPeriode === 'triwulan' ? $rekapTriwulan : '',
         $kode,
-        $bagianLabelsExport[$kode] ?? 'Bagian Audit',
+        $bagianLabelsExport[$kode] ?? ($row['item_text'] ?? 'Bagian Audit'),
         (int) ($row['bulan'] ?? 0),
         $num,
         $den,

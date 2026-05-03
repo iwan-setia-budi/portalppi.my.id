@@ -115,23 +115,55 @@
 </style>
 
 <?php
-$bagianLabels = [
-  'B00' => 'Checklist Audit Ambulance',
-];
+$bagianLabels = [];
+if (isset($checklistSections) && is_array($checklistSections)) {
+  foreach ($checklistSections as $kode => $section) {
+    $items = $section['items'] ?? [];
+    foreach ($items as $idx => $itemText) {
+      $indikatorKode = sprintf('%s%04d', (string) $kode, $idx + 1);
+      $bagianLabels[$indikatorKode] = (string) $itemText;
+    }
+  }
+}
+$rekapRowsMap = [];
+while ($row = mysqli_fetch_assoc($qRekapBagian)) {
+  $kb = (string) ($row['kode_bagian'] ?? '');
+  if ($kb === '') {
+    continue;
+  }
+  $rekapRowsMap[$kb] = [
+    'kode_bagian' => $kb,
+    'item_text' => (string) ($row['item_text'] ?? ''),
+    'num' => (int) ($row['num'] ?? 0),
+    'denum' => (int) ($row['denum'] ?? 0),
+  ];
+}
+$kodeUrutan = array_keys($bagianLabels);
+if (count($kodeUrutan) === 0) {
+  $kodeDariData = array_keys($rekapRowsMap);
+  $kodeUrutan = array_values(array_filter($kodeDariData, static function ($v) {
+    return $v !== '';
+  }));
+}
+sort($kodeUrutan);
+
 $rekapRows = [];
 $totalNum = 0;
 $totalDenum = 0;
-while ($row = mysqli_fetch_assoc($qRekapBagian)) {
-  $num = (int) ($row['num'] ?? 0);
-  $den = (int) ($row['denum'] ?? 0);
+foreach ($kodeUrutan as $kode) {
+  $src = $rekapRowsMap[$kode] ?? null;
+  $num = $src ? (int) $src['num'] : 0;
+  $den = $src ? (int) $src['denum'] : 0;
   $persen = $den > 0 ? round(($num / $den) * 100, 1) : 0;
   $scoreClass = $persen >= 95 ? 'good' : ($persen >= 80 ? 'warn' : 'bad');
+  $namaBaris = $bagianLabels[$kode] ?? ($src['item_text'] ?? '');
   $rekapRows[] = [
-    'kode_bagian' => $row['kode_bagian'],
+    'kode_bagian' => $kode,
+    'item_text' => $namaBaris,
     'num' => $num,
     'denum' => $den,
     'persen' => $persen,
-    'score_class' => $scoreClass
+    'score_class' => $scoreClass,
   ];
   $totalNum += $num;
   $totalDenum += $den;
@@ -142,8 +174,6 @@ $namaBulanPendek = [
   1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'Mei', 6 => 'Jun',
   7 => 'Jul', 8 => 'Agu', 9 => 'Sep', 10 => 'Okt', 11 => 'Nov', 12 => 'Des'
 ];
-$kodeUrutan = array_keys($bagianLabels);
-sort($kodeUrutan);
 
 $matrixWhere = ["YEAR(a.tanggal_audit) = $rekapTahun"];
 if ($rekapPeriode === 'bulanan') {
@@ -157,14 +187,15 @@ $matrixWhereSql = 'WHERE ' . implode(' AND ', $matrixWhere);
 
 $qMatrix = mysqli_query($conn, "
   SELECT
-    d.kode_bagian,
+    CONCAT(d.kode_bagian, LPAD(d.urutan_item, 4, '0')) AS kode_bagian,
+    MAX(d.item_text) AS item_text,
     MONTH(a.tanggal_audit) AS bln,
     SUM(CASE WHEN d.jawaban = 'ya' THEN 1 ELSE 0 END) AS num,
     COUNT(*) AS denum
   FROM audit_ambulance a
   JOIN detail_audit_ambulance d ON a.id = d.audit_id
   $matrixWhereSql
-  GROUP BY d.kode_bagian, MONTH(a.tanggal_audit)
+  GROUP BY d.kode_bagian, d.urutan_item, MONTH(a.tanggal_audit)
 ");
 
 $matrixData = [];
@@ -298,7 +329,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
               <tr>
                 <td><strong><?= htmlspecialchars($row['kode_bagian']) ?></strong></td>
                 <td>
-                  <?= htmlspecialchars($bagianLabels[$row['kode_bagian']] ?? 'Bagian Audit') ?>
+                  <?= htmlspecialchars($bagianLabels[$row['kode_bagian']] ?? ($row['item_text'] !== '' ? $row['item_text'] : 'Bagian Audit')) ?>
                 </td>
                 <td class="center">
                   <span class="score-pill <?= $row['score_class'] ?>"><?= $row['persen'] ?>% (<?= $row['num'] ?>/<?= $row['denum'] ?>)</span>
@@ -370,7 +401,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
                   <tr>
                     <td><strong><?= htmlspecialchars($row['kode_bagian']) ?></strong></td>
                     <td>
-                      <?= htmlspecialchars($bagianLabels[$row['kode_bagian']] ?? '') ?>
+                      <?= htmlspecialchars($bagianLabels[$row['kode_bagian']] ?? ($row['item_text'] !== '' ? $row['item_text'] : '')) ?>
                     </td>
                     <td class="center">
                       <span class="score-pill <?= $row['score_class'] ?>"><?= $row['persen'] ?>% (<?= $row['num'] ?>/<?= $row['denum'] ?>)</span>
@@ -395,7 +426,7 @@ $matrixFooterGrandPct = $matrixFooterGrandD > 0 ? round(($matrixFooterGrandN / $
             <?php foreach ($rekapRows as $row): ?>
               <div class="mobile-item">
                 <h4 class="subheading-level-2"><?= htmlspecialchars($row['kode_bagian']) ?></h4>
-                <div class="subheading-level-4" style="color:#64748b;margin-bottom:8px;"><?= htmlspecialchars($bagianLabels[$row['kode_bagian']] ?? '') ?></div>
+                <div class="subheading-level-4" style="color:#64748b;margin-bottom:8px;"><?= htmlspecialchars($bagianLabels[$row['kode_bagian']] ?? ($row['item_text'] !== '' ? $row['item_text'] : '')) ?></div>
                 <div class="center">
                   <span class="score-pill <?= $row['score_class'] ?>"><?= $row['persen'] ?>% (<?= $row['num'] ?>/<?= $row['denum'] ?>)</span>
                 </div>
